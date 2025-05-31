@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório Ev.C.S. - Calculadora de Compacidade</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #3f51b5;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background-color: #303f9f;
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            padding: 0;
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info .status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        
+        .content-area {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            min-height: calc(100vh - 140px);
+        }
+        
+        .welcome-message {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .welcome-message h2 {
+            font-size: 2rem;
+            color: #3f51b5;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-message p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+        
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        .login-card {
+            width: 400px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h2 {
+            color: #3f51b5;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .login-header p {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .login-form input:focus {
+            border-color: #3f51b5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+        }
+        
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .login-form button:hover {
+            background-color: #303f9f;
+        }
+        
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .login-options a {
+            color: #3f51b5;
+            text-decoration: none;
+        }
+        
+        .login-options a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+            }
+            
+            .login-card {
+                width: 90%;
+                max-width: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Conteúdo será carregado dinamicamente -->
+    </div>
+
+    <script>
+        // Verificar se o usuário está autenticado
+        function verificarAutenticacao() {
+            return localStorage.getItem('usuario_autenticado') === 'true';
+        }
+        
+        // Carregar página de login
+        function carregarLogin() {
+            document.getElementById('app').innerHTML = `
+                <div class="login-container">
+                    <div class="login-card">
+                        <div class="login-header">
+                            <h2>Laboratório Ev.C.S.</h2>
+                            <p>Calculadora de Compacidade</p>
+                        </div>
+                        <form class="login-form" id="login-form">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" placeholder="Seu email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="senha">Senha</label>
+                                <input type="password" id="senha" placeholder="Sua senha" required>
+                            </div>
+                            <button type="submit">Entrar</button>
+                            <div class="login-options">
+                                <a href="#" id="btn-offline">Entrar em modo offline</a>
+                                <a href="#">Esqueceu a senha?</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            // Configurar evento de login
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const senha = document.getElementById('senha').value;
+                
+                // Simulação de autenticação
+                if (email && senha) {
+                    localStorage.setItem('usuario_autenticado', 'true');
+                    localStorage.setItem('usuario_nome', email.split('@')[0]);
+                    localStorage.setItem('usuario_email', email);
+                    carregarDashboard();
+                }
+            });
+            
+            // Configurar modo offline
+            document.getElementById('btn-offline').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.setItem('usuario_autenticado', 'true');
+                localStorage.setItem('usuario_nome', 'Usuário Offline');
+                localStorage.setItem('usuario_email', 'offline@exemplo.com');
+                carregarDashboard();
+            });
+        }
+        
+        // Carregar dashboard
+        function carregarDashboard() {
+            const nomeUsuario = localStorage.getItem('usuario_nome') || 'Usuário';
+            
+            document.getElementById('app').innerHTML = `
+                <div class="container">
+                    <div class="sidebar">
+                        <div class="sidebar-header">
+                            <h2>Laboratório Ev.C.S.</h2>
+                            <p>Calculadora de Compacidade</p>
+                        </div>
+                        <ul class="sidebar-menu">
+                            <li>
+                                <a href="#" class="menu-item active" data-page="dashboard">
+                                    <i class="fas fa-home"></i> Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="menu-item" data-type="in-situ">
+                                    <i class="fas fa-ruler-vertical"></i> Densidade In Situ
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="menu-item" data-type="real">
+                                    <i class="fas fa-balance-scale"></i> Densidade Real
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="menu-item" data-type="max-min">
+                                    <i class="fas fa-balance-scale-left"></i> Densidade Máx/Min
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="menu-item" data-page="relatorios">
+                                    <i class="fas fa-file-alt"></i> Relatórios
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="btn-logout">
+                                    <i class="fas fa-sign-out-alt"></i> Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="main-content">
+                        <div class="top-bar">
+                            <h2>Dashboard</h2>
+                            <div class="user-info">
+                                <span>${nomeUsuario}</span>
+                                <span class="status"></span>
+                            </div>
+                        </div>
+                        <div class="content-area" id="content">
+                            <div class="welcome-message">
+                                <h2>Bem-vindo à Calculadora de Compacidade</h2>
+                                <p>Selecione uma opção no menu para começar.</p>
+                            </div>
+                        </div>
+                        <div class="footer">
+                            © 2025 Laboratório Ev.C.S. - Todos os direitos reservados
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Configurar eventos do menu
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Atualizar item ativo no menu
+                    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Atualizar título da página
+                    const topBar = document.querySelector('.top-bar h2');
+                    
+                    if (this.dataset.page) {
+                        // Carregar página específica
+                        switch (this.dataset.page) {
+                            case 'dashboard':
+                                topBar.textContent = 'Dashboard';
+                                document.getElementById('content').innerHTML = `
+                                    <div class="welcome-message">
+                                        <h2>Bem-vindo à Calculadora de Compacidade</h2>
+                                        <p>Selecione uma opção no menu para começar.</p>
+                                    </div>
+                                `;
+                                break;
+                            case 'relatorios':
+                                topBar.textContent = 'Relatórios';
+                                document.getElementById('content').innerHTML = `
+                                    <div class="welcome-message">
+                                        <h2>Relatórios</h2>
+                                        <p>Funcionalidade em desenvolvimento.</p>
+                                    </div>
+                                `;
+                                break;
+                        }
+                    } else if (this.dataset.type) {
+                        // Carregar tipo de ensaio
+                        const tipoEnsaio = this.dataset.type;
+                        window.currentEnsaioType = tipoEnsaio;
+                        
+                        switch (tipoEnsaio) {
+                            case 'in-situ':
+                                topBar.textContent = 'Densidade In Situ';
+                                window.currentCalculadoraUrl = '/templates/densidade_in_situ.html';
+                                break;
+                            case 'real':
+                                topBar.textContent = 'Densidade Real';
+                                window.currentCalculadoraUrl = '/templates/densidade_real.html';
+                                break;
+                            case 'max-min':
+                                topBar.textContent = 'Densidade Máxima e Mínima';
+                                window.currentCalculadoraUrl = '/templates/densidade_max_min.html';
+                                break;
+                        }
+                        
+                        // Carregar lista de ensaios
+                        loadContent('/templates/lista_ensaios.html', tipoEnsaio);
+                    }
+                });
+            });
+            
+            // Configurar evento de logout
+            document.getElementById('btn-logout').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('usuario_autenticado');
+                localStorage.removeItem('usuario_nome');
+                localStorage.removeItem('usuario_email');
+                carregarLogin();
+            });
+        }
+        
+        // Função para carregar conteúdo
+        window.loadContent = function(url, tipoEnsaio, dadosEnsaio = null) {
+            console.log(`Carregando ${url} para tipo ${tipoEnsaio}`);
+            
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('content').innerHTML = html;
+                    
+                    // Se for edição, armazenar dados para o formulário
+                    if (dadosEnsaio) {
+                        localStorage.setItem('ensaio_edicao', JSON.stringify(dadosEnsaio));
+                    }
+                    
+                    // Configurar eventos após carregar o conteúdo
+                    setTimeout(() => {
+                        // Configurar botão Novo Ensaio se estiver na lista de ensaios
+                        if (url.includes('lista_ensaios')) {
+                            const btnNovoEnsaio = document.querySelector('.btn-novo-ensaio');
+                            if (btnNovoEnsaio) {
+                                btnNovoEnsaio.addEventListener('click', function() {
+                                    console.log('Botão Novo Ensaio clicado');
+                                    
+                                    if (!tipoEnsaio || !window.currentCalculadoraUrl) {
+                                        console.error('Tipo de ensaio ou URL da calculadora não definidos');
+                                        alert('Erro: Tipo de ensaio ou URL da calculadora não definidos');
+                                        return;
+                                    }
+                                    
+                                    console.log(`Criando novo ensaio do tipo ${tipoEnsaio} com URL ${window.currentCalculadoraUrl}`);
+                                    
+                                    // Limpar dados de edição
+                                    localStorage.removeItem('ensaio_edicao');
+                                    
+                                    // Carregar calculadora vazia
+                                    window.loadContent(window.currentCalculadoraUrl, tipoEnsaio, null);
+                                });
+                            }
+                        }
+                    }, 100);
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar conteúdo:', error);
+                    document.getElementById('content').innerHTML = `
+                        <div class="welcome-message">
+                            <h2>Erro ao carregar conteúdo</h2>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                });
+        };
+        
+        // Inicializar aplicação
+        document.addEventListener('DOMContentLoaded', function() {
+            if (verificarAutenticacao()) {
+                carregarDashboard();
+            } else {
+                carregarLogin();
+            }
+            
+            // Adicionar evento global para botão Novo Ensaio
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-novo-ensaio')) {
+                    console.log('Evento global: Botão Novo Ensaio clicado');
+                    
+                    const tipoEnsaio = window.currentEnsaioType;
+                    const calculadoraUrl = window.currentCalculadoraUrl;
+                    
+                    if (!tipoEnsaio || !calculadoraUrl) {
+                        console.error('Tipo de ensaio ou URL da calculadora não definidos');
+                        alert('Erro: Tipo de ensaio ou URL da calculadora não definidos');
+                        return;
+                    }
+                    
+                    console.log(`Criando novo ensaio do tipo ${tipoEnsaio} com URL ${calculadoraUrl}`);
+                    
+                    // Limpar dados de edição
+                    localStorage.removeItem('ensaio_edicao');
+                    
+                    // Carregar calculadora vazia
+                    window.loadContent(calculadoraUrl, tipoEnsaio, null);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório Ev.C.S. - Calculadora de Compacidade</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        /* Estilos específicos para o layout com menu lateral */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #3f51b5;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-container h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .logo-container p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-name {
+            margin-right: 10px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            display: inline-block;
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover {
+            background-color: #f0f0f0;
+            color: #3f51b5;
+        }
+        
+        .sidebar-menu a.active {
+            background-color: #e3f2fd;
+            color: #3f51b5;
+            border-left: 4px solid #3f51b5;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .welcome-screen {
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        
+        .welcome-screen h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-screen p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .auth-status {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            margin-top: 30px;
+        }
+        
+        .footer {
+            background-color: #3f51b5;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .content-area {
+                order: 1;
+            }
+            
+            .sidebar-menu a {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <h1>Laboratório Ev.C.S.</h1>
+            <p>Calculadora de Compacidade</p>
+        </div>
+        <div class="user-info">
+            <span class="user-name" id="user-name">Carregando...</span>
+            <span class="status-indicator"></span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#" class="menu-item" data-ensaio="in-situ" data-lista="/templates/lista_ensaios.html" data-calculadora="/templates/densidade_in_situ.html">
+                        <i class="fas fa-flask"></i> Densidade In Situ
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-ensaio="real" data-lista="/templates/lista_ensaios.html" data-calculadora="/templates/densidade_real.html">
+                        <i class="fas fa-microscope"></i> Densidade Real
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-ensaio="max-min" data-lista="/templates/lista_ensaios.html" data-calculadora="/templates/densidade_max_min.html">
+                        <i class="fas fa-vial"></i> Densidade Máx/Mín
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-ensaio="relatorios">
+                        <i class="fas fa-file-alt"></i> Relatórios
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="content-area" id="content">
+            <div class="welcome-screen">
+                <h2>Bem-vindo à Calculadora de Compacidade</h2>
+                <p>Selecione uma opção no menu para começar.</p>
+                
+                <div class="auth-status">
+                    <p id="auth-status-message">Você está autenticado no sistema.</p>
+                    <p id="user-details"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Laboratório Ev.C.S. - Todos os direitos reservados</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticação
+            if (localStorage.getItem('authenticated') !== 'true') {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Exibir informações do usuário
+            const userName = localStorage.getItem('user_name') || 'Usuário';
+            const userEmail = localStorage.getItem('user_email') || '';
+            
+            document.getElementById('user-name').textContent = userName;
+            
+            const userDetails = document.getElementById('user-details');
+            if (userDetails) {
+                if (localStorage.getItem('offline_mode') === 'true') {
+                    userDetails.innerHTML = 'Você está no modo offline. Algumas funcionalidades podem estar limitadas.';
+                } else {
+                    userDetails.innerHTML = `
+                        <strong>Nome:</strong> ${userName}<br>
+                        <strong>Email:</strong> ${userEmail}
+                    `;
+                }
+            }
+            
+            // Configurar logout
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('user_name');
+                localStorage.removeItem('user_email');
+                localStorage.removeItem('offline_mode');
+                window.location.href = 'index.html';
+            });
+            
+            // Configurar menu lateral
+            const menuItems = document.querySelectorAll('.menu-item');
+            const contentArea = document.getElementById('content');
+            
+            let currentEnsaioType = null;
+            let currentListaUrl = null;
+            
+            // Mapeia os tipos de ensaio para nomes mais amigáveis
+            const tiposEnsaioNomes = {
+                'in-situ': 'Densidade In Situ',
+                'real': 'Densidade Real',
+                'max-min': 'Densidade Máxima e Mínima'
+            };
+            
+            // Função para carregar conteúdo dinamicamente
+            async function loadContent(url, ensaioType = null, data = null) {
+                console.log(`Tentando carregar ${url} para o tipo: ${ensaioType} com dados:`, data);
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Erro ao carregar ${url}: ${response.statusText}`);
+                    }
+                    const html = await response.text();
+                    contentArea.innerHTML = html;
+                    console.log(`Conteúdo de ${url} carregado.`);
+                    
+                    // Passa o tipo de ensaio para o script carregado, se houver
+                    window.currentEnsaioType = ensaioType;
+                    window.currentListaUrl = currentListaUrl; // Passa a URL da lista atual
+                    window.ensaioData = data; // Passa os dados para edição
+                    
+                    // Executa scripts inline após carregar o HTML
+                    executeInlineScripts(contentArea);
+                    
+                    // Adiciona botão "Voltar para Lista" se estiver na calculadora
+                    if (url.includes('densidade_')) {
+                        addVoltarButton(contentArea);
+                    }
+                    
+                } catch (error) {
+                    console.error('Erro ao carregar conteúdo:', error);
+                    contentArea.innerHTML = `<p style="color: red;">Erro ao carregar conteúdo: ${error.message}</p>`;
+                }
+            }
+            
+            // Função para executar scripts inline
+            function executeInlineScripts(container) {
+                const scripts = container.querySelectorAll("script");
+                scripts.forEach(script => {
+                    const newScript = document.createElement("script");
+                    if (script.src) {
+                        // Se for script externo, apenas clona (pode não funcionar como esperado para todos os casos)
+                        newScript.src = script.src;
+                    } else {
+                        // Se for script inline, copia o conteúdo
+                        newScript.textContent = script.textContent;
+                    }
+                    // Remove o script original e adiciona o novo para forçar a execução
+                    script.parentNode.removeChild(script);
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript); // Executa no escopo global
+                });
+            }
+            
+            // Função para adicionar botão "Voltar para Lista"
+            function addVoltarButton(container) {
+                const form = container.querySelector('form.calculadora-container');
+                if (form) {
+                    const voltarBtn = document.createElement('button');
+                    voltarBtn.type = 'button'; // Evita submit do form
+                    voltarBtn.className = 'btn-voltar-lista';
+                    voltarBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Voltar para Lista';
+                    voltarBtn.style.cssText = 'padding: 10px 15px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px;';
+                    
+                    // Adiciona o botão antes dos botões de ação existentes ou no final do form
+                    const actionButtons = form.querySelector('.form-actions'); // Supondo que exista uma div para botões
+                    if (actionButtons) {
+                        actionButtons.insertBefore(voltarBtn, actionButtons.firstChild);
+                    } else {
+                        form.appendChild(voltarBtn);
+                    }
+                }
+            }
+            
+            // Adiciona listeners aos itens do menu
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove classe active de todos os itens
+                    menuItems.forEach(mi => mi.classList.remove('active'));
+                    // Adiciona classe active ao item clicado
+                    this.classList.add('active');
+                    
+                    const ensaioType = this.getAttribute('data-ensaio');
+                    const listaUrl = this.getAttribute('data-lista');
+                    const calculadoraUrl = this.getAttribute('data-calculadora');
+                    
+                    if (ensaioType === 'relatorios') {
+                        // Implementação futura para relatórios
+                        contentArea.innerHTML = '<div class="welcome-screen"><h2>Relatórios</h2><p>Funcionalidade em desenvolvimento.</p></div>';
+                        return;
+                    }
+                    
+                    if (listaUrl) {
+                        currentEnsaioType = ensaioType;
+                        currentListaUrl = listaUrl; // Guarda a URL da lista para o botão Voltar
+                        window.currentCalculadoraUrl = calculadoraUrl; // Guarda a URL da calculadora para o botão Novo/Editar
+                        loadContent(listaUrl, ensaioType);
+                    }
+                });
+            });
+            
+            // Delegação de eventos para botões carregados dinamicamente
+            contentArea.addEventListener('click', async (event) => {
+                const target = event.target;
+                
+                // Botão Novo Ensaio (na lista)
+                if (target.classList.contains('btn-novo-ensaio')) {
+                    console.log('Botão Novo Ensaio clicado');
+                    if (window.currentCalculadoraUrl && window.currentEnsaioType) {
+                        loadContent(window.currentCalculadoraUrl, window.currentEnsaioType, null); // Passa null como dados
+                    } else {
+                        alert('Erro: Não foi possível determinar a calculadora para este tipo de ensaio.');
+                    }
+                }
+                
+                // Botão Editar (na lista)
+                if (target.classList.contains('btn-editar')) {
+                    const registroId = target.getAttribute('data-id');
+                    console.log(`Botão Editar clicado para registro: ${registroId}`);
+                    // Simulação: Carrega a calculadora vazia por enquanto
+                    // Em um cenário real, buscaria os dados do registroId e passaria para loadContent
+                    if (window.currentCalculadoraUrl && window.currentEnsaioType) {
+                        // const dadosDoRegistro = await buscarDadosRegistro(registroId); // Função a ser implementada
+                        const dadosSimulados = { id: registroId, registro: `REG-${registroId}`, data: '2025-05-31', material: 'Simulado' }; // Dados simulados
+                        loadContent(window.currentCalculadoraUrl, window.currentEnsaioType, dadosSimulados);
+                    } else {
+                        alert('Erro: Não foi possível determinar a calculadora para este tipo de ensaio.');
+                    }
+                }
+                
+                // Botão Voltar para Lista (na calculadora)
+                if (target.classList.contains('btn-voltar-lista')) {
+                    console.log('Botão Voltar para Lista clicado');
+                    if (window.currentListaUrl && window.currentEnsaioType) {
+                        loadContent(window.currentListaUrl, window.currentEnsaioType);
+                    } else {
+                        alert('Erro: Não foi possível determinar a lista de ensaios para retornar.');
+                        // Como fallback, recarrega a tela inicial
+                        contentArea.innerHTML = '<div class="welcome-screen"><h2>Bem-vindo à Calculadora de Compacidade</h2><p>Selecione uma opção no menu para começar.</p></div>';
+                    }
+                }
+                
+                // Botão Excluir (na lista) - Adicionar lógica se necessário
+                if (target.classList.contains('btn-excluir')) {
+                    const registroId = target.getAttribute('data-id');
+                    if (confirm(`Tem certeza que deseja excluir o registro ${registroId}?`)) {
+                        console.log(`Excluir registro ${registroId}`);
+                        // Adicionar lógica de exclusão aqui (e.g., chamar API, atualizar UI)
+                        // Recarregar a lista após excluir
+                        if (window.currentListaUrl && window.currentEnsaioType) {
+                            loadContent(window.currentListaUrl, window.currentEnsaioType);
+                        }
+                    }
+                }
+                
+                // Botão Filtrar (na lista) - Adicionar lógica se necessário
+                if (target.classList.contains('btn-filtro')) {
+                    console.log('Aplicando filtros...');
+                    // Adicionar lógica de filtro aqui (e.g., chamar API com filtros, atualizar UI)
+                    // Recarregar a lista após aplicar filtros
+                    if (window.currentListaUrl && window.currentEnsaioType) {
+                        loadContent(window.currentListaUrl, window.currentEnsaioType);
+                    }
+                }
+            });
+            
+            // Disponibiliza a função loadContent globalmente para ser chamada por scripts carregados
+            window.loadContent = loadContent;
+            
+            console.log('Dashboard inicializado.');
+        });
+    </script>
+</body>
+</html>
