@@ -89,129 +89,192 @@ window.calculadora.db = (() => {
         
         // Salvar registro
         function salvarRegistro(tipo, dados) {
-            return new Promise((resolve, reject) => {
-                init()
-                    .then(() => {
-                        const store = getStoreByTipo(tipo);
-                        if (!store) {
-                            reject(new Error(`Tipo de ensaio inválido: ${tipo}`));
-                            return;
-                        }
-                        
-                        const transaction = db.transaction([store], 'readwrite');
-                        const objectStore = transaction.objectStore(store);
-                        
-                        // Adicionar timestamp
-                        dados.timestamp = new Date().getTime();
-                        
-                        const request = objectStore.put(dados);
-                        
-                        request.onsuccess = () => {
-                            console.log(`Registro salvo com sucesso: ${dados.registro}`);
-                            salvarRegistroFirestore(tipo, dados);
-                            resolve(dados);
-                        };
-                        
-                        request.onerror = (event) => {
-                            console.error('Erro ao salvar registro:', event.target.error);
-                            reject(event.target.error);
-                        };
-                    })
-                    .catch(reject);
+            return new Promise(async (resolve, reject) => {
+                const store = getStoreByTipo(tipo);
+                if (!store) {
+                    reject(new Error(`Tipo de ensaio inválido: ${tipo}`));
+                    return;
+                }
+
+                // Adicionar timestamp
+                dados.timestamp = new Date().getTime();
+
+                try {
+                    // Tenta salvar no Firestore primeiro
+                    if (window.firebaseDB) {
+                        await window.firebaseDB.collection(store).doc(String(dados.registro)).set(dados);
+                        console.log(`Registro salvo com sucesso no Firestore: ${dados.registro}`);
+                    } else {
+                        console.warn('Firebase Firestore não disponível. Salvando apenas localmente.');
+                    }
+
+                    // Salva no IndexedDB para cache local (sempre ou como fallback)
+                    await new Promise((resolveIndexedDB, rejectIndexedDB) => {
+                        init() // Garante que IndexedDB está inicializado
+                            .then(() => {
+                                const transaction = db.transaction([store], 'readwrite');
+                                const objectStore = transaction.objectStore(store);
+                                const request = objectStore.put(dados);
+
+                                request.onsuccess = () => {
+                                    console.log(`Registro salvo com sucesso no IndexedDB: ${dados.registro}`);
+                                    resolveIndexedDB();
+                                };
+
+                                request.onerror = (event) => {
+                                    console.error('Erro ao salvar registro no IndexedDB:', event.target.error);
+                                    rejectIndexedDB(event.target.error);
+                                };
+                            })
+                            .catch(rejectIndexedDB);
+                    });
+
+                    resolve(dados);
+                } catch (error) {
+                    console.error('Erro ao salvar registro (Firestore ou IndexedDB):', error);
+                    reject(error);
+                }
             });
         }
         
         // Carregar registro por ID
         function carregarRegistro(tipo, registro) {
-            return new Promise((resolve, reject) => {
-                init()
-                    .then(() => {
-                        const store = getStoreByTipo(tipo);
-                        if (!store) {
-                            reject(new Error(`Tipo de ensaio inválido: ${tipo}`));
-                            return;
+            return new Promise(async (resolve, reject) => {
+                const store = getStoreByTipo(tipo);
+                if (!store) {
+                    reject(new Error(`Tipo de ensaio inválido: ${tipo}`));
+                    return;
+                }
+
+                try {
+                    if (window.firebaseDB) {
+                        const doc = await window.firebaseDB.collection(store).doc(String(registro)).get();
+                        if (doc.exists) {
+                            console.log(`Registro carregado do Firestore: ${registro}`);
+                            resolve(doc.data());
+                            return; // Retorna os dados do Firestore
+                        } else {
+                            console.log(`Registro não encontrado no Firestore: ${registro}. Tentando IndexedDB...`);
                         }
-                        
-                        const transaction = db.transaction([store], 'readonly');
-                        const objectStore = transaction.objectStore(store);
-                        const request = objectStore.get(registro);
-                        
-                        request.onsuccess = (event) => {
-                            const resultado = event.target.result;
-                            if (resultado) {
-                                console.log(`Registro carregado: ${registro}`);
-                                resolve(resultado);
-                            } else {
-                                console.log(`Registro não encontrado: ${registro}`);
-                                resolve(null);
-                            }
-                        };
-                        
-                        request.onerror = (event) => {
-                            console.error('Erro ao carregar registro:', event.target.error);
-                            reject(event.target.error);
-                        };
-                    })
-                    .catch(reject);
+                    }
+
+                    // Fallback para IndexedDB se não encontrado no Firestore ou se Firestore não estiver disponível
+                    await init(); // Garante que IndexedDB está inicializado
+                    const transaction = db.transaction([store], 'readonly');
+                    const objectStore = transaction.objectStore(store);
+                    const request = objectStore.get(registro);
+
+                    request.onsuccess = (event) => {
+                        const resultado = event.target.result;
+                        if (resultado) {
+                            console.log(`Registro carregado do IndexedDB: ${registro}`);
+                            resolve(resultado);
+                        } else {
+                            console.log(`Registro não encontrado em IndexedDB: ${registro}`);
+                            resolve(null);
+                        }
+                    };
+
+                    request.onerror = (event) => {
+                        console.error('Erro ao carregar registro do IndexedDB:', event.target.error);
+                        reject(event.target.error);
+                    };
+                } catch (error) {
+                    console.error('Erro ao carregar registro (Firestore ou IndexedDB):', error);
+                    reject(error);
+                }
             });
         }
         
         // Listar todos os registros
         function listarRegistros(tipo) {
-            return new Promise((resolve, reject) => {
-                init()
-                    .then(() => {
-                        const store = getStoreByTipo(tipo);
-                        if (!store) {
-                            reject(new Error(`Tipo de ensaio inválido: ${tipo}`));
-                            return;
-                        }
-                        
-                        const transaction = db.transaction([store], 'readonly');
-                        const objectStore = transaction.objectStore(store);
-                        const request = objectStore.getAll();
-                        
-                        request.onsuccess = (event) => {
-                            const registros = event.target.result;
-                            console.log(`${registros.length} registros encontrados para ${tipo}`);
-                            resolve(registros);
-                        };
-                        
-                        request.onerror = (event) => {
-                            console.error('Erro ao listar registros:', event.target.error);
-                            reject(event.target.error);
-                        };
-                    })
-                    .catch(reject);
+            return new Promise(async (resolve, reject) => {
+                const store = getStoreByTipo(tipo);
+                if (!store) {
+                    reject(new Error(`Tipo de ensaio inválido: ${tipo}`));
+                    return;
+                }
+
+                try {
+                    if (window.firebaseDB) {
+                        const snapshot = await window.firebaseDB.collection(store).get();
+                        const registrosFirestore = [];
+                        snapshot.forEach(doc => {
+                            registrosFirestore.push(doc.data());
+                        });
+                        console.log(`${registrosFirestore.length} registros encontrados no Firestore para ${tipo}`);
+                        resolve(registrosFirestore); // Retorna os dados do Firestore
+                        return;
+                    } else {
+                        console.warn('Firebase Firestore não disponível. Listando apenas localmente.');
+                    }
+
+                    // Fallback para IndexedDB se Firestore não estiver disponível
+                    await init(); // Garante que IndexedDB está inicializado
+                    const transaction = db.transaction([store], 'readonly');
+                    const objectStore = transaction.objectStore(store);
+                    const request = objectStore.getAll();
+
+                    request.onsuccess = (event) => {
+                        const registrosIndexedDB = event.target.result;
+                        console.log(`${registrosIndexedDB.length} registros encontrados no IndexedDB para ${tipo}`);
+                        resolve(registrosIndexedDB);
+                    };
+
+                    request.onerror = (event) => {
+                        console.error('Erro ao listar registros do IndexedDB:', event.target.error);
+                        reject(event.target.error);
+                    };
+                } catch (error) {
+                    console.error('Erro ao listar registros (Firestore ou IndexedDB):', error);
+                    reject(error);
+                }
             });
         }
         
         // Excluir registro
         function excluirRegistro(tipo, registro) {
-            return new Promise((resolve, reject) => {
-                init()
-                    .then(() => {
-                        const store = getStoreByTipo(tipo);
-                        if (!store) {
-                            reject(new Error(`Tipo de ensaio inválido: ${tipo}`));
-                            return;
-                        }
-                        
-                        const transaction = db.transaction([store], 'readwrite');
-                        const objectStore = transaction.objectStore(store);
-                        const request = objectStore.delete(registro);
-                        
-                        request.onsuccess = () => {
-                            console.log(`Registro excluído: ${registro}`);
-                            resolve(true);
-                        };
-                        
-                        request.onerror = (event) => {
-                            console.error('Erro ao excluir registro:', event.target.error);
-                            reject(event.target.error);
-                        };
-                    })
-                    .catch(reject);
+            return new Promise(async (resolve, reject) => {
+                const store = getStoreByTipo(tipo);
+                if (!store) {
+                    reject(new Error(`Tipo de ensaio inválido: ${tipo}`));
+                    return;
+                }
+
+                try {
+                    if (window.firebaseDB) {
+                        await window.firebaseDB.collection(store).doc(String(registro)).delete();
+                        console.log(`Registro excluído com sucesso do Firestore: ${registro}`);
+                    } else {
+                        console.warn('Firebase Firestore não disponível. Excluindo apenas localmente.');
+                    }
+
+                    // Exclui do IndexedDB
+                    await new Promise((resolveIndexedDB, rejectIndexedDB) => {
+                        init() // Garante que IndexedDB está inicializado
+                            .then(() => {
+                                const transaction = db.transaction([store], 'readwrite');
+                                const objectStore = transaction.objectStore(store);
+                                const request = objectStore.delete(registro);
+
+                                request.onsuccess = () => {
+                                    console.log(`Registro excluído com sucesso do IndexedDB: ${registro}`);
+                                    resolveIndexedDB(true);
+                                };
+
+                                request.onerror = (event) => {
+                                    console.error('Erro ao excluir registro do IndexedDB:', event.target.error);
+                                    rejectIndexedDB(event.target.error);
+                                };
+                            })
+                            .catch(rejectIndexedDB);
+                    });
+
+                    resolve(true);
+                } catch (error) {
+                    console.error('Erro ao excluir registro (Firestore ou IndexedDB):', error);
+                    reject(error);
+                }
             });
         }
         
@@ -319,16 +382,17 @@ window.calculadora.db = (() => {
             }
         }
 
-        function salvarRegistroFirestore(tipo, dados) {
-            if (!window.firebaseDB) return;
-            const store = getStoreByTipo(tipo);
-            if (!store) return;
-            try {
-                window.firebaseDB.collection(store).doc(String(dados.registro)).set(dados);
-            } catch (e) {
-                console.error('Erro ao salvar no Firestore:', e);
-            }
-        }
+        // Remover a função salvarRegistroFirestore, pois sua lógica foi incorporada em salvarRegistro
+        // function salvarRegistroFirestore(tipo, dados) {
+        //     if (!window.firebaseDB) return;
+        //     const store = getStoreByTipo(tipo);
+        //     if (!store) return;
+        //     try {
+        //         window.firebaseDB.collection(store).doc(String(dados.registro)).set(dados);
+        //     } catch (e) {
+        //         console.error('Erro ao salvar no Firestore:', e);
+        //     }
+        // }
         
         // Verificar se o banco de dados está disponível
         function verificarDisponibilidade() {
@@ -388,3 +452,5 @@ if (!(typeof process !== 'undefined' && process.env.JEST_WORKER_ID)) {
         }
     }
 }
+
+
