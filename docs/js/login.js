@@ -51,21 +51,7 @@
   document.querySelectorAll('.back-to-login').forEach(el => el.addEventListener('click', e => {
     e.preventDefault();
     showForm(loginForm);
-  }));
-
-  const offlineLink = document.getElementById('offline-link');
-  if (offlineLink) {
-    offlineLink.addEventListener('click', e => {
-      e.preventDefault();
-      header.style.display = '';
-      sidebar.style.display = '';
-      main.style.display = '';
-      footer.style.display = '';
-      loginContainer.style.display = 'none';
-    });
-  }
-
-   const auth = window.firebaseAuth;
+  }t auth = window.firebaseAuth;
 
    function registrar() {
      const u = document.getElementById('register-username').value.trim();
