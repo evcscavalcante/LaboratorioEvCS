@@ -51,7 +51,9 @@
   document.querySelectorAll('.back-to-login').forEach(el => el.addEventListener('click', e => {
     e.preventDefault();
     showForm(loginForm);
-  }t auth = window.firebaseAuth;
+  }));
+
+  const auth = window.firebaseAuth;
 
    function registrar() {
      const u = document.getElementById('register-username').value.trim();
@@ -103,11 +105,10 @@
        recuperar();
      }
    });
-
-  logoutBtn.addEventListener('click', () => {
+  logoutBtn.addEventListener(\'click\', () => {
     auth.signOut();
+    showForm(loginForm);
   });
-
   header.style.display = 'none';
   sidebar.style.display = 'none';
   main.style.display = 'none';
