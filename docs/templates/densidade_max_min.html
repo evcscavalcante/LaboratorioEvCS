@@ -1,16 +1,25 @@
-<form class="calculadora-container">
-      <h2>Densidade Máxima e Mínima</h2>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Densidade Máxima e Mínima</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         .calculadora-container {
             background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px; /* Adicionado padding para melhor visualização */
         }
 
         .form-section {
             margin-bottom: 20px;
             padding: 15px;
             background-color: #f8f9fa;
+            border-radius: 5px;
+        }
 
             .form-section h3 {
                 margin-top: 0;
@@ -18,7 +27,6 @@
                 border-bottom: 1px solid #dee2e6;
                 padding-bottom: 10px;
                 margin-bottom: 15px;
-            }
             }
 
         .form-row {
@@ -28,10 +36,10 @@
             margin-left: -10px;
             margin-bottom: 15px;
         }
+
         .form-group {
             flex: 0 0 calc(33.333% - 20px);
             margin: 0 10px 10px;
-            box-sizing: border-box; /* Incluído para cálculo correto do flex */
         }
 
             .form-group label {
@@ -39,14 +47,14 @@
                 margin-bottom: 5px;
                 font-weight: 500;
             }
-            
 
             .form-group input,
             .form-group select {
                 width: 100%;
                 padding: 8px;
                 border: 1px solid #ced4da;
-                border-radius: 4px; /* Adicionado border-radius */
+                border-radius: 4px;
+            }
 
                 .form-group input:focus,
                 .form-group select:focus {
@@ -54,6 +62,9 @@
                     outline: none;
                     box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25);
                 }
+
+                .form-group input[readonly] {
+                    background-color: #e9ecef;
                 }
 
         .table-responsive {
@@ -68,13 +79,13 @@
 
             .data-table th,
             .data-table td {
-                padding: 10px; /* Adicionado padding para células */
-                text-align: left; /* Alinhado texto à esquerda */
+                padding: 10px;
+                text-align: left;
                 border-bottom: 1px solid #dee2e6;
             }
 
             .data-table th {
-                background-color: #e9ecef; /* Cor de fundo para cabeçalho */
+                background-color: #f8f9fa;
                 font-weight: 600;
             }
 
@@ -82,9 +93,12 @@
                 width: 100%;
                 padding: 8px;
                 border: 1px solid #ced4da;
-                border-radius: 4px; /* Adicionado border-radius */
+                border-radius: 4px;
+            }
+
+                .data-table input[readonly] {
                     background-color: #e9ecef;
-                } /* <- Erro corrigido aqui */
+                }
 
         .media-row {
             background-color: #e8f0fe;
@@ -93,13 +107,12 @@
             .media-row td {
                 font-weight: 500;
             }
-        /* <- Fechamento do media-row td */
 
         .form-actions {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px; /* Espaço acima das ações */
-            padding-top: 15px; /* Padding acima da borda superior */
+            margin-top: 20px;
+            padding-top: 15px;
             border-top: 1px solid #dee2e6;
         }
 
@@ -107,8 +120,8 @@
             padding: 10px 15px;
             border: none;
             border-radius: 4px;
+            cursor: pointer;
             font-weight: 500;
-            cursor: pointer; /* Indica que é clicável */
             transition: all 0.3s;
         }
 
@@ -120,7 +133,6 @@
             .btn-primary:hover {
                 background-color: #303f9f;
             }
-            
 
         .btn-secondary {
             background-color: #6c757d;
@@ -130,7 +142,6 @@
             .btn-secondary:hover {
                 background-color: #5a6268;
             }
-            
 
         .btn-success {
             background-color: #28a745;
@@ -140,7 +151,6 @@
             .btn-success:hover {
                 background-color: #218838;
             }
-            
 
         .btn-danger {
             background-color: #dc3545;
@@ -150,7 +160,6 @@
             .btn-danger:hover {
                 background-color: #c82333;
             }
-            
 
         .btn-info {
             background-color: #17a2b8;
@@ -160,7 +169,6 @@
             .btn-info:hover {
                 background-color: #138496;
             }
-            
 
         /* Estilos para os cards de resultados */
         .resultados-cards-container {
@@ -189,7 +197,6 @@
                 font-size: 1.1rem;
                 text-align: center;
             }
-            
 
         .card-content {
             display: flex;
@@ -211,7 +218,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
             padding-right: 5px;
-            word-break: break-word; /* Adicionado para quebrar palavras longas */
         }
 
         .resultado-valor {
@@ -220,13 +226,14 @@
             align-items: center;
         }
 
-        .resultado-valor input { /* Seletor correto */
+            .resultado-valor input {
+                width: 100%;
                 text-align: right;
                 padding: 6px;
                 border: 1px solid #ced4da;
                 border-radius: 4px;
                 background-color: #e9ecef;
-            } /* <- Fechamento do .resultado-valor input */
+            }
 
         .resultado-unidade {
             margin-left: 5px;
@@ -238,8 +245,8 @@
         .resultado-destaque {
             background-color: #e8f0fe;
             border-left: 3px solid #4285f4;
+            padding: 8px;
             border-radius: 0 4px 4px 0;
-            padding: 8px; /* Adicionado padding para destaque */
         }
 
         @media (max-width: 992px) {
@@ -265,16 +272,18 @@
                 .form-actions button {
                     width: 100%;
                 }
-                }
 
             .card-resultado {
                 flex: 1 1 100%;
             }
-        
+        }
     </style>
-    <!-- Conteúdo da calculadora começa aqui -->
+</head>
+<body>
+    <h2>Densidade Máxima e Mínima</h2>
 
-      <!-- Informações Gerais -->
+    <form class="calculadora-container">
+        <!-- Informações Gerais -->
         <div class="form-section">
             <h3>Informações Gerais</h3>
             <table class="header-table">
