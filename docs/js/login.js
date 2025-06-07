@@ -53,7 +53,19 @@
     showForm(loginForm);
   }));
 
-  const auth = window.firebaseAuth;
+  const offlineLink = document.getElementById('offline-link');
+  if (offlineLink) {
+    offlineLink.addEventListener('click', e => {
+      e.preventDefault();
+      header.style.display = '';
+      sidebar.style.display = '';
+      main.style.display = '';
+      footer.style.display = '';
+      loginContainer.style.display = 'none';
+    });
+  }
+
+   const auth = window.firebaseAuth;
 
    function registrar() {
      const u = document.getElementById('register-username').value.trim();
@@ -105,10 +117,11 @@
        recuperar();
      }
    });
-  logoutBtn.addEventListener(\'click\', () => {
+
+  logoutBtn.addEventListener('click', () => {
     auth.signOut();
-    showForm(loginForm);
   });
+
   header.style.display = 'none';
   sidebar.style.display = 'none';
   main.style.display = 'none';
