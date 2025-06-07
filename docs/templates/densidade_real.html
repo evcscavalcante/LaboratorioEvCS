@@ -1,284 +1,197 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Densidade Real</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .calculadora-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+<form class="calculadora-container">
 
-        .form-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
+ <h2>Densidade Real dos Grãos</h2>
 
-            .form-section h3 {
-                margin-top: 0;
-                color: #3f51b5;
-                border-bottom: 1px solid #dee2e6;
-                padding-bottom: 10px;
-                margin-bottom: 15px;
-            }
+ <!-- Informações Gerais -->
+ <div class="form-section">
+ <h3>Informações Gerais</h3>
+ <table class="header-table">
+ <tr>
+ <td>
+ <label for="registro-real">Número do Registro:</label>
+ <input type="text" id="registro-real" placeholder="Informe o número do registro">
+ </td>
+ <td>
+ <label for="data-real">Data:</label>
+ <input type="date" id="data-real">
+ </td>
+ </tr>
+ <tr>
+ <td>
+ <label for="operador-real">Operador:</label>
+ <input type="text" id="operador-real" placeholder="Nome do operador">
+ </td>
+ <td>
+ <label for="material-real">Material:</label>
+ <input type="text" id="material-real" placeholder="Descrição do material">
+ </td>
+ </tr>
+ <tr>
+ <td>
+ <label for="origem-real">Origem:</label>
+ <input type="text" id="origem-real" placeholder="Origem do material">
+ </td>
+ <td></td>
+ </tr>
+ </table>
+ </div>
 
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: -10px;
-            margin-left: -10px;
-            margin-bottom: 15px;
-        }
+ <!-- Teor de Umidade -->
+ <div class="form-section">
+ <h3>Teor de Umidade</h3>
+ <div class="table-responsive">
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th></th>
+ <th>Determinação 1</th>
+ <th>Determinação 2</th>
+ <th>Determinação 3</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>Cápsula Nº</td>
+                <td><input type="text" id="capsula-umidade-1" name="capsula-umidade-1" placeholder="Nº"></td>
+                <td><input type="text" id="capsula-umidade-2" name="capsula-umidade-2" placeholder="Nº"></td>
+                <td><input type="text" id="capsula-umidade-3" name="capsula-umidade-3" placeholder="Nº"></td>
+ </tr>
+ <tr>
+ <td>Solo Úmido + Tara (g)</td>
+                <td><input type="number" id="solo-umido-tara-1" name="solo-umido-tara-1" step="0.01" placeholder="0.00"></td>
+                <td><input type="number" id="solo-umido-tara-2" name="solo-umido-tara-2" step="0.01" placeholder="0.00"></td>
+                <td><input type="number" id="solo-umido-tara-3" name="solo-umido-tara-3" step="0.01" placeholder="0.00"></td>
+ </tr>
+ <tr>
+ <td>Solo Seco + Tara (g)</td>
+ <td><input type="number" id="solo-seco-tara-real-1" step="0.01" placeholder="0.00"></td>
+ <td><input type="number" id="solo-seco-tara-real-2" step="0.01" placeholder="0.00"></td>
+ <td><input type="number" id="solo-seco-tara-real-3" step="0.01" placeholder="0.00"></td>
+ </tr>
+ <tr>
+ <td>Tara (g)</td>
+                <td><input type="number" id="tara-1" name="tara-1" step="0.01" placeholder="0.00"></td>
+                <td><input type="number" id="tara-2" name="tara-2" step="0.01" placeholder="0.00"></td>
+                <td><input type="number" id="tara-3" name="tara-3" step="0.01" placeholder="0.00"></td>
+ </tr>
+ <tr>
+                <td>Solo Seco (g)</td>
+ <td><input type="number" id="solo-seco-real-1" step="0.01" placeholder="0.00" readonly></td>
+ <td><input type="number" id="solo-seco-real-2" step="0.01" placeholder="0.00" readonly></td>
+ <td><input type="number" id="solo-seco-real-3" step="0.01" placeholder="0.00" readonly></td>
+ </tr>
+ <tr>
+ <td>Água (g)</td>
+ <td><input type="number" id="agua-real-1" step="0.01" placeholder="0.00" readonly></td>
+ <td><input type="number" id="agua-real-2" step="0.01" placeholder="0.00" readonly></td>
+ <td><input type="number" id="agua-real-3" step="0.01" placeholder="0.00" readonly></td>
+ </tr>
+ <tr>
+ <td>Umidade (%)</td>
+ <td><input type="number" id="umidade-real-1" step="0.1" placeholder="0.0" readonly></td>
+ <td><input type="number" id="umidade-real-2" step="0.1" placeholder="0.0" readonly></td>
+ <td><input type="number" id="umidade-real-3" step="0.1" placeholder="0.0" readonly></td>
+ </tr>
+ <tr class="media-row">
+ <td>Umidade Média (%):</td>
+ <td colspan="3"><input type="number" id="umidade-media-real" step="0.1" placeholder="0.0" readonly></td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
 
-        .form-group {
-            flex: 0 0 calc(33.333% - 20px);
-            margin: 0 10px 10px;
-        }
+ <!-- Picnômetro -->
+ <div class="form-section">
+ <h3>Picnômetro</h3>
+ <div class="table-responsive">
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th></th>
+ <th>Determinação 1</th>
+ <th>Determinação 2</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>Picnômetro Nº</td>
+ <td><input type="text" id="picnometro-1" placeholder="Nº"></td>
+ <td><input type="text" id="picnometro-2" placeholder="Nº"></td>
+ </tr>
+ <tr>
+ <td>Massa do Picnômetro (g)</td>
+ <td><input type="number" id="massa-pic-1" step="0.1" placeholder="0.0"></td>
+ <td><input type="number" id="massa-pic-2" step="0.1" placeholder="0.0"></td>
+ </tr>
+ <tr>
+ <td>Massa Pic+Amostra+Água (g)</td>
+ <td><input type="number" id="massa-pic-amostra-agua-1" step="0.01" placeholder="0.00"></td>
+ <td><input type="number" id="massa-pic-amostra-agua-2" step="0.01" placeholder="0.00"></td>
+ </tr>
+ <tr>
+ <td>Temperatura (°C)</td>
+ <td><input type="number" id="temperatura-1" step="0.1" placeholder="0.0"></td>
+ <td><input type="number" id="temperatura-2" step="0.1" placeholder="0.0"></td>
+ </tr>
+ <tr>
+ <td>Massa Pic+Água (g)</td>
+ <td><input type="number" id="massa-pic-agua-1" step="0.1" placeholder="0.0"></td>
+ <td><input type="number" id="massa-pic-agua-2" step="0.1" placeholder="0.0"></td>
+ </tr>
+ <tr>
+ <td>Densidade da Água (g/cm³)</td>
+ <td><input type="number" id="densidade-agua-1" step="0.0001" placeholder="0.0000" readonly></td>
+ <td><input type="number" id="densidade-agua-2" step="0.0001" placeholder="0.0000" readonly></td>
+ </tr>
+ <tr>
+ <td>Massa do Solo Úmido (g)</td>
+ <td><input type="number" id="massa-solo-umido-1" step="0.01" placeholder="0.00"></td>
+ <td><input type="number" id="massa-solo-umido-2" step="0.01" placeholder="0.00"></td>
+ </tr>
+ <tr>
+ <td>Massa do Solo Seco (g)</td>
+ <td><input type="number" id="massa-solo-seco-1" step="0.01" placeholder="0.00" readonly></td>
+ <td><input type="number" id="massa-solo-seco-2" step="0.01" placeholder="0.00" readonly></td>
+ </tr>
+ <tr>
+ <td>Densidade Real (g/cm³)</td>
+ <td><input type="number" id="densidade-real-1" step="0.001" placeholder="0.000" readonly></td>
+ <td><input type="number" id="densidade-real-2" step="0.001" placeholder="0.000" readonly></td>
+ </tr>
+ <tr class="media-row">
+ <td>Média Densidade Real (g/cm³):</td>
+ <td colspan="2"><input type="number" id="media-densidade-real" step="0.001" placeholder="0.000" readonly></td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
 
-            .form-group label {
-                display: block;
-                margin-bottom: 5px;
-                font-weight: 500;
-            }
+ <!-- Resultados finais -->
+ <div class="form-section">
+ <h3>Resultados</h3>
+ <div class="form-row">
+ <div class="form-group">
+ <label for="diferenca-real">Diferença (g/cm³):</label>
+ <input type="number" id="diferenca-real" step="0.001" placeholder="0.000" readonly>
+ </div>
+ </div>
+ <div class="form-row">
+ <div class="status-container">
+ <label>Status:</label>
+ <div id="status-ensaio" class="status-ensaio">AGUARDANDO CÁLCULO</div>
+ </div>
+ </div>
+ </div>
 
-            .form-group input,
-            .form-group select {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-            }
-
-                .form-group input:focus,
-                .form-group select:focus {
-                    border-color: #3f51b5;
-                    outline: none;
-                    box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25);
-                }
-
-                .form-group input[readonly] {
-                    background-color: #e9ecef;
-                }
-
-        .table-responsive {
-            overflow-x: auto;
-            margin-bottom: 15px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-            .data-table th,
-            .data-table td {
-                padding: 10px;
-                text-align: left;
-                border-bottom: 1px solid #dee2e6;
-            }
-
-            .data-table th {
-                background-color: #f8f9fa;
-                font-weight: 600;
-            }
-
-            .data-table input {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-            }
-
-                .data-table input[readonly] {
-                    background-color: #e9ecef;
-                }
-
-        .media-row {
-            background-color: #e8f0fe;
-        }
-
-            .media-row td {
-                font-weight: 500;
-            }
-
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background-color: #3f51b5;
-            color: white;
-        }
-
-            .btn-primary:hover {
-                background-color: #303f9f;
-            }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-            .btn-secondary:hover {
-                background-color: #5a6268;
-            }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-            .btn-success:hover {
-                background-color: #218838;
-            }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-            .btn-danger:hover {
-                background-color: #c82333;
-            }
-
-        .btn-info {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-            .btn-info:hover {
-                background-color: #138496;
-            }
-
-        /* Estilos para os cards de resultados */
-        .resultados-cards-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card-resultado {
-            flex: 1 1 calc(33.333% - 20px);
-            min-width: 250px;
-            background-color: #f0f2f5;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-            .card-resultado h4 {
-                color: #3f51b5;
-                margin-top: 0;
-                margin-bottom: 15px;
-                border-bottom: 1px solid #dee2e6;
-                padding-bottom: 8px;
-                font-size: 1.1rem;
-                text-align: center;
-            }
-
-        .card-content {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .resultado-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        .resultado-label {
-            flex: 0 0 60%;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding-right: 5px;
-        }
-
-        .resultado-valor {
-            flex: 0 0 40%;
-            display: flex;
-            align-items: center;
-        }
-
-            .resultado-valor input {
-                width: 100%;
-                text-align: right;
-                padding: 6px;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-                background-color: #e9ecef;
-            }
-
-        .resultado-unidade {
-            margin-left: 5px;
-            font-size: 0.85em;
-            color: #666;
-            white-space: nowrap;
-        }
-
-        .resultado-destaque {
-            background-color: #e8f0fe;
-            border-left: 3px solid #4285f4;
-            padding: 8px;
-            border-radius: 0 4px 4px 0;
-        }
-
-        @media (max-width: 992px) {
-            .form-group {
-                flex: 0 0 calc(50% - 20px);
-            }
-
-            .card-resultado {
-                flex: 1 1 calc(50% - 20px);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .form-group {
-                flex: 0 0 calc(100% - 20px);
-            }
-
-            .form-actions {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-                .form-actions button {
-                    width: 100%;
-                }
-
-            .card-resultado {
-                flex: 1 1 100%;
-            }
-        }
-    </style>
-</head>
+ <!-- Ações -->
+ <div class="acoes">
+ <button type="button" class="btn-salvar">Salvar</button>
+ <button type="button" class="btn-gerar-pdf">Gerar PDF</button>
+ <button type="button" class="btn-limpar">Limpar</button>
+ </div>
+ </form>
 <body>
     <h2>Densidade Real</h2>
 
@@ -368,13 +281,13 @@
                             <td><input type="number" id="agua-3" name="agua-3" step="0.01" placeholder="0.00" readonly></td>
                         </tr>
                         <tr>
-                            <td>Umidade (%)</td>
-                            <td><input type="number" id="umidade-1" name="umidade-1" step="0.1" placeholder="0.0" readonly></td>
-                            <td><input type="number" id="umidade-2" name="umidade-2" step="0.1" placeholder="0.0" readonly></td>
-                            <td><input type="number" id="umidade-3" name="umidade-3" step="0.1" placeholder="0.0" readonly></td>
+                  <td>Umidade</td>
+                  <td><input type="number" id="umidade-1" name="umidade-1" step="0.1" placeholder="0.0" readonly><span class="unidade">%</span></td>
+                  <td><input type="number" id="umidade-2" name="umidade-2" step="0.1" placeholder="0.0" readonly><span class="unidade">%</span></td>
+                  <td><input type="number" id="umidade-3" name="umidade-3" step="0.1" placeholder="0.0" readonly><span class="unidade">%</span></td>
                         </tr>
                         <tr class="media-row">
-                            <td>Umidade Média (%):</td>
+                  <td>Umidade Média:</td>
                             <td colspan="3"><input type="number" id="umidade-media" name="umidade-media" step="0.1" placeholder="0.0" readonly></td>
                         </tr>
                     </tbody>
@@ -470,13 +383,6 @@
         </div>
 
         <div class="form-actions">
-            <button type="button" class="btn btn-primary btn-calcular">Calcular</button>
-            <button type="button" class="btn btn-success btn-salvar">Salvar</button>
-            <button type="button" class="btn btn-info btn-gerar-pdf">Gerar PDF</button>
-            <button type="button" class="btn btn-danger btn-limpar">Limpar</button>
-        </div>
-    </form>
-
     <!-- Scripts originais comentados para evitar conflitos -->
     <!-- <script src="static/js/calculos.js"></script>
     <script src="static/js/calculos-wrapper.js"></script>
