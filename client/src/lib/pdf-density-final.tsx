@@ -5,7 +5,8 @@ const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
-    padding: 15,
+    padding: 25,
+    paddingTop: 30,
     fontFamily: 'Helvetica',
     fontSize: 7,
   },
@@ -634,11 +635,22 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
       {/* Status e Observações */}
       <View style={{flexDirection: 'row', marginBottom: 3}}>
         <Text style={{fontSize: 6, fontWeight: 'bold', marginRight: 10}}>STATUS:</Text>
-        <View style={{backgroundColor: calculations.results?.status === 'APROVADO' ? '#4CAF50' : '#FFF', borderWidth: 1, borderColor: '#000', padding: 2, marginRight: 5}}>
-          <Text style={{color: calculations.results?.status === 'APROVADO' ? '#FFF' : '#000', fontSize: 5, fontWeight: 'bold'}}>APROVADO</Text>
-        </View>
-        <View style={{backgroundColor: calculations.results?.status === 'REPROVADO' ? '#F44336' : '#FFF', borderWidth: 1, borderColor: '#000', padding: 2}}>
-          <Text style={{color: calculations.results?.status === 'REPROVADO' ? '#FFF' : '#000', fontSize: 5, fontWeight: 'bold'}}>REPROVADO</Text>
+        <View style={{
+          backgroundColor: 
+            calculations.results?.status === 'APROVADO' ? '#4CAF50' :
+            calculations.results?.status === 'REPROVADO' ? '#F44336' : '#FFC107',
+          borderWidth: 1, 
+          borderColor: '#000', 
+          padding: 2
+        }}>
+          <Text style={{
+            color: '#FFF', 
+            fontSize: 6, 
+            fontWeight: 'bold'
+          }}>
+            {calculations.results?.status === 'APROVADO' ? 'APROVADO' :
+             calculations.results?.status === 'REPROVADO' ? 'REPROVADO' : 'EM ANDAMENTO'}
+          </Text>
         </View>
       </View>
 
