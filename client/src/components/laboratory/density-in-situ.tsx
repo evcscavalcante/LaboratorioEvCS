@@ -90,7 +90,17 @@ export default function DensityInSitu() {
     gammaNatDryAvg: 0,
     moistureTop: { det1: { dryWeight: 0, water: 0, moisture: 0 }, det2: { dryWeight: 0, water: 0, moisture: 0 }, det3: { dryWeight: 0, water: 0, moisture: 0 }, average: 0 },
     moistureBase: { det1: { dryWeight: 0, water: 0, moisture: 0 }, det2: { dryWeight: 0, water: 0, moisture: 0 }, det3: { dryWeight: 0, water: 0, moisture: 0 }, average: 0 },
-    results: { gammaDTop: 0, gammaDBase: 0, voidIndex: 0.65, relativeCompactness: 75, status: "AGUARDANDO" as const }
+    results: { 
+      gammaDTop: 0, 
+      gammaDBase: 0, 
+      voidIndex: 0, 
+      relativeCompactness: 0,
+      voidIndexTop: 0,
+      voidIndexBase: 0,
+      relativeCompactnessTop: 0,
+      relativeCompactnessBase: 0,
+      status: "AGUARDANDO" as const 
+    }
   });
 
   const saveTestMutation = useMutation({
@@ -131,11 +141,35 @@ export default function DensityInSitu() {
       data.moistureBase3
     ]);
 
-    // Calculate dry densities
-    const det1GammaNatDry = moistureTopResults.average > 0 ? det1GammaNatWet / (1 + moistureTopResults.average / 100) : 0;
-    const det2GammaNatDry = moistureTopResults.average > 0 ? det2GammaNatWet / (1 + moistureTopResults.average / 100) : 0;
+    // Calculate dry densities for top and base
+    const det1GammaNatDryTop = moistureTopResults.average > 0 ? det1GammaNatWet / (1 + moistureTopResults.average / 100) : 0;
+    const det2GammaNatDryTop = moistureTopResults.average > 0 ? det2GammaNatWet / (1 + moistureTopResults.average / 100) : 0;
     
-    const gammaNatDryAvg = (det1GammaNatDry + det2GammaNatDry) / 2;
+    const det1GammaNatDryBase = moistureBaseResults.average > 0 ? det1GammaNatWet / (1 + moistureBaseResults.average / 100) : 0;
+    const det2GammaNatDryBase = moistureBaseResults.average > 0 ? det2GammaNatWet / (1 + moistureBaseResults.average / 100) : 0;
+    
+    const gammaDTop = (det1GammaNatDryTop + det2GammaNatDryTop) / 2;
+    const gammaDBase = (det1GammaNatDryBase + det2GammaNatDryBase) / 2;
+
+    // Calculate void indices and relative compactness
+    // Using standard soil mechanics formulas
+    const gammaS = 2.67; // Typical specific gravity for soil solids
+    const gammaDMax = 2.1; // Reference maximum dry density (would come from max/min test)
+    const gammaDMin = 1.4; // Reference minimum dry density (would come from max/min test)
+    
+    // Void index calculations: e = (γs/γd) - 1
+    const voidIndexTop = gammaDTop > 0 ? (gammaS / gammaDTop) - 1 : 0;
+    const voidIndexBase = gammaDBase > 0 ? (gammaS / gammaDBase) - 1 : 0;
+    
+    // Relative compactness calculations: CR = (emax - e) / (emax - emin) × 100
+    const emax = (gammaS / gammaDMin) - 1;
+    const emin = (gammaS / gammaDMax) - 1;
+    
+    const relativeCompactnessTop = emax !== emin ? ((emax - voidIndexTop) / (emax - emin)) * 100 : 0;
+    const relativeCompactnessBase = emax !== emin ? ((emax - voidIndexBase) / (emax - emin)) * 100 : 0;
+
+    // Average values for overall assessment
+    const gammaNatDryAvg = (gammaDTop + gammaDBase) / 2;
 
     // Determine status
     const status: "AGUARDANDO" | "APROVADO" | "REPROVADO" = 
@@ -143,16 +177,20 @@ export default function DensityInSitu() {
       gammaNatDryAvg === 0 ? "AGUARDANDO" : "REPROVADO";
 
     setCalculations({
-      det1: { soil: det1Soil, gammaNatWet: det1GammaNatWet, gammaNatDry: det1GammaNatDry },
-      det2: { soil: det2Soil, gammaNatWet: det2GammaNatWet, gammaNatDry: det2GammaNatDry },
+      det1: { soil: det1Soil, gammaNatWet: det1GammaNatWet, gammaNatDry: det1GammaNatDryTop },
+      det2: { soil: det2Soil, gammaNatWet: det2GammaNatWet, gammaNatDry: det2GammaNatDryTop },
       gammaNatDryAvg,
       moistureTop: moistureTopResults,
       moistureBase: moistureBaseResults,
       results: {
-        gammaDTop: gammaNatDryAvg,
-        gammaDBase: gammaNatDryAvg,
-        voidIndex: 0.65, // Would be calculated with reference values
-        relativeCompactness: 75, // Would be calculated with reference values
+        gammaDTop,
+        gammaDBase,
+        voidIndexTop,
+        voidIndexBase,
+        relativeCompactnessTop,
+        relativeCompactnessBase,
+        voidIndex: (voidIndexTop + voidIndexBase) / 2, // Average for compatibility
+        relativeCompactness: (relativeCompactnessTop + relativeCompactnessBase) / 2, // Average for compatibility
         status
       }
     });
@@ -765,22 +803,48 @@ export default function DensityInSitu() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">γd Topo (g/cm³)</div>
-              <div className="text-xl font-bold text-gray-900 font-mono">{calculations.results.gammaDTop.toFixed(3)}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+              <div className="text-sm text-blue-700 mb-1 font-medium">γd Topo (g/cm³)</div>
+              <div className="text-xl font-bold text-blue-800 font-mono">{calculations.results.gammaDTop.toFixed(3)}</div>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">γd Base (g/cm³)</div>
-              <div className="text-xl font-bold text-gray-900 font-mono">{calculations.results.gammaDBase.toFixed(3)}</div>
+            <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+              <div className="text-sm text-green-700 mb-1 font-medium">γd Base (g/cm³)</div>
+              <div className="text-xl font-bold text-green-800 font-mono">{calculations.results.gammaDBase.toFixed(3)}</div>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">Índice de Vazios (e)</div>
-              <div className="text-xl font-bold text-gray-900 font-mono">{calculations.results.voidIndex.toFixed(3)}</div>
+            <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-500">
+              <div className="text-sm text-gray-700 mb-1 font-medium">γd Médio (g/cm³)</div>
+              <div className="text-xl font-bold text-gray-800 font-mono">{calculations.gammaNatDryAvg.toFixed(3)}</div>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">Compacidade Relativa (%)</div>
-              <div className="text-xl font-bold text-gray-900 font-mono">{calculations.results.relativeCompactness.toFixed(1)}</div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-blue-700 border-b border-blue-200 pb-2">Resultados Topo</h4>
+              <div className="grid grid-cols-1 gap-3">
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <div className="text-sm text-blue-700 mb-1">Índice de Vazios Topo (e)</div>
+                  <div className="text-lg font-bold text-blue-800 font-mono">{calculations.results.voidIndexTop.toFixed(3)}</div>
+                </div>
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <div className="text-sm text-blue-700 mb-1">Compacidade Relativa Topo (%)</div>
+                  <div className="text-lg font-bold text-blue-800 font-mono">{calculations.results.relativeCompactnessTop.toFixed(1)}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-green-700 border-b border-green-200 pb-2">Resultados Base</h4>
+              <div className="grid grid-cols-1 gap-3">
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <div className="text-sm text-green-700 mb-1">Índice de Vazios Base (e)</div>
+                  <div className="text-lg font-bold text-green-800 font-mono">{calculations.results.voidIndexBase.toFixed(3)}</div>
+                </div>
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <div className="text-sm text-green-700 mb-1">Compacidade Relativa Base (%)</div>
+                  <div className="text-lg font-bold text-green-800 font-mono">{calculations.results.relativeCompactnessBase.toFixed(1)}</div>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>

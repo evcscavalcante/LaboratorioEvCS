@@ -116,7 +116,7 @@ export default function DensityMaxMin() {
 
     // Determine status based on consistency
     const isConsistent = (maxAverage - minAverage) > 0.1 && maxAverage > 0 && minAverage > 0;
-    const status = isConsistent ? "APROVADO" : 
+    const status: "AGUARDANDO" | "APROVADO" | "REPROVADO" = isConsistent ? "APROVADO" : 
                    maxAverage === 0 && minAverage === 0 ? "AGUARDANDO" : "REPROVADO";
 
     setCalculations({

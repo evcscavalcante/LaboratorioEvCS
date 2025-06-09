@@ -48,6 +48,10 @@ export const densityInSituTests = pgTable("density_in_situ_tests", {
     gammaDBase: number;
     voidIndex: number;
     relativeCompactness: number;
+    voidIndexTop: number;
+    voidIndexBase: number;
+    relativeCompactnessTop: number;
+    relativeCompactnessBase: number;
     status: "AGUARDANDO" | "APROVADO" | "REPROVADO";
   }>(),
   createdAt: timestamp("created_at").defaultNow(),

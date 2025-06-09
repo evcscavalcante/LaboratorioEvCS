@@ -80,9 +80,7 @@ export function generateDensityInSituPDF(data: any, calculations: any): void {
   const results = [
     ['γd Topo:', `${calculations.results.gammaDTop.toFixed(3)} g/cm³`],
     ['γd Base:', `${calculations.results.gammaDBase.toFixed(3)} g/cm³`],
-    ['Índice de Vazios (e):', calculations.results.voidIndex.toFixed(3)],
-    ['Compacidade Relativa:', `${calculations.results.relativeCompactness.toFixed(1)}%`],
-    ['Média γnat seco:', `${calculations.gammaNatDryAvg.toFixed(3)} g/cm³`],
+    ['γd Médio:', `${calculations.gammaNatDryAvg.toFixed(3)} g/cm³`],
     ['Umidade Média Topo:', `${calculations.moistureTop.average.toFixed(2)}%`],
     ['Umidade Média Base:', `${calculations.moistureBase.average.toFixed(2)}%`]
   ];
@@ -94,8 +92,31 @@ export function generateDensityInSituPDF(data: any, calculations: any): void {
     theme: 'grid',
     styles: { fontSize: 10 },
     columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 60 },
-      1: { cellWidth: 60 }
+      0: { fontStyle: 'bold', cellWidth: 70 },
+      1: { cellWidth: 50 }
+    }
+  });
+
+  // Detailed Results - Top and Base
+  doc.text('Índices de Vazios e Compacidade Relativa', 20, (doc as any).lastAutoTable.finalY + 15);
+  
+  const detailedResults = [
+    ['Parâmetro', 'Topo', 'Base'],
+    ['Índice de Vazios (e)', calculations.results.voidIndexTop.toFixed(3), calculations.results.voidIndexBase.toFixed(3)],
+    ['Compacidade Relativa (%)', calculations.results.relativeCompactnessTop.toFixed(1), calculations.results.relativeCompactnessBase.toFixed(1)]
+  ];
+  
+  autoTable(doc, {
+    startY: (doc as any).lastAutoTable.finalY + 20,
+    head: [detailedResults[0]],
+    body: detailedResults.slice(1),
+    theme: 'striped',
+    headStyles: { fillColor: [25, 118, 210] },
+    styles: { fontSize: 10, halign: 'center' },
+    columnStyles: {
+      0: { halign: 'left', fontStyle: 'bold', cellWidth: 70 },
+      1: { cellWidth: 40 },
+      2: { cellWidth: 40 }
     }
   });
 

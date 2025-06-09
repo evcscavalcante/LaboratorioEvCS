@@ -135,8 +135,9 @@ export default function DensityReal() {
     const average = (realDensity1 + realDensity2) / 2;
 
     // Status: APPROVED if difference ≤ 0.02 g/cm³ (corrected from 0.05)
-    const status = difference <= 0.02 && average > 0 ? "APROVADO" : 
-                   difference === 0 ? "AGUARDANDO" : "REPROVADO";
+    const status: "AGUARDANDO" | "APROVADO" | "REPROVADO" = 
+      difference <= 0.02 && average > 0 ? "APROVADO" : 
+      difference === 0 ? "AGUARDANDO" : "REPROVADO";
 
     setCalculations({
       moisture: moistureResults,
