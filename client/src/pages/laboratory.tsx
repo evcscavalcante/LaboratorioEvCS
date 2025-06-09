@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { FlaskRound, Save, PanelLeftOpen, PanelLeftClose } from "lucide-react";
+import { FlaskRound, Save, PanelLeftOpen, PanelLeftClose, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "wouter";
 import DensityInSitu from "@/components/laboratory/density-in-situ";
 import DensityReal from "@/components/laboratory/density-real";
 import DensityMaxMin from "@/components/laboratory/density-max-min";
@@ -72,6 +73,12 @@ export default function Laboratory() {
               </div>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">{currentDateTime}</span>
+                <Link href="/analytics">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <BarChart3 size={16} />
+                    Analytics
+                  </Button>
+                </Link>
                 <Button 
                   variant="outline" 
                   size="sm"
