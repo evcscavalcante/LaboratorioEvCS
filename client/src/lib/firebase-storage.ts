@@ -20,7 +20,7 @@ import type {
   InsertDensityInSituTest,
   InsertRealDensityTest,
   InsertMaxMinDensityTest
-} from '../../../shared/schema';
+} from '@shared/schema';
 
 // Enable offline persistence
 let persistenceEnabled = false;
@@ -29,9 +29,7 @@ const enablePersistence = async () => {
   if (!db || persistenceEnabled) return;
   
   try {
-    await enableIndexedDbPersistence(db, {
-      cacheSizeBytes: CACHE_SIZE_UNLIMITED
-    });
+    await enableIndexedDbPersistence(db);
     persistenceEnabled = true;
     console.log('Firebase offline persistence enabled');
   } catch (error: any) {
