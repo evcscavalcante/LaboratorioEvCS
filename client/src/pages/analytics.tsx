@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FlaskRound } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, FlaskRound, BarChart3, Wrench, Target } from 'lucide-react';
 import PerformanceDashboard from '@/components/analytics/performance-dashboard';
+import EquipmentAnalytics from '@/components/analytics/equipment-analytics';
+import CapacityAnalytics from '@/components/analytics/capacity-analytics';
 
 export default function Analytics() {
   return (
@@ -30,7 +33,43 @@ export default function Analytics() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <PerformanceDashboard />
+        <Tabs defaultValue="performance" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-white border sticky top-0 z-10 mb-6">
+            <TabsTrigger 
+              value="performance" 
+              className="flex items-center gap-2 py-4 px-4 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+            >
+              <BarChart3 size={16} />
+              Performance Geral
+            </TabsTrigger>
+            <TabsTrigger 
+              value="equipment"
+              className="flex items-center gap-2 py-4 px-4 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+            >
+              <Wrench size={16} />
+              Equipamentos
+            </TabsTrigger>
+            <TabsTrigger 
+              value="capacity"
+              className="flex items-center gap-2 py-4 px-4 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+            >
+              <Target size={16} />
+              Capacidade & Qualidade
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="performance">
+            <PerformanceDashboard />
+          </TabsContent>
+
+          <TabsContent value="equipment">
+            <EquipmentAnalytics />
+          </TabsContent>
+
+          <TabsContent value="capacity">
+            <CapacityAnalytics />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
