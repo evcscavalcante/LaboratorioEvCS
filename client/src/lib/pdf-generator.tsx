@@ -368,397 +368,176 @@ const DensityInSituDocument: React.FC<{ data: any; calculations: any }> = ({ dat
         </View>
       </View>
 
-      {/* Seção de Identificação */}
-      <View style={{flexDirection: 'row', marginBottom: 10}}>
-        {/* Coluna Esquerda */}
-        <View style={{width: '50%', paddingRight: 5}}>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, {width: '40%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>OPERADOR:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '60%'}]}>
-              <Text style={{fontSize: 8}}>{data.operator || 'DYALISSON'}</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, {width: '40%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>RESPONSÁVEL PELO CÁLCULO:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '60%'}]}>
-              <Text style={{fontSize: 8}}>KLAVERTY</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, {width: '40%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>VERIFICADOR:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '60%'}]}>
-              <Text style={{fontSize: 8}}>EVANDRO</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, {width: '40%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>DATA:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '60%'}]}>
-              <Text style={{fontSize: 8}}>{data.date || '20/05/2025'}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Coluna Direita */}
-        <View style={{width: '50%', paddingLeft: 5}}>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, {width: '30%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>NORTE:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '30%'}]}>
-              <Text style={{fontSize: 8}}>7.795.968.318</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '20%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>CAMADA Nº:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '20%'}]}>
-              <Text style={{fontSize: 8}}>19º</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, {width: '30%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>ESTE:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '30%'}]}>
-              <Text style={{fontSize: 8}}>690.853.569</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '20%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>MATERIAL:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '20%'}]}>
-              <Text style={{fontSize: 8}}>{data.material || 'REJEITO FILTRADO'}</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, {width: '30%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>COTA:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '30%'}]}>
-              <Text style={{fontSize: 8}}>766.919</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '20%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>ORIGEM:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '20%'}]}>
-              <Text style={{fontSize: 8}}>{data.origin || 'EDVC'}</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, {width: '30%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>QUADRANTE:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '30%'}]}>
-              <Text style={{fontSize: 8}}>A, B, FAIXA 1</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '20%', backgroundColor: '#F0F0F0'}]}>
-              <Text style={{fontSize: 8, fontWeight: 'bold'}}>REGISTRO:</Text>
-            </View>
-            <View style={[styles.tableCol, {width: '20%'}]}>
-              <Text style={{fontSize: 8}}>{data.registrationNumber || 'CR-215'}</Text>
-            </View>
-          </View>
-        </View>
+      {/* Seção de Identificação Compacta */}
+      <View style={{flexDirection: 'row', marginBottom: 5}}>
+        <Text style={{fontSize: 7, width: '15%'}}>OPERADOR:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>{data.operator || 'ALEXANDRE'}</Text>
+        <Text style={{fontSize: 7, width: '10%'}}>NORTE:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>7.795.866,093</Text>
+        <Text style={{fontSize: 7, width: '12%'}}>CAMADA N°:</Text>
+        <Text style={{fontSize: 7, width: '8%'}}>21ª</Text>
+        <Text style={{fontSize: 7, width: '8%'}}>FVS:</Text>
+        <Text style={{fontSize: 7, width: '17%'}}>202</Text>
+      </View>
+      
+      <View style={{flexDirection: 'row', marginBottom: 5}}>
+        <Text style={{fontSize: 7, width: '15%'}}>RESPONSÁVEL PELO CÁLCULO:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>KLAIVERTY</Text>
+        <Text style={{fontSize: 7, width: '10%'}}>ESTE:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>686.769,643</Text>
+        <Text style={{fontSize: 7, width: '12%'}}>MATERIAL:</Text>
+        <Text style={{fontSize: 7, width: '33%'}}>{data.material || 'REJEITO FILTRADO'}</Text>
+      </View>
+      
+      <View style={{flexDirection: 'row', marginBottom: 5}}>
+        <Text style={{fontSize: 7, width: '15%'}}>VERIFICADOR:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>EVANDRO</Text>
+        <Text style={{fontSize: 7, width: '10%'}}>COTA:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>797,618</Text>
+        <Text style={{fontSize: 7, width: '12%'}}>ORIGEM:</Text>
+        <Text style={{fontSize: 7, width: '33%'}}>{data.origin || 'EDVC'}</Text>
+      </View>
+      
+      <View style={{flexDirection: 'row', marginBottom: 5}}>
+        <Text style={{fontSize: 7, width: '15%'}}>DATA:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>{data.date || '04/06/2025'}</Text>
+        <Text style={{fontSize: 7, width: '10%'}}>QUADRANTE:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>A/B, FAIXA 1</Text>
+        <Text style={{fontSize: 7, width: '12%'}}>REGISTRO:</Text>
+        <Text style={{fontSize: 7, width: '33%'}}>{data.registrationNumber || 'CR-250'}</Text>
       </View>
 
-      {/* Seção TEMPO e DISPOSITIVOS */}
-      <View style={{flexDirection: 'row', marginBottom: 10}}>
-        <View style={{width: '60%'}}>
-          <View style={[styles.tableColHeader, {backgroundColor: '#F0F0F0', padding: 3}]}>
-            <Text style={{fontSize: 9, fontWeight: 'bold', color: '#000'}}>TEMPO</Text>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-around', padding: 5}}>
-            <View style={{alignItems: 'center'}}>
-              <View style={{width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#000', marginBottom: 2}}></View>
-              <Text style={{fontSize: 7}}>SOL FORTE</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <View style={{width: 15, height: 15, borderRadius: 7.5, borderWidth: 1, borderColor: '#000', marginBottom: 2}}></View>
-              <Text style={{fontSize: 7}}>CHUVA FRACA</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <View style={{width: 15, height: 15, borderRadius: 7.5, borderWidth: 1, borderColor: '#000', marginBottom: 2}}></View>
-              <Text style={{fontSize: 7}}>CHUVA FORTE</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <View style={{width: 15, height: 15, borderRadius: 7.5, borderWidth: 1, borderColor: '#000', marginBottom: 2}}></View>
-              <Text style={{fontSize: 7}}>NUBLADO</Text>
-            </View>
-          </View>
+      {/* Seção TEMPO e DISPOSITIVOS Compacta */}
+      <View style={{flexDirection: 'row', marginBottom: 5, borderTopWidth: 1, borderTopColor: '#000', paddingTop: 2}}>
+        <Text style={{fontSize: 7, fontWeight: 'bold', width: '12%'}}>TEMPO</Text>
+        <View style={{flexDirection: 'row', width: '45%'}}>
+          <Text style={{fontSize: 7, marginRight: 5}}>● SOL FORTE</Text>
+          <Text style={{fontSize: 7, marginRight: 5}}>○ CHUVA FRACA</Text>
+          <Text style={{fontSize: 7, marginRight: 5}}>○ CHUVA FORTE</Text>
+          <Text style={{fontSize: 7}}>○ NUBLADO</Text>
         </View>
-        <View style={{width: '20%', textAlign: 'center'}}>
-          <View style={[styles.tableColHeader, {backgroundColor: '#F0F0F0', padding: 3}]}>
-            <Text style={{fontSize: 9, fontWeight: 'bold', color: '#000'}}>HORA:</Text>
-          </View>
-          <Text style={{fontSize: 10, padding: 5}}>11:35</Text>
-        </View>
-        <View style={{width: '20%'}}>
-          <View style={[styles.tableColHeader, {backgroundColor: '#F0F0F0', padding: 3}]}>
-            <Text style={{fontSize: 9, fontWeight: 'bold', color: '#000'}}>CAMADA REENSAMADA:</Text>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'center', padding: 5}}>
-            <View style={{alignItems: 'center', marginRight: 10}}>
-              <View style={{width: 12, height: 12, borderRadius: 6, borderWidth: 1, borderColor: '#000'}}></View>
-              <Text style={{fontSize: 7}}>SIM</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <View style={{width: 12, height: 12, borderRadius: 6, backgroundColor: '#000'}}></View>
-              <Text style={{fontSize: 7}}>NÃO</Text>
-            </View>
-          </View>
-        </View>
+        <Text style={{fontSize: 7, fontWeight: 'bold', width: '8%'}}>HORA:</Text>
+        <Text style={{fontSize: 7, width: '10%'}}>15:11</Text>
+        <Text style={{fontSize: 7, fontWeight: 'bold', width: '15%'}}>CAMADA REENSAIADA:</Text>
+        <Text style={{fontSize: 7, width: '10%'}}>○ SIM ● NÃO</Text>
+      </View>
+      
+      <View style={{flexDirection: 'row', marginBottom: 5}}>
+        <Text style={{fontSize: 7, fontWeight: 'bold', width: '25%'}}>DISPOSITIVOS DE PRECISÃO</Text>
+        <Text style={{fontSize: 7, fontWeight: 'bold', width: '10%'}}>BALANÇA:</Text>
+        <Text style={{fontSize: 7, width: '15%'}}>46916</Text>
+        <Text style={{fontSize: 7, fontWeight: 'bold', width: '10%'}}>ESTUFA:</Text>
+        <Text style={{fontSize: 7, width: '40%'}}>718</Text>
       </View>
 
-      {/* Dispositivos de Precisão */}
-      <View style={{flexDirection: 'row', marginBottom: 15}}>
-        <View style={{width: '30%'}}>
-          <Text style={{fontSize: 9, fontWeight: 'bold', marginBottom: 3}}>DISPOSITIVOS DE PRECISÃO</Text>
-        </View>
-        <View style={{width: '35%'}}>
-          <Text style={{fontSize: 9, fontWeight: 'bold', marginBottom: 3}}>BALANÇA:</Text>
-          <Text style={{fontSize: 9}}>46916</Text>
-        </View>
-        <View style={{width: '35%'}}>
-          <Text style={{fontSize: 9, fontWeight: 'bold', marginBottom: 3}}>ESTUFA:</Text>
-          <Text style={{fontSize: 9}}>718</Text>
-        </View>
-      </View>
-
-      {/* Tabelas de Densidade Máxima e Mínima */}
-      <View style={{flexDirection: 'row', marginBottom: 15}}>
-        {/* Densidade Seca Máxima */}
+      {/* Tabelas de Densidade Máxima e Mínima - Formato Compacto */}
+      <View style={{flexDirection: 'row', marginBottom: 8}}>
         <View style={{width: '48%', marginRight: '2%'}}>
-          <View style={[styles.tableColHeader, {backgroundColor: '#E0E0E0', padding: 3}]}>
-            <Text style={{fontSize: 9, fontWeight: 'bold', color: '#000', textAlign: 'center'}}>DENSIDADE SECA MÁXIMA</Text>
-          </View>
-          <View style={styles.table}>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8, fontWeight: 'bold'}}>DETERMINAÇÃO Nº</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1</Text></View>
+          <Text style={{fontSize: 8, fontWeight: 'bold', textAlign: 'center', backgroundColor: '#E0E0E0', padding: 2}}>DENSIDADE SECA MÁXIMA</Text>
+          <View style={{borderWidth: 1, borderColor: '#000'}}>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>DETERMINAÇÃO Nº</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>1</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>MOLDE + SOLO (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>6012</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>6017</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>6023</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>MOLDE + SOLO (g)</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>6035</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>6030</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>6032</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>MOLDE (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>4114</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>4114</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>4114</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>MOLDE (g)</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>4106</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>4106</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>4106</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>SOLO (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1898</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1903</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1909</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>SOLO (g)</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1929</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1924</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>1926</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>VOLUME (cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1007</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1007</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1007</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>γd(g/cm³)</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1.908</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1.903</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>1.905</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γₕ(g/cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.885</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.890</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.895</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>w (%)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>0.0</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>0.0</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>0.0</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γd(g/cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.885</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.890</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.895</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γd,máx(g/cm³)</Text>
-              </View>
-              <View style={[styles.tableCol, {borderRightWidth: 0}]}><Text style={{fontSize: 8}}></Text></View>
-              <View style={[styles.tableCol, {backgroundColor: '#E0E0E0', borderLeftWidth: 0, borderRightWidth: 0}]}><Text style={{fontSize: 8, textAlign: 'center'}}>1.890</Text></View>
-              <View style={[styles.tableCol, {borderLeftWidth: 0}]}><Text style={{fontSize: 8}}></Text></View>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>γdmáx(g/cm³)</Text>
+              <Text style={{fontSize: 6, width: '65%', textAlign: 'center', backgroundColor: '#E0E0E0', padding: 1}}>1.905</Text>
             </View>
           </View>
         </View>
 
-        {/* Densidade Seca Mínima */}
         <View style={{width: '48%', marginLeft: '2%'}}>
-          <View style={[styles.tableColHeader, {backgroundColor: '#E0E0E0', padding: 3}]}>
-            <Text style={{fontSize: 9, fontWeight: 'bold', color: '#000', textAlign: 'center'}}>DENSIDADE SECA MÍNIMA</Text>
-          </View>
-          <View style={styles.table}>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8, fontWeight: 'bold'}}>NÚMERO DO CILINDRO</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1</Text></View>
+          <Text style={{fontSize: 8, fontWeight: 'bold', textAlign: 'center', backgroundColor: '#E0E0E0', padding: 2}}>DENSIDADE SECA MÍNIMA</Text>
+          <View style={{borderWidth: 1, borderColor: '#000'}}>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>NÚMERO DO CILINDRO</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>1</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>MOLDE + SOLO (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>5671</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>5683</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>5675</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>MOLDE + SOLO (g)</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>5670</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>5668</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>5658</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>MOLDE (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>4114</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>4114</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>4114</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>MOLDE (g)</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>4106</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>4106</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>4106</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>SOLO (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1557</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1569</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1561</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>SOLO (g)</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1564</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1562</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>1552</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>VOLUME (cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1007</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1007</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1007</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>γd(g/cm³)</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1.547</Text>
+              <Text style={{fontSize: 6, width: '21.7%', textAlign: 'center', padding: 1}}>1.545</Text>
+              <Text style={{fontSize: 6, width: '21.6%', textAlign: 'center', padding: 1}}>1.535</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γₕ(g/cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.546</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.558</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.550</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>w (%)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>0.0</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>0.0</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>0.0</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γd(g/cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.546</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.558</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1.550</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γd,mín(g/cm³)</Text>
-              </View>
-              <View style={[styles.tableCol, {borderRightWidth: 0}]}><Text style={{fontSize: 8}}></Text></View>
-              <View style={[styles.tableCol, {backgroundColor: '#E0E0E0', borderLeftWidth: 0, borderRightWidth: 0}]}><Text style={{fontSize: 8, textAlign: 'center'}}>1.551</Text></View>
-              <View style={[styles.tableCol, {borderLeftWidth: 0}]}><Text style={{fontSize: 8}}></Text></View>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{fontSize: 6, width: '35%', backgroundColor: '#F0F0F0', padding: 1}}>γdmín(g/cm³)</Text>
+              <Text style={{fontSize: 6, width: '65%', textAlign: 'center', backgroundColor: '#E0E0E0', padding: 1}}>1.542</Text>
             </View>
           </View>
         </View>
       </View>
 
-      {/* Densidade In Situ */}
-      <View style={{flexDirection: 'row', marginBottom: 15}}>
-        {/* Densidade In Situ - Cilindro de Cravação */}
-        <View style={{width: '48%', marginRight: '2%'}}>
-          <View style={[styles.tableColHeader, {backgroundColor: '#E0E0E0', padding: 3}]}>
-            <Text style={{fontSize: 9, fontWeight: 'bold', color: '#000', textAlign: 'center'}}>DENSIDADE "IN SITU" - CILINDRO DE CRAVAÇÃO</Text>
-            <Text style={{fontSize: 8, color: '#000', textAlign: 'center'}}>NBR 9813:2016</Text>
-          </View>
-          <View style={styles.table}>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8, fontWeight: 'bold'}}>NÚMERO DO CILINDRO</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>1</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>2</Text></View>
+      {/* Seção Densidade In Situ e Umidade - Layout Horizontal Compacto */}
+      <View style={{flexDirection: 'row', marginBottom: 8}}>
+        {/* Densidade In Situ Compacta */}
+        <View style={{width: '35%', marginRight: '2%'}}>
+          <Text style={{fontSize: 7, fontWeight: 'bold', textAlign: 'center', backgroundColor: '#E0E0E0', padding: 2}}>DENSIDADE "IN SITU" - CILINDRO DE CRAVAÇÃO</Text>
+          <Text style={{fontSize: 6, textAlign: 'center', marginBottom: 2}}>NBR 9813:2016</Text>
+          <View style={{borderWidth: 1, borderColor: '#000'}}>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '50%', backgroundColor: '#F0F0F0', padding: 1}}>NÚMERO DO CILINDRO</Text>
+              <Text style={{fontSize: 6, width: '25%', textAlign: 'center', padding: 1}}>3</Text>
+              <Text style={{fontSize: 6, width: '25%', textAlign: 'center', padding: 1}}>4</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>MOLDE + SOLO (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(data.det1?.moldeSolo || 3200).toFixed(0)}</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(data.det2?.moldeSolo || 3184).toFixed(0)}</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '50%', backgroundColor: '#F0F0F0', padding: 1}}>MOLDE + SOLO (g)</Text>
+              <Text style={{fontSize: 6, width: '25%', textAlign: 'center', padding: 1}}>3091</Text>
+              <Text style={{fontSize: 6, width: '25%', textAlign: 'center', padding: 1}}>3186</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>MOLDE (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(data.det1?.molde || 1132).toFixed(0)}</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(data.det2?.molde || 1146).toFixed(0)}</Text></View>
+            <View style={{flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000'}}>
+              <Text style={{fontSize: 6, width: '50%', backgroundColor: '#F0F0F0', padding: 1}}>γd(g/cm³)</Text>
+              <Text style={{fontSize: 6, width: '25%', textAlign: 'center', padding: 1}}>1.820</Text>
+              <Text style={{fontSize: 6, width: '25%', textAlign: 'center', padding: 1}}>1.879</Text>
             </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>SOLO (g)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{((data.det1?.moldeSolo || 3200) - (data.det1?.molde || 1132)).toFixed(0)}</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{((data.det2?.moldeSolo || 3184) - (data.det2?.molde || 1146)).toFixed(0)}</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>VOLUME (cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(data.det1?.volume || 1003).toFixed(0)}</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(data.det2?.volume || 1000).toFixed(0)}</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γₕ(g/cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(calculations.det1?.gammaNat || 2.062).toFixed(3)}</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(calculations.det2?.gammaNat || 2.038).toFixed(3)}</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γd(g/cm³)</Text>
-              </View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(calculations.det1?.gammaDry || 1.964).toFixed(3)}</Text></View>
-              <View style={styles.tableCol}><Text style={{fontSize: 8}}>{(calculations.det2?.gammaDry || 1.828).toFixed(3)}</Text></View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0'}]}>
-                <Text style={{fontSize: 8}}>γd(g/cm³) Média</Text>
-              </View>
-              <View style={[styles.tableCol, {borderRightWidth: 0}]}><Text style={{fontSize: 8}}></Text></View>
-              <View style={[styles.tableCol, {backgroundColor: '#E0E0E0', borderLeftWidth: 0}]}><Text style={{fontSize: 8, textAlign: 'center'}}>1.846</Text></View>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{fontSize: 6, width: '50%', backgroundColor: '#F0F0F0', padding: 1}}>γd(g/cm³) Média</Text>
+              <Text style={{fontSize: 6, width: '50%', textAlign: 'center', backgroundColor: '#E0E0E0', padding: 1}}>1.850</Text>
             </View>
           </View>
         </View>
