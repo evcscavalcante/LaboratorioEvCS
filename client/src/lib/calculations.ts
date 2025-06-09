@@ -87,12 +87,13 @@ export function calculateMoistureContent(moistureData: Array<{
 }
 
 /**
- * Calculate density in situ parameters
+ * Calculate density in situ parameters with separate moisture for each determination
  */
 export function calculateDensityInSitu(
   det1: { moldeSolo: number; molde: number; volume: number },
   det2: { moldeSolo: number; molde: number; volume: number },
-  moistureAverage: number
+  moistureTop: number,
+  moistureBase: number
 ): {
   det1: { soil: number; gammaNatWet: number; gammaNatDry: number };
   det2: { soil: number; gammaNatWet: number; gammaNatDry: number };
@@ -106,11 +107,12 @@ export function calculateDensityInSitu(
   const det1GammaNatWet = det1.volume > 0 ? det1Soil / det1.volume : 0;
   const det2GammaNatWet = det2.volume > 0 ? det2Soil / det2.volume : 0;
 
-  // Calculate dry densities
-  const det1GammaNatDry = moistureAverage > 0 ? 
-    det1GammaNatWet / (1 + moistureAverage / 100) : det1GammaNatWet;
-  const det2GammaNatDry = moistureAverage > 0 ? 
-    det2GammaNatWet / (1 + moistureAverage / 100) : det2GammaNatWet;
+  // Calculate dry densities using specific moisture for each determination
+  // det1 (TOPO) uses moistureTop, det2 (BASE) uses moistureBase
+  const det1GammaNatDry = moistureTop > 0 ? 
+    det1GammaNatWet / (1 + moistureTop / 100) : det1GammaNatWet;
+  const det2GammaNatDry = moistureBase > 0 ? 
+    det2GammaNatWet / (1 + moistureBase / 100) : det2GammaNatWet;
 
   // Calculate average dry density
   const gammaNatDryAvg = (det1GammaNatDry + det2GammaNatDry) / 2;

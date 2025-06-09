@@ -99,7 +99,7 @@ export default function DensityInSitu() {
       voidIndexBase: 0,
       relativeCompactnessTop: 0,
       relativeCompactnessBase: 0,
-      status: "AGUARDANDO" as const 
+      status: "AGUARDANDO" as "AGUARDANDO" | "APROVADO" | "REPROVADO" 
     }
   });
 
@@ -141,15 +141,13 @@ export default function DensityInSitu() {
       data.moistureBase3
     ]);
 
-    // Calculate dry densities for top and base
-    const det1GammaNatDryTop = moistureTopResults.average > 0 ? det1GammaNatWet / (1 + moistureTopResults.average / 100) : 0;
-    const det2GammaNatDryTop = moistureTopResults.average > 0 ? det2GammaNatWet / (1 + moistureTopResults.average / 100) : 0;
+    // Calculate dry densities correctly: det1 (TOPO) uses moistureTop, det2 (BASE) uses moistureBase
+    const det1GammaNatDry = moistureTopResults.average > 0 ? det1GammaNatWet / (1 + moistureTopResults.average / 100) : det1GammaNatWet;
+    const det2GammaNatDry = moistureBaseResults.average > 0 ? det2GammaNatWet / (1 + moistureBaseResults.average / 100) : det2GammaNatWet;
     
-    const det1GammaNatDryBase = moistureBaseResults.average > 0 ? det1GammaNatWet / (1 + moistureBaseResults.average / 100) : 0;
-    const det2GammaNatDryBase = moistureBaseResults.average > 0 ? det2GammaNatWet / (1 + moistureBaseResults.average / 100) : 0;
-    
-    const gammaDTop = (det1GammaNatDryTop + det2GammaNatDryTop) / 2;
-    const gammaDBase = (det1GammaNatDryBase + det2GammaNatDryBase) / 2;
+    // Store individual values for TOPO and BASE
+    const gammaDTop = det1GammaNatDry;
+    const gammaDBase = det2GammaNatDry;
 
     // Calculate void indices and relative compactness
     // Using standard soil mechanics formulas
@@ -177,8 +175,8 @@ export default function DensityInSitu() {
       gammaNatDryAvg === 0 ? "AGUARDANDO" : "REPROVADO";
 
     setCalculations({
-      det1: { soil: det1Soil, gammaNatWet: det1GammaNatWet, gammaNatDry: det1GammaNatDryTop },
-      det2: { soil: det2Soil, gammaNatWet: det2GammaNatWet, gammaNatDry: det2GammaNatDryTop },
+      det1: { soil: det1Soil, gammaNatWet: det1GammaNatWet, gammaNatDry: det1GammaNatDry },
+      det2: { soil: det2Soil, gammaNatWet: det2GammaNatWet, gammaNatDry: det2GammaNatDry },
       gammaNatDryAvg,
       moistureTop: moistureTopResults,
       moistureBase: moistureBaseResults,
@@ -189,8 +187,9 @@ export default function DensityInSitu() {
         voidIndexBase,
         relativeCompactnessTop,
         relativeCompactnessBase,
-        voidIndex: (voidIndexTop + voidIndexBase) / 2, // Average for compatibility
-        relativeCompactness: (relativeCompactnessTop + relativeCompactnessBase) / 2, // Average for compatibility
+        averageGammaDry: gammaNatDryAvg,
+        voidIndex: (voidIndexTop + voidIndexBase) / 2,
+        relativeCompactness: (relativeCompactnessTop + relativeCompactnessBase) / 2,
         status
       }
     });
