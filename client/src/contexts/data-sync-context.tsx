@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './auth-context';
 import { db } from '../lib/firebase';
 import { 
-  collection, 
+  collection as firebaseCollection, 
   doc, 
   addDoc, 
   updateDoc, 
@@ -83,7 +83,7 @@ export function DataSyncProvider({ children }: DataSyncProviderProps) {
       for (const item of pendingData) {
         try {
           const collectionPath = `users/${currentUser.uid}/${item.collection}`;
-          const collectionRef = collection(db, collectionPath);
+          const collectionRef = firebaseCollection(db, collectionPath);
           
           if (item.operation === 'create') {
             await addDoc(collectionRef, {
@@ -178,7 +178,7 @@ export function DataSyncProvider({ children }: DataSyncProviderProps) {
       if (isOnline && db) {
         try {
           const collectionPath = `users/${currentUser.uid}/${collection}`;
-          const collectionRef = collection(db, collectionPath);
+          const collectionRef = firebaseCollection(db, collectionPath);
           await addDoc(collectionRef, newItem);
         } catch (error) {
           addToPendingSync('create', collection, newItem);
