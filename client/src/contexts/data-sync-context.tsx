@@ -67,22 +67,7 @@ export function DataSyncProvider({ children }: DataSyncProviderProps) {
     };
   }, [currentUser]);
 
-  // Enable Firebase offline persistence
-  useEffect(() => {
-    if (db) {
-      enableIndexedDbPersistence(db)
-        .then(() => {
-          console.log('Firebase offline persistence enabled');
-        })
-        .catch((error) => {
-          if (error.code === 'failed-precondition') {
-            console.warn('Multiple tabs open, persistence can only be enabled in one tab');
-          } else if (error.code === 'unimplemented') {
-            console.warn('Browser does not support persistence');
-          }
-        });
-    }
-  }, []);
+  // Firebase persistence is handled in firebase.ts to avoid conflicts
 
   // Sync pending data when coming online
   const syncPendingData = async () => {

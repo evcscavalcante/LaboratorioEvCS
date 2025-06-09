@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { hybridStorage } from "./hybrid-storage";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -12,6 +13,22 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  // Intercept API calls and use hybrid storage for Firebase/offline sync
+  if (method === 'POST' && url.includes('/api/density-in-situ')) {
+    const result = await hybridStorage.createDensityInSituTest(data as any);
+    return new Response(JSON.stringify(result), { status: 200 });
+  }
+  
+  if (method === 'POST' && url.includes('/api/real-density')) {
+    const result = await hybridStorage.createRealDensityTest(data as any);
+    return new Response(JSON.stringify(result), { status: 200 });
+  }
+  
+  if (method === 'POST' && url.includes('/api/max-min-density')) {
+    const result = await hybridStorage.createMaxMinDensityTest(data as any);
+    return new Response(JSON.stringify(result), { status: 200 });
+  }
+
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
@@ -29,7 +46,22 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Use hybrid storage for specific endpoints
+    const url = queryKey[0] as string;
+    
+    if (url === '/api/density-in-situ') {
+      return await hybridStorage.getDensityInSituTests();
+    }
+    
+    if (url === '/api/real-density') {
+      return await hybridStorage.getRealDensityTests();
+    }
+    
+    if (url === '/api/max-min-density') {
+      return await hybridStorage.getMaxMinDensityTests();
+    }
+
+    const res = await fetch(url, {
       credentials: "include",
     });
 

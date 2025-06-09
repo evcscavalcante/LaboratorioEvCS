@@ -1,22 +1,33 @@
-import { Wifi, WifiOff, Cloud, CloudOff, Loader2 } from 'lucide-react';
+import { WifiOff, Cloud, CloudOff } from 'lucide-react';
 import { Badge } from './badge';
+import { useState, useEffect } from 'react';
 
-interface SyncStatusProps {
-  isOnline: boolean;
-  isSyncing: boolean;
-  pendingChanges: number;
-  lastSyncTime?: Date | null;
-}
+export default function SyncStatus() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [pendingChanges, setPendingChanges] = useState(0);
 
-export default function SyncStatus({ isOnline, isSyncing, pendingChanges, lastSyncTime }: SyncStatusProps) {
-  if (isSyncing) {
-    return (
-      <Badge variant="secondary" className="flex items-center gap-1">
-        <Loader2 className="h-3 w-3 animate-spin" />
-        Sincronizando...
-      </Badge>
-    );
-  }
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    // Check for pending changes
+    const checkPending = () => {
+      const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+      setPendingChanges(pending.length);
+    };
+    
+    checkPending();
+    const interval = setInterval(checkPending, 1000);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      clearInterval(interval);
+    };
+  }, []);
 
   if (!isOnline) {
     return (
@@ -44,15 +55,7 @@ export default function SyncStatus({ isOnline, isSyncing, pendingChanges, lastSy
   return (
     <Badge variant="outline" className="flex items-center gap-1">
       <Cloud className="h-3 w-3" />
-      Sincronizado
-      {lastSyncTime && (
-        <span className="text-xs opacity-70">
-          {lastSyncTime.toLocaleTimeString('pt-BR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          })}
-        </span>
-      )}
+      Online
     </Badge>
   );
 }

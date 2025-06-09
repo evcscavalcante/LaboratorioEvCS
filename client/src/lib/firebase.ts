@@ -1,6 +1,6 @@
 import { initializeApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
-import { getFirestore, Firestore, enableNetwork, disableNetwork } from "firebase/firestore";
+import { getFirestore, Firestore, enableNetwork, disableNetwork, enableIndexedDbPersistence } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
@@ -15,11 +15,30 @@ const firebaseConfig = {
 let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
 let db: Firestore | undefined;
+let persistenceEnabled = false;
 
 try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
+  
+  // Enable persistence only once
+  if (db && !persistenceEnabled) {
+    enableIndexedDbPersistence(db)
+      .then(() => {
+        persistenceEnabled = true;
+        console.log('Firebase offline persistence enabled');
+      })
+      .catch((error) => {
+        if (error.code === 'failed-precondition') {
+          console.warn('Multiple tabs open, persistence can only be enabled in one tab');
+        } else if (error.code === 'unimplemented') {
+          console.warn('Browser does not support persistence');
+        } else {
+          console.warn('Persistence error:', error);
+        }
+      });
+  }
 } catch (error) {
   console.warn('Firebase initialization error:', error);
 }
