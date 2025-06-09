@@ -789,17 +789,17 @@ const MaxMinDensityDocument: React.FC<{ data: any; calculations: any }> = ({ dat
 // Funções de exportação
 export async function generateDensityInSituPDF(data: any, calculations: any): Promise<void> {
   try {
-    const document = <DensityInSituDocument data={data} calculations={calculations} />;
-    const asPdf = pdf(document);
+    const pdfDocument = <DensityInSituDocument data={data} calculations={calculations} />;
+    const asPdf = pdf(pdfDocument);
     const blob = await asPdf.toBlob();
     
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = window.document.createElement('a');
     link.href = url;
     link.download = `densidade-in-situ-${data.registrationNumber || 'relatorio'}.pdf`;
-    document.body.appendChild(link);
+    window.document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    window.document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Erro ao gerar PDF:', error);
@@ -809,17 +809,17 @@ export async function generateDensityInSituPDF(data: any, calculations: any): Pr
 
 export async function generateRealDensityPDF(data: any, calculations: any): Promise<void> {
   try {
-    const document = <RealDensityDocument data={data} calculations={calculations} />;
-    const asPdf = pdf(document);
+    const pdfDocument = <RealDensityDocument data={data} calculations={calculations} />;
+    const asPdf = pdf(pdfDocument);
     const blob = await asPdf.toBlob();
     
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = globalThis.document.createElement('a');
     link.href = url;
     link.download = `densidade-real-${data.registrationNumber || 'relatorio'}.pdf`;
-    document.body.appendChild(link);
+    globalThis.document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    globalThis.document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Erro ao gerar PDF:', error);
@@ -829,17 +829,17 @@ export async function generateRealDensityPDF(data: any, calculations: any): Prom
 
 export async function generateMaxMinDensityPDF(data: any, calculations: any): Promise<void> {
   try {
-    const document = <MaxMinDensityDocument data={data} calculations={calculations} />;
-    const asPdf = pdf(document);
+    const pdfDocument = <MaxMinDensityDocument data={data} calculations={calculations} />;
+    const asPdf = pdf(pdfDocument);
     const blob = await asPdf.toBlob();
     
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = globalThis.document.createElement('a');
     link.href = url;
     link.download = `densidade-max-min-${data.registrationNumber || 'relatorio'}.pdf`;
-    document.body.appendChild(link);
+    globalThis.document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    globalThis.document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Erro ao gerar PDF:', error);
