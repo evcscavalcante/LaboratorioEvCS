@@ -1,6 +1,12 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
+
 /**
  * Generate PDF for Density In Situ test
  */
@@ -36,7 +42,7 @@ export function generateDensityInSituPDF(data: any, calculations: any): void {
     ['Coordenadas:', data.coordinates || '-']
   ];
   
-  autoTable(doc, {
+  doc.autoTable({
     startY: 65,
     head: [],
     body: generalInfo,
@@ -62,7 +68,7 @@ export function generateDensityInSituPDF(data: any, calculations: any): void {
     ['γnat seco (g/cm³)', calculations.det1.gammaNatDry.toFixed(3), calculations.det2.gammaNatDry.toFixed(3)]
   ];
   
-  autoTable(doc, {
+  doc.autoTable({
     startY: (doc as any).lastAutoTable.finalY + 20,
     head: [densityData[0]],
     body: densityData.slice(1),
@@ -85,7 +91,7 @@ export function generateDensityInSituPDF(data: any, calculations: any): void {
     ['Umidade Média Base:', `${calculations.moistureBase.average.toFixed(2)}%`]
   ];
   
-  autoTable(doc, {
+  doc.autoTable({
     startY: (doc as any).lastAutoTable.finalY + 20,
     head: [],
     body: results,
@@ -106,7 +112,7 @@ export function generateDensityInSituPDF(data: any, calculations: any): void {
     ['Compacidade Relativa (%)', calculations.results.relativeCompactnessTop.toFixed(1), calculations.results.relativeCompactnessBase.toFixed(1)]
   ];
   
-  autoTable(doc, {
+  doc.autoTable({
     startY: (doc as any).lastAutoTable.finalY + 20,
     head: [detailedResults[0]],
     body: detailedResults.slice(1),
