@@ -224,14 +224,14 @@ export default function UserManagement() {
               <div>
                 <Label htmlFor="organization">Organização</Label>
                 <Select 
-                  value={formData.organizationId?.toString() || ''} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, organizationId: value ? parseInt(value) : null }))}
+                  value={formData.organizationId?.toString() || '0'} 
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, organizationId: value && value !== '0' ? parseInt(value) : null }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma organização" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sem organização</SelectItem>
+                    <SelectItem value="0">Sem organização</SelectItem>
                     {organizations.map((org: Organization) => (
                       <SelectItem key={org.id} value={org.id.toString()}>{org.name}</SelectItem>
                     ))}
@@ -370,14 +370,14 @@ export default function UserManagement() {
             <div>
               <Label htmlFor="edit-organization">Organização</Label>
               <Select 
-                value={formData.organizationId?.toString() || ''} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, organizationId: value ? parseInt(value) : null }))}
+                value={formData.organizationId?.toString() || '0'} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, organizationId: value && value !== '0' ? parseInt(value) : null }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione uma organização" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sem organização</SelectItem>
+                  <SelectItem value="0">Sem organização</SelectItem>
                   {organizations.map((org: Organization) => (
                     <SelectItem key={org.id} value={org.id.toString()}>{org.name}</SelectItem>
                   ))}
