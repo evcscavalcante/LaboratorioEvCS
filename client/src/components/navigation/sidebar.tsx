@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import UserMenu from '@/components/auth/user-menu';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -126,14 +127,17 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   return (
     <div className="fixed left-0 top-0 z-40 h-screen w-64 bg-white border-r border-gray-200 shadow-lg">
       {/* Header */}
-      <div className="flex items-center gap-3 p-6 border-b border-gray-200">
-        <div className="p-2 bg-blue-100 rounded-lg">
-          <FlaskRound className="h-6 w-6 text-blue-600" />
+      <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <FlaskRound className="h-6 w-6 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Laboratório Ev.C.S</h2>
+            <p className="text-sm text-gray-500">Sistema Geotécnico</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">Laboratório Ev.C.S</h2>
-          <p className="text-sm text-gray-500">Sistema Geotécnico</p>
-        </div>
+        <UserMenu />
       </div>
 
       {/* Navigation */}

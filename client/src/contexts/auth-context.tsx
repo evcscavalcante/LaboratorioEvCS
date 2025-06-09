@@ -12,8 +12,8 @@ import { auth } from '@/lib/firebase';
 
 interface AuthContextType {
   currentUser: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, displayName: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
+  signup: (email: string, password: string, displayName: string) => Promise<any>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   loading: boolean;

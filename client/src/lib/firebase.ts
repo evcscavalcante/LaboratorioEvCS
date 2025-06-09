@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "GOOGLE_API_KEY",
+  apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
   authDomain: "laboratorio-evcs.firebaseapp.com",
   projectId: "laboratorio-evcs",
   storageBucket: "laboratorio-evcs.firebasestorage.app",
