@@ -13,6 +13,9 @@ import {
   Target,
   Layers,
   Scale,
+  Shield,
+  Users,
+  Building,
   LucideIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -51,6 +54,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const [solosOpen, setSolosOpen] = useState(true);
   const [asfaltoOpen, setAsfaltoOpen] = useState(false);
   const [concretoOpen, setConcretoOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const { currentUser } = useAuth();
 
   const menuItems: MenuItem[] = [

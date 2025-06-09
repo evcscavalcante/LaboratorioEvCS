@@ -1,11 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
+import { users, organizations, userSessions } from "@shared/schema";
 import { 
   insertDensityInSituTestSchema,
   insertRealDensityTestSchema,
-  insertMaxMinDensityTestSchema
+  insertMaxMinDensityTestSchema,
+  insertUserSchema,
+  insertOrganizationSchema
 } from "@shared/schema";
+import { eq, count } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -171,6 +176,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ message: "Failed to update max min density test" });
       }
+    }
+  });
+
+  // User Management Routes
+  app.get("/api/users", async (req, res) => {
+    try {
+      const allUsers = await db.select().from(users);
+      res.json(allUsers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.post("/api/users", async (req, res) => {
+    try {
+      const validated = insertUserSchema.parse(req.body);
+      const [user] = await db.insert(users).values(validated).returning();
+      res.status(201).json(user);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to create user" });
+      }
+    }
+  });
+
+  app.patch("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      const [user] = await db.update(users).set(updates).where(eq(users.id, id)).returning();
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to update user" });
+      }
+    }
+  });
+
+  app.delete("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(users).where(eq(users.id, id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Organization Management Routes
+  app.get("/api/organizations", async (req, res) => {
+    try {
+      const allOrgs = await db.select().from(organizations);
+      res.json(allOrgs);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch organizations" });
+    }
+  });
+
+  app.get("/api/organizations/user-counts", async (req, res) => {
+    try {
+      const userCounts = await db
+        .select({
+          organizationId: users.organizationId,
+          count: count()
+        })
+        .from(users)
+        .where(eq(users.active, true))
+        .groupBy(users.organizationId);
+      
+      const countsMap = userCounts.reduce((acc, item) => {
+        if (item.organizationId) {
+          acc[item.organizationId] = item.count;
+        }
+        return acc;
+      }, {} as Record<number, number>);
+      
+      res.json(countsMap);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user counts" });
+    }
+  });
+
+  app.post("/api/organizations", async (req, res) => {
+    try {
+      const validated = insertOrganizationSchema.parse(req.body);
+      const [org] = await db.insert(organizations).values(validated).returning();
+      res.status(201).json(org);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to create organization" });
+      }
+    }
+  });
+
+  app.patch("/api/organizations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      const [org] = await db.update(organizations).set(updates).where(eq(organizations.id, id)).returning();
+      if (!org) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      res.json(org);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to update organization" });
+      }
+    }
+  });
+
+  app.delete("/api/organizations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(organizations).where(eq(organizations.id, id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete organization" });
     }
   });
 
