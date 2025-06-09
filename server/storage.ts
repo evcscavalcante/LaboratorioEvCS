@@ -47,9 +47,10 @@ export class MemStorage implements IStorage {
   async createDensityInSituTest(insertTest: InsertDensityInSituTest): Promise<DensityInSituTest> {
     const id = this.currentId++;
     const test: DensityInSituTest = { 
-      ...insertTest, 
+      ...insertTest,
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      time: insertTest.time || null
     };
     this.densityInSituTests.set(id, test);
     return test;

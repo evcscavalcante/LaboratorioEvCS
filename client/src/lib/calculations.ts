@@ -218,7 +218,7 @@ export function determineTestStatus(
       
     case "real-density":
       if (values.difference === 0) return "AGUARDANDO";
-      // Corrected criteria: APPROVED if difference ≤ 0.02 g/cm³ (not 0.05)
+      // APPROVED if difference ≤ 0.02 g/cm³ (corrected from 0.05)
       return values.difference <= 0.02 && values.average > 0 ? "APROVADO" : "REPROVADO";
       
     case "max-min-density":

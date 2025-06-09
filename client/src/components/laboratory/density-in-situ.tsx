@@ -9,8 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import StatusIndicator from "./status-indicator";
 import { calculateMoistureContent, calculateDensityInSitu } from "@/lib/calculations";
 import { generateDensityInSituPDF } from "@/lib/pdf-generator";
-import { useMutation, queryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface DensityInSituData {
@@ -138,7 +138,9 @@ export default function DensityInSitu() {
     const gammaNatDryAvg = (det1GammaNatDry + det2GammaNatDry) / 2;
 
     // Determine status
-    const status = gammaNatDryAvg > 1.5 ? "APROVADO" : gammaNatDryAvg === 0 ? "AGUARDANDO" : "REPROVADO";
+    const status: "AGUARDANDO" | "APROVADO" | "REPROVADO" = 
+      gammaNatDryAvg > 1.5 ? "APROVADO" : 
+      gammaNatDryAvg === 0 ? "AGUARDANDO" : "REPROVADO";
 
     setCalculations({
       det1: { soil: det1Soil, gammaNatWet: det1GammaNatWet, gammaNatDry: det1GammaNatDry },
@@ -161,10 +163,16 @@ export default function DensityInSitu() {
   };
 
   const updateNestedData = (parent: string, field: string, value: any) => {
-    setData(prev => ({
-      ...prev,
-      [parent]: { ...prev[parent as keyof DensityInSituData], [field]: value }
-    }));
+    setData(prev => {
+      const parentData = prev[parent as keyof DensityInSituData];
+      if (typeof parentData === 'object' && parentData !== null) {
+        return {
+          ...prev,
+          [parent]: { ...parentData, [field]: value }
+        };
+      }
+      return prev;
+    });
   };
 
   const handleSave = () => {

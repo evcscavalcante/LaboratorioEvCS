@@ -1,150 +1,127 @@
-// PDF generation utilities using browser's print functionality
-// This approach is more reliable than external libraries for production use
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 /**
  * Generate PDF for Density In Situ test
  */
 export function generateDensityInSituPDF(data: any, calculations: any): void {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    alert('Por favor, permita pop-ups para gerar o PDF');
-    return;
-  }
+  const doc = new jsPDF();
+  
+  // Header
+  doc.setFontSize(18);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Laboratório Ev.C.S', 105, 20, { align: 'center' });
+  
+  doc.setFontSize(14);
+  doc.setTextColor(102, 102, 102);
+  doc.text('Relatório de Densidade In Situ', 105, 30, { align: 'center' });
+  
+  doc.setFontSize(10);
+  doc.text('Conforme ABNT NBR 6457 e NBR 9813', 105, 38, { align: 'center' });
+  doc.text(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, 105, 44, { align: 'center' });
+  
+  // General Information
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text('Informações Gerais', 20, 60);
+  
+  const generalInfo = [
+    ['Registro:', data.registrationNumber || '-'],
+    ['Data:', data.date || '-'],
+    ['Hora:', data.time || '-'],
+    ['Operador:', data.operator || '-'],
+    ['Responsável Técnico:', data.technicalResponsible || '-'],
+    ['Material:', data.material || '-'],
+    ['Origem:', data.origin || '-'],
+    ['Coordenadas:', data.coordinates || '-']
+  ];
+  
+  autoTable(doc, {
+    startY: 65,
+    head: [],
+    body: generalInfo,
+    theme: 'grid',
+    styles: { fontSize: 9 },
+    columnStyles: {
+      0: { fontStyle: 'bold', cellWidth: 40 },
+      1: { cellWidth: 60 }
+    }
+  });
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Relatório de Densidade In Situ</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-        .header { text-align: center; border-bottom: 2px solid #1976D2; padding-bottom: 20px; margin-bottom: 30px; }
-        .header h1 { color: #1976D2; margin: 0; }
-        .header h2 { color: #666; margin: 5px 0; font-weight: normal; }
-        .section { margin: 20px 0; }
-        .section-title { background: #1976D2; color: white; padding: 10px; margin: 15px 0 10px 0; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
-        .info-item { padding: 5px; border-bottom: 1px solid #eee; }
-        .label { font-weight: bold; color: #555; }
-        .value { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background: #f5f5f5; font-weight: bold; }
-        .calculated { background: #e3f2fd; }
-        .results { background: #f9f9f9; padding: 15px; border-left: 4px solid #1976D2; }
-        .status { padding: 10px; text-align: center; font-weight: bold; margin: 20px 0; }
-        .status.APROVADO { background: #4CAF50; color: white; }
-        .status.REPROVADO { background: #F44336; color: white; }
-        .status.AGUARDANDO { background: #FF9800; color: white; }
-        .footer { margin-top: 40px; font-size: 12px; text-align: center; color: #666; }
-        @media print { .no-print { display: none; } }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>🧪 Laboratório Ev.C.S</h1>
-        <h2>Relatório de Densidade In Situ</h2>
-        <p>Conforme ABNT NBR 6457 e NBR 9813</p>
-        <p>Data de geração: ${new Date().toLocaleString('pt-BR')}</p>
-      </div>
+  // Density Determinations
+  doc.text('Densidade In Situ - Determinações', 20, (doc as any).lastAutoTable.finalY + 15);
+  
+  const densityData = [
+    ['Campo', 'Det 1', 'Det 2'],
+    ['Cilindro Nº', data.det1?.cylinderNumber || '-', data.det2?.cylinderNumber || '-'],
+    ['Molde + Solo (g)', (data.det1?.moldeSolo || 0).toFixed(2), (data.det2?.moldeSolo || 0).toFixed(2)],
+    ['Molde (g)', (data.det1?.molde || 0).toFixed(2), (data.det2?.molde || 0).toFixed(2)],
+    ['Solo (g)', calculations.det1.soil.toFixed(2), calculations.det2.soil.toFixed(2)],
+    ['Volume (cm³)', (data.det1?.volume || 0).toFixed(2), (data.det2?.volume || 0).toFixed(2)],
+    ['γnat úmido (g/cm³)', calculations.det1.gammaNatWet.toFixed(3), calculations.det2.gammaNatWet.toFixed(3)],
+    ['γnat seco (g/cm³)', calculations.det1.gammaNatDry.toFixed(3), calculations.det2.gammaNatDry.toFixed(3)]
+  ];
+  
+  autoTable(doc, {
+    startY: (doc as any).lastAutoTable.finalY + 20,
+    head: [densityData[0]],
+    body: densityData.slice(1),
+    theme: 'striped',
+    headStyles: { fillColor: [25, 118, 210] },
+    styles: { fontSize: 9, halign: 'center' },
+    columnStyles: {
+      0: { halign: 'left', fontStyle: 'bold' }
+    }
+  });
 
-      <div class="section">
-        <div class="section-title">Informações Gerais</div>
-        <div class="info-grid">
-          <div class="info-item"><span class="label">Registro:</span> <span class="value">${data.registrationNumber}</span></div>
-          <div class="info-item"><span class="label">Data:</span> <span class="value">${data.date}</span></div>
-          <div class="info-item"><span class="label">Hora:</span> <span class="value">${data.time}</span></div>
-          <div class="info-item"><span class="label">Operador:</span> <span class="value">${data.operator}</span></div>
-          <div class="info-item"><span class="label">Responsável Técnico:</span> <span class="value">${data.technicalResponsible}</span></div>
-          <div class="info-item"><span class="label">Material:</span> <span class="value">${data.material}</span></div>
-          <div class="info-item"><span class="label">Origem:</span> <span class="value">${data.origin}</span></div>
-          <div class="info-item"><span class="label">Coordenadas:</span> <span class="value">${data.coordinates}</span></div>
-        </div>
-      </div>
+  // Results
+  doc.text('Resultados Finais', 20, (doc as any).lastAutoTable.finalY + 15);
+  
+  const results = [
+    ['γd Topo:', `${calculations.results.gammaDTop.toFixed(3)} g/cm³`],
+    ['γd Base:', `${calculations.results.gammaDBase.toFixed(3)} g/cm³`],
+    ['Índice de Vazios (e):', calculations.results.voidIndex.toFixed(3)],
+    ['Compacidade Relativa:', `${calculations.results.relativeCompactness.toFixed(1)}%`],
+    ['Média γnat seco:', `${calculations.gammaNatDryAvg.toFixed(3)} g/cm³`],
+    ['Umidade Média Topo:', `${calculations.moistureTop.average.toFixed(2)}%`],
+    ['Umidade Média Base:', `${calculations.moistureBase.average.toFixed(2)}%`]
+  ];
+  
+  autoTable(doc, {
+    startY: (doc as any).lastAutoTable.finalY + 20,
+    head: [],
+    body: results,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    columnStyles: {
+      0: { fontStyle: 'bold', cellWidth: 60 },
+      1: { cellWidth: 60 }
+    }
+  });
 
-      <div class="section">
-        <div class="section-title">Densidade In Situ - Determinações</div>
-        <table>
-          <tr>
-            <th>Campo</th>
-            <th>Det 1</th>
-            <th>Det 2</th>
-          </tr>
-          <tr>
-            <td>Cilindro Nº</td>
-            <td>${data.det1.cylinderNumber}</td>
-            <td>${data.det2.cylinderNumber}</td>
-          </tr>
-          <tr>
-            <td>Molde + Solo (g)</td>
-            <td>${data.det1.moldeSolo.toFixed(2)}</td>
-            <td>${data.det2.moldeSolo.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Molde (g)</td>
-            <td>${data.det1.molde.toFixed(2)}</td>
-            <td>${data.det2.molde.toFixed(2)}</td>
-          </tr>
-          <tr class="calculated">
-            <td>Solo (g)</td>
-            <td>${calculations.det1.soil.toFixed(2)}</td>
-            <td>${calculations.det2.soil.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Volume (cm³)</td>
-            <td>${data.det1.volume.toFixed(2)}</td>
-            <td>${data.det2.volume.toFixed(2)}</td>
-          </tr>
-          <tr class="calculated">
-            <td>γnat úmido (g/cm³)</td>
-            <td>${calculations.det1.gammaNatWet.toFixed(3)}</td>
-            <td>${calculations.det2.gammaNatWet.toFixed(3)}</td>
-          </tr>
-          <tr class="calculated">
-            <td>γnat seco (g/cm³)</td>
-            <td>${calculations.det1.gammaNatDry.toFixed(3)}</td>
-            <td>${calculations.det2.gammaNatDry.toFixed(3)}</td>
-          </tr>
-        </table>
-      </div>
+  // Status
+  const statusColors = {
+    'APROVADO': [76, 175, 80],
+    'REPROVADO': [244, 67, 54],
+    'AGUARDANDO': [255, 152, 0]
+  };
+  
+  const statusColor = statusColors[calculations.results.status as keyof typeof statusColors] || [128, 128, 128];
+  doc.setFillColor(statusColor[0], statusColor[1], statusColor[2]);
+  doc.rect(20, (doc as any).lastAutoTable.finalY + 15, 170, 15, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(12);
+  doc.text(`STATUS DO ENSAIO: ${calculations.results.status}`, 105, (doc as any).lastAutoTable.finalY + 25, { align: 'center' });
 
-      <div class="section">
-        <div class="section-title">Teor de Umidade</div>
-        <p><strong>Umidade Média Topo:</strong> ${calculations.moistureTop.average.toFixed(2)}%</p>
-        <p><strong>Umidade Média Base:</strong> ${calculations.moistureBase.average.toFixed(2)}%</p>
-      </div>
+  // Footer
+  doc.setTextColor(128, 128, 128);
+  doc.setFontSize(8);
+  doc.text('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', 105, 280, { align: 'center' });
+  doc.text('Conforme normas ABNT NBR 6457 e NBR 9813', 105, 286, { align: 'center' });
 
-      <div class="section">
-        <div class="section-title">Resultados Finais</div>
-        <div class="results">
-          <p><strong>γd Topo:</strong> ${calculations.results.gammaDTop.toFixed(3)} g/cm³</p>
-          <p><strong>γd Base:</strong> ${calculations.results.gammaDBase.toFixed(3)} g/cm³</p>
-          <p><strong>Índice de Vazios (e):</strong> ${calculations.results.voidIndex.toFixed(3)}</p>
-          <p><strong>Compacidade Relativa:</strong> ${calculations.results.relativeCompactness.toFixed(1)}%</p>
-          <p><strong>Média γnat seco:</strong> ${calculations.gammaNatDryAvg.toFixed(3)} g/cm³</p>
-        </div>
-      </div>
-
-      <div class="status ${calculations.results.status}">
-        STATUS DO ENSAIO: ${calculations.results.status}
-      </div>
-
-      <div class="footer">
-        <p>Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S</p>
-        <p>Conforme normas ABNT NBR 6457 e NBR 9813</p>
-      </div>
-
-      <div class="no-print" style="text-align: center; margin: 20px;">
-        <button onclick="window.print()" style="padding: 10px 20px; background: #1976D2; color: white; border: none; border-radius: 5px; cursor: pointer;">Imprimir PDF</button>
-        <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Fechar</button>
-      </div>
-    </body>
-    </html>
-  `;
-
-  printWindow.document.write(html);
-  printWindow.document.close();
+  // Save PDF
+  doc.save(`densidade-in-situ-${data.registrationNumber || 'relatorio'}.pdf`);
 }
 
 /**
