@@ -20,6 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { cn } from '@/lib/utils';
 import UserMenu from '@/components/auth/user-menu';
 import { useAuth } from '@/contexts/auth-context';
+import SyncStatus from '@/components/ui/sync-status';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -139,7 +140,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
             <p className="text-sm text-gray-500">Sistema Geotécnico</p>
           </div>
         </div>
-        {currentUser && <UserMenu />}
+        <div className="flex items-center gap-2">
+          <SyncStatus />
+          {currentUser && <UserMenu />}
+        </div>
       </div>
 
       {/* Navigation */}
