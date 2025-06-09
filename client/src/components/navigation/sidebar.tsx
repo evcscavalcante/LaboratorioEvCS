@@ -16,7 +16,10 @@ import {
   Shield,
   Users,
   Building,
-  LucideIcon
+  LucideIcon,
+  HelpCircle,
+  Book,
+  UserCog
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -55,6 +58,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const [asfaltoOpen, setAsfaltoOpen] = useState(false);
   const [concretoOpen, setConcretoOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { currentUser } = useAuth();
 
   const menuItems: MenuItem[] = [
@@ -151,6 +155,27 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           icon: Building,
           href: '/admin/organizations',
           active: location === '/admin/organizations'
+        }
+      ]
+    },
+    {
+      label: 'Ajuda',
+      icon: HelpCircle,
+      expandable: true,
+      expanded: helpOpen,
+      onToggle: () => setHelpOpen(!helpOpen),
+      children: [
+        {
+          label: 'Manual do Usuário',
+          icon: Book,
+          href: '/help/manual-usuario',
+          active: location === '/help/manual-usuario'
+        },
+        {
+          label: 'Manual Administrativo',
+          icon: UserCog,
+          href: '/help/manual-admin',
+          active: location === '/help/manual-admin'
         }
       ]
     }
