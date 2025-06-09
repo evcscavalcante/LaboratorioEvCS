@@ -149,324 +149,274 @@ export function generateDensityInSituPDF(data: any, calculations: any): void {
  * Generate PDF for Real Density test
  */
 export function generateRealDensityPDF(data: any, calculations: any): void {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    alert('Por favor, permita pop-ups para gerar o PDF');
-    return;
+  const doc = new jsPDF();
+
+  // Header
+  doc.setFontSize(20);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Laboratório Ev.C.S', 105, 20, { align: 'center' });
+  
+  doc.setFontSize(16);
+  doc.setTextColor(102, 102, 102);
+  doc.text('Relatório de Densidade Real dos Grãos', 105, 30, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.text('Determinação por Picnometria - ABNT NBR 6457', 105, 40, { align: 'center' });
+  doc.text(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, 105, 48, { align: 'center' });
+
+  // General Information
+  doc.setFontSize(14);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Informações Gerais', 20, 65);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Registro: ${data.registrationNumber}`, 20, 75);
+  doc.text(`Data: ${data.date}`, 105, 75);
+  doc.text(`Operador: ${data.operator}`, 20, 82);
+  doc.text(`Material: ${data.material}`, 105, 82);
+  doc.text(`Origem: ${data.origin || 'N/A'}`, 20, 89);
+
+  // Moisture Content
+  doc.setFontSize(14);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Teor de Umidade', 20, 105);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Umidade Média: ${calculations.moisture.average.toFixed(2)}%`, 20, 115);
+
+  // Picnometer determinations table
+  doc.setFontSize(14);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Picnômetro - Determinações', 20, 130);
+
+  const picnometerData = [
+    ['Campo', 'Det 1', 'Det 2'],
+    ['Massa do Picnômetro (g)', data.picnometer1.massaPicnometro.toFixed(2), data.picnometer2.massaPicnometro.toFixed(2)],
+    ['Massa Pic + Amostra + Água (g)', data.picnometer1.massaPicAmostraAgua.toFixed(2), data.picnometer2.massaPicAmostraAgua.toFixed(2)],
+    ['Massa Pic + Água (g)', data.picnometer1.massaPicAgua.toFixed(2), data.picnometer2.massaPicAgua.toFixed(2)],
+    ['Temperatura (°C)', data.picnometer1.temperatura.toFixed(1), data.picnometer2.temperatura.toFixed(1)],
+    ['Densidade da Água (g/cm³)', calculations.picnometer.det1.waterDensity.toFixed(5), calculations.picnometer.det2.waterDensity.toFixed(5)],
+    ['Massa Solo Úmido (g)', data.picnometer1.massaSoloUmido.toFixed(2), data.picnometer2.massaSoloUmido.toFixed(2)],
+    ['Massa Solo Seco (g)', calculations.picnometer.det1.dryWeight.toFixed(2), calculations.picnometer.det2.dryWeight.toFixed(2)],
+    ['Densidade Real (g/cm³)', calculations.picnometer.det1.realDensity.toFixed(3), calculations.picnometer.det2.realDensity.toFixed(3)]
+  ];
+
+  (doc as any).autoTable({
+    startY: 140,
+    head: [picnometerData[0]],
+    body: picnometerData.slice(1),
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 3 },
+    headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0] },
+    columnStyles: {
+      0: { cellWidth: 70 },
+      1: { cellWidth: 35, halign: 'center' },
+      2: { cellWidth: 35, halign: 'center' }
+    },
+    didParseCell: function(data: any) {
+      if (data.row.index >= 4 && data.row.index <= 7 && data.column.index > 0) {
+        data.cell.styles.fillColor = [227, 242, 253];
+      }
+    }
+  });
+
+  // Results
+  const finalY = (doc as any).lastAutoTable.finalY + 15;
+  doc.setFontSize(14);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Resultados Finais', 20, finalY);
+
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Densidade Real Média: ${calculations.results.average.toFixed(3)} g/cm³`, 20, finalY + 15);
+  doc.text(`Diferença entre Determinações: ${calculations.results.difference.toFixed(3)} g/cm³`, 20, finalY + 25);
+
+  // Approval criteria
+  doc.setFontSize(10);
+  doc.setTextColor(102, 102, 102);
+  doc.text('Critério de Aprovação: Diferença ≤ 0.02 g/cm³', 20, finalY + 40);
+  doc.text('Conforme normas ABNT para ensaios de densidade real', 20, finalY + 47);
+
+  // Status
+  const statusY = finalY + 60;
+  let statusColor: [number, number, number];
+  switch (calculations.results.status) {
+    case 'APROVADO':
+      statusColor = [76, 175, 80];
+      break;
+    case 'REPROVADO':
+      statusColor = [244, 67, 54];
+      break;
+    default:
+      statusColor = [255, 152, 0];
   }
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Relatório de Densidade Real dos Grãos</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-        .header { text-align: center; border-bottom: 2px solid #1976D2; padding-bottom: 20px; margin-bottom: 30px; }
-        .header h1 { color: #1976D2; margin: 0; }
-        .header h2 { color: #666; margin: 5px 0; font-weight: normal; }
-        .section { margin: 20px 0; }
-        .section-title { background: #1976D2; color: white; padding: 10px; margin: 15px 0 10px 0; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
-        .info-item { padding: 5px; border-bottom: 1px solid #eee; }
-        .label { font-weight: bold; color: #555; }
-        .value { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background: #f5f5f5; font-weight: bold; }
-        .calculated { background: #e3f2fd; }
-        .results { background: #f9f9f9; padding: 15px; border-left: 4px solid #1976D2; }
-        .status { padding: 10px; text-align: center; font-weight: bold; margin: 20px 0; }
-        .status.APROVADO { background: #4CAF50; color: white; }
-        .status.REPROVADO { background: #F44336; color: white; }
-        .status.AGUARDANDO { background: #FF9800; color: white; }
-        .approval-criteria { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; }
-        .footer { margin-top: 40px; font-size: 12px; text-align: center; color: #666; }
-        @media print { .no-print { display: none; } }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>🧪 Laboratório Ev.C.S</h1>
-        <h2>Relatório de Densidade Real dos Grãos</h2>
-        <p>Determinação por Picnometria - ABNT NBR 6457</p>
-        <p>Data de geração: ${new Date().toLocaleString('pt-BR')}</p>
-      </div>
+  doc.setFillColor(...statusColor);
+  doc.rect(20, statusY - 5, 170, 15, 'F');
+  doc.setFontSize(12);
+  doc.setTextColor(255, 255, 255);
+  doc.text(`STATUS DO ENSAIO: ${calculations.results.status}`, 105, statusY + 3, { align: 'center' });
 
-      <div class="section">
-        <div class="section-title">Informações Gerais</div>
-        <div class="info-grid">
-          <div class="info-item"><span class="label">Registro:</span> <span class="value">${data.registrationNumber}</span></div>
-          <div class="info-item"><span class="label">Data:</span> <span class="value">${data.date}</span></div>
-          <div class="info-item"><span class="label">Operador:</span> <span class="value">${data.operator}</span></div>
-          <div class="info-item"><span class="label">Material:</span> <span class="value">${data.material}</span></div>
-          <div class="info-item"><span class="label">Origem:</span> <span class="value">${data.origin}</span></div>
-        </div>
-      </div>
+  // Footer
+  doc.setFontSize(8);
+  doc.setTextColor(102, 102, 102);
+  doc.text('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', 105, 280, { align: 'center' });
+  doc.text('Conforme norma ABNT NBR 6457', 105, 286, { align: 'center' });
 
-      <div class="section">
-        <div class="section-title">Teor de Umidade</div>
-        <p><strong>Umidade Média:</strong> ${calculations.moisture.average.toFixed(2)}%</p>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Picnômetro - Determinações</div>
-        <table>
-          <tr>
-            <th>Campo</th>
-            <th>Det 1</th>
-            <th>Det 2</th>
-          </tr>
-          <tr>
-            <td>Massa do Picnômetro (g)</td>
-            <td>${data.picnometer1.massaPicnometro.toFixed(2)}</td>
-            <td>${data.picnometer2.massaPicnometro.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Massa Pic + Amostra + Água (g)</td>
-            <td>${data.picnometer1.massaPicAmostraAgua.toFixed(2)}</td>
-            <td>${data.picnometer2.massaPicAmostraAgua.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Massa Pic + Água (g)</td>
-            <td>${data.picnometer1.massaPicAgua.toFixed(2)}</td>
-            <td>${data.picnometer2.massaPicAgua.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Temperatura (°C)</td>
-            <td>${data.picnometer1.temperatura.toFixed(1)}</td>
-            <td>${data.picnometer2.temperatura.toFixed(1)}</td>
-          </tr>
-          <tr class="calculated">
-            <td>Densidade da Água (g/cm³)</td>
-            <td>${calculations.picnometer.det1.waterDensity.toFixed(5)}</td>
-            <td>${calculations.picnometer.det2.waterDensity.toFixed(5)}</td>
-          </tr>
-          <tr>
-            <td>Massa Solo Úmido (g)</td>
-            <td>${data.picnometer1.massaSoloUmido.toFixed(2)}</td>
-            <td>${data.picnometer2.massaSoloUmido.toFixed(2)}</td>
-          </tr>
-          <tr class="calculated">
-            <td>Massa Solo Seco (g)</td>
-            <td>${calculations.picnometer.det1.dryWeight.toFixed(2)}</td>
-            <td>${calculations.picnometer.det2.dryWeight.toFixed(2)}</td>
-          </tr>
-          <tr class="calculated">
-            <td><strong>Densidade Real (g/cm³)</strong></td>
-            <td><strong>${calculations.picnometer.det1.realDensity.toFixed(3)}</strong></td>
-            <td><strong>${calculations.picnometer.det2.realDensity.toFixed(3)}</strong></td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Resultados Finais</div>
-        <div class="results">
-          <p><strong>Densidade Real Média:</strong> ${calculations.results.average.toFixed(3)} g/cm³</p>
-          <p><strong>Diferença entre Determinações:</strong> ${calculations.results.difference.toFixed(3)} g/cm³</p>
-        </div>
-        
-        <div class="approval-criteria">
-          <p><strong>Critério de Aprovação:</strong> Diferença ≤ 0.02 g/cm³</p>
-          <p><em>Conforme normas ABNT para ensaios de densidade real</em></p>
-        </div>
-      </div>
-
-      <div class="status ${calculations.results.status}">
-        STATUS DO ENSAIO: ${calculations.results.status}
-      </div>
-
-      <div class="footer">
-        <p>Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S</p>
-        <p>Conforme norma ABNT NBR 6457</p>
-      </div>
-
-      <div class="no-print" style="text-align: center; margin: 20px;">
-        <button onclick="window.print()" style="padding: 10px 20px; background: #1976D2; color: white; border: none; border-radius: 5px; cursor: pointer;">Imprimir PDF</button>
-        <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Fechar</button>
-      </div>
-    </body>
-    </html>
-  `;
-
-  printWindow.document.write(html);
-  printWindow.document.close();
+  // Save PDF
+  doc.save(`densidade-real-${data.registrationNumber || 'relatorio'}.pdf`);
 }
 
 /**
  * Generate PDF for Max/Min Density test
  */
 export function generateMaxMinDensityPDF(data: any, calculations: any): void {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    alert('Por favor, permita pop-ups para gerar o PDF');
-    return;
+  const doc = new jsPDF();
+
+  // Header
+  doc.setFontSize(20);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Laboratório Ev.C.S', 105, 20, { align: 'center' });
+  
+  doc.setFontSize(16);
+  doc.setTextColor(102, 102, 102);
+  doc.text('Relatório de Densidade Máxima e Mínima', 105, 30, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.text('Determinação dos Índices de Vazios - ABNT NBR 9813', 105, 40, { align: 'center' });
+  doc.text(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, 105, 48, { align: 'center' });
+
+  // General Information
+  doc.setFontSize(14);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Informações Gerais', 20, 65);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Registro: ${data.registrationNumber}`, 20, 75);
+  doc.text(`Data: ${data.date}`, 105, 75);
+  doc.text(`Operador: ${data.operator}`, 20, 82);
+  doc.text(`Material: ${data.material}`, 105, 82);
+  doc.text(`Origem: ${data.origin || 'N/A'}`, 20, 89);
+
+  // Maximum Density Table
+  doc.setFontSize(14);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Densidade Máxima', 20, 105);
+
+  const maxDensityData = [
+    ['Campo', 'Det 1', 'Det 2', 'Det 3'],
+    ['Molde + Solo (g)', data.maxDensity1.moldeSolo.toFixed(2), data.maxDensity2.moldeSolo.toFixed(2), data.maxDensity3.moldeSolo.toFixed(2)],
+    ['Molde (g)', data.maxDensity1.molde.toFixed(2), data.maxDensity2.molde.toFixed(2), data.maxDensity3.molde.toFixed(2)],
+    ['Solo (g)', calculations.maxDensity.det1.soil.toFixed(2), calculations.maxDensity.det2.soil.toFixed(2), calculations.maxDensity.det3.soil.toFixed(2)],
+    ['Volume (cm³)', data.maxDensity1.volume.toFixed(2), data.maxDensity2.volume.toFixed(2), data.maxDensity3.volume.toFixed(2)],
+    ['γd (g/cm³)', calculations.maxDensity.det1.gammaDMax.toFixed(3), calculations.maxDensity.det2.gammaDMax.toFixed(3), calculations.maxDensity.det3.gammaDMax.toFixed(3)]
+  ];
+
+  (doc as any).autoTable({
+    startY: 115,
+    head: [maxDensityData[0]],
+    body: maxDensityData.slice(1),
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 2 },
+    headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0] },
+    columnStyles: {
+      0: { cellWidth: 50 },
+      1: { cellWidth: 30, halign: 'center' },
+      2: { cellWidth: 30, halign: 'center' },
+      3: { cellWidth: 30, halign: 'center' }
+    },
+    didParseCell: function(data: any) {
+      if ((data.row.index === 2 || data.row.index === 5) && data.column.index > 0) {
+        data.cell.styles.fillColor = [227, 242, 253];
+      }
+    }
+  });
+
+  let currentY = (doc as any).lastAutoTable.finalY + 10;
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`γdmax Média: ${calculations.maxDensity.average.toFixed(3)} g/cm³`, 20, currentY);
+
+  // Minimum Density Table
+  currentY += 15;
+  doc.setFontSize(14);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Densidade Mínima', 20, currentY);
+
+  const minDensityData = [
+    ['Campo', 'Det 1', 'Det 2', 'Det 3'],
+    ['Molde + Solo (g)', data.minDensity1.moldeSolo.toFixed(2), data.minDensity2.moldeSolo.toFixed(2), data.minDensity3.moldeSolo.toFixed(2)],
+    ['Molde (g)', data.minDensity1.molde.toFixed(2), data.minDensity2.molde.toFixed(2), data.minDensity3.molde.toFixed(2)],
+    ['Solo (g)', calculations.minDensity.det1.soil.toFixed(2), calculations.minDensity.det2.soil.toFixed(2), calculations.minDensity.det3.soil.toFixed(2)],
+    ['Volume (cm³)', data.minDensity1.volume.toFixed(2), data.minDensity2.volume.toFixed(2), data.minDensity3.volume.toFixed(2)],
+    ['γd (g/cm³)', calculations.minDensity.det1.gammaDMin.toFixed(3), calculations.minDensity.det2.gammaDMin.toFixed(3), calculations.minDensity.det3.gammaDMin.toFixed(3)]
+  ];
+
+  (doc as any).autoTable({
+    startY: currentY + 10,
+    head: [minDensityData[0]],
+    body: minDensityData.slice(1),
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 2 },
+    headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0] },
+    columnStyles: {
+      0: { cellWidth: 50 },
+      1: { cellWidth: 30, halign: 'center' },
+      2: { cellWidth: 30, halign: 'center' },
+      3: { cellWidth: 30, halign: 'center' }
+    },
+    didParseCell: function(data: any) {
+      if ((data.row.index === 2 || data.row.index === 5) && data.column.index > 0) {
+        data.cell.styles.fillColor = [227, 242, 253];
+      }
+    }
+  });
+
+  currentY = (doc as any).lastAutoTable.finalY + 10;
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`γdmin Média: ${calculations.minDensity.average.toFixed(3)} g/cm³`, 20, currentY);
+
+  // Results
+  currentY += 20;
+  doc.setFontSize(14);
+  doc.setTextColor(25, 118, 210);
+  doc.text('Resultados Finais', 20, currentY);
+
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`emax: ${calculations.results.emax.toFixed(3)}`, 20, currentY + 15);
+  doc.text(`emin: ${calculations.results.emin.toFixed(3)}`, 105, currentY + 15);
+
+  // Status
+  currentY += 35;
+  let statusColor: [number, number, number];
+  switch (calculations.results.status) {
+    case 'APROVADO':
+      statusColor = [76, 175, 80];
+      break;
+    case 'REPROVADO':
+      statusColor = [244, 67, 54];
+      break;
+    default:
+      statusColor = [255, 152, 0];
   }
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Relatório de Densidade Máxima e Mínima</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-        .header { text-align: center; border-bottom: 2px solid #1976D2; padding-bottom: 20px; margin-bottom: 30px; }
-        .header h1 { color: #1976D2; margin: 0; }
-        .header h2 { color: #666; margin: 5px 0; font-weight: normal; }
-        .section { margin: 20px 0; }
-        .section-title { background: #1976D2; color: white; padding: 10px; margin: 15px 0 10px 0; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
-        .info-item { padding: 5px; border-bottom: 1px solid #eee; }
-        .label { font-weight: bold; color: #555; }
-        .value { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background: #f5f5f5; font-weight: bold; }
-        .calculated { background: #e3f2fd; }
-        .results { background: #f9f9f9; padding: 15px; border-left: 4px solid #1976D2; }
-        .status { padding: 10px; text-align: center; font-weight: bold; margin: 20px 0; }
-        .status.APROVADO { background: #4CAF50; color: white; }
-        .status.REPROVADO { background: #F44336; color: white; }
-        .status.AGUARDANDO { background: #FF9800; color: white; }
-        .footer { margin-top: 40px; font-size: 12px; text-align: center; color: #666; }
-        @media print { .no-print { display: none; } }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>🧪 Laboratório Ev.C.S</h1>
-        <h2>Relatório de Densidade Máxima e Mínima</h2>
-        <p>Determinação dos Índices de Vazios - ABNT NBR 9813</p>
-        <p>Data de geração: ${new Date().toLocaleString('pt-BR')}</p>
-      </div>
+  doc.setFillColor(...statusColor);
+  doc.rect(20, currentY - 5, 170, 15, 'F');
+  doc.setFontSize(12);
+  doc.setTextColor(255, 255, 255);
+  doc.text(`STATUS DO ENSAIO: ${calculations.results.status}`, 105, currentY + 3, { align: 'center' });
 
-      <div class="section">
-        <div class="section-title">Informações Gerais</div>
-        <div class="info-grid">
-          <div class="info-item"><span class="label">Registro:</span> <span class="value">${data.registrationNumber}</span></div>
-          <div class="info-item"><span class="label">Data:</span> <span class="value">${data.date}</span></div>
-          <div class="info-item"><span class="label">Operador:</span> <span class="value">${data.operator}</span></div>
-          <div class="info-item"><span class="label">Material:</span> <span class="value">${data.material}</span></div>
-          <div class="info-item"><span class="label">Origem:</span> <span class="value">${data.origin}</span></div>
-        </div>
-      </div>
+  // Footer
+  doc.setFontSize(8);
+  doc.setTextColor(102, 102, 102);
+  doc.text('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', 105, 280, { align: 'center' });
+  doc.text('Conforme norma ABNT NBR 9813', 105, 286, { align: 'center' });
 
-      <div class="section">
-        <div class="section-title">Densidade Máxima</div>
-        <table>
-          <tr>
-            <th>Campo</th>
-            <th>Det 1</th>
-            <th>Det 2</th>
-            <th>Det 3</th>
-          </tr>
-          <tr>
-            <td>Molde + Solo (g)</td>
-            <td>${data.maxDensity1.moldeSolo.toFixed(2)}</td>
-            <td>${data.maxDensity2.moldeSolo.toFixed(2)}</td>
-            <td>${data.maxDensity3.moldeSolo.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Molde (g)</td>
-            <td>${data.maxDensity1.molde.toFixed(2)}</td>
-            <td>${data.maxDensity2.molde.toFixed(2)}</td>
-            <td>${data.maxDensity3.molde.toFixed(2)}</td>
-          </tr>
-          <tr class="calculated">
-            <td>Solo (g)</td>
-            <td>${calculations.maxDensity.det1.soil.toFixed(2)}</td>
-            <td>${calculations.maxDensity.det2.soil.toFixed(2)}</td>
-            <td>${calculations.maxDensity.det3.soil.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Volume (cm³)</td>
-            <td>${data.maxDensity1.volume.toFixed(2)}</td>
-            <td>${data.maxDensity2.volume.toFixed(2)}</td>
-            <td>${data.maxDensity3.volume.toFixed(2)}</td>
-          </tr>
-          <tr class="calculated">
-            <td><strong>γd (g/cm³)</strong></td>
-            <td><strong>${calculations.maxDensity.det1.gammaDMax.toFixed(3)}</strong></td>
-            <td><strong>${calculations.maxDensity.det2.gammaDMax.toFixed(3)}</strong></td>
-            <td><strong>${calculations.maxDensity.det3.gammaDMax.toFixed(3)}</strong></td>
-          </tr>
-        </table>
-        <p><strong>γdmax Média:</strong> ${calculations.maxDensity.average.toFixed(3)} g/cm³</p>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Densidade Mínima</div>
-        <table>
-          <tr>
-            <th>Campo</th>
-            <th>Det 1</th>
-            <th>Det 2</th>
-            <th>Det 3</th>
-          </tr>
-          <tr>
-            <td>Molde + Solo (g)</td>
-            <td>${data.minDensity1.moldeSolo.toFixed(2)}</td>
-            <td>${data.minDensity2.moldeSolo.toFixed(2)}</td>
-            <td>${data.minDensity3.moldeSolo.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Molde (g)</td>
-            <td>${data.minDensity1.molde.toFixed(2)}</td>
-            <td>${data.minDensity2.molde.toFixed(2)}</td>
-            <td>${data.minDensity3.molde.toFixed(2)}</td>
-          </tr>
-          <tr class="calculated">
-            <td>Solo (g)</td>
-            <td>${calculations.minDensity.det1.soil.toFixed(2)}</td>
-            <td>${calculations.minDensity.det2.soil.toFixed(2)}</td>
-            <td>${calculations.minDensity.det3.soil.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>Volume (cm³)</td>
-            <td>${data.minDensity1.volume.toFixed(2)}</td>
-            <td>${data.minDensity2.volume.toFixed(2)}</td>
-            <td>${data.minDensity3.volume.toFixed(2)}</td>
-          </tr>
-          <tr class="calculated">
-            <td><strong>γd (g/cm³)</strong></td>
-            <td><strong>${calculations.minDensity.det1.gammaDMin.toFixed(3)}</strong></td>
-            <td><strong>${calculations.minDensity.det2.gammaDMin.toFixed(3)}</strong></td>
-            <td><strong>${calculations.minDensity.det3.gammaDMin.toFixed(3)}</strong></td>
-          </tr>
-        </table>
-        <p><strong>γdmin Média:</strong> ${calculations.minDensity.average.toFixed(3)} g/cm³</p>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Resultados Finais</div>
-        <div class="results">
-          <p><strong>γdmax:</strong> ${calculations.results.gammaDMax.toFixed(3)} g/cm³</p>
-          <p><strong>γdmin:</strong> ${calculations.results.gammaDMin.toFixed(3)} g/cm³</p>
-          <p><strong>emax:</strong> ${calculations.results.emax.toFixed(3)}</p>
-          <p><strong>emin:</strong> ${calculations.results.emin.toFixed(3)}</p>
-        </div>
-      </div>
-
-      <div class="status ${calculations.results.status}">
-        STATUS DO ENSAIO: ${calculations.results.status}
-      </div>
-
-      <div class="footer">
-        <p>Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S</p>
-        <p>Conforme norma ABNT NBR 9813</p>
-      </div>
-
-      <div class="no-print" style="text-align: center; margin: 20px;">
-        <button onclick="window.print()" style="padding: 10px 20px; background: #1976D2; color: white; border: none; border-radius: 5px; cursor: pointer;">Imprimir PDF</button>
-        <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Fechar</button>
-      </div>
-    </body>
-    </html>
-  `;
-
-  printWindow.document.write(html);
-  printWindow.document.close();
+  // Save PDF
+  doc.save(`densidade-max-min-${data.registrationNumber || 'relatorio'}.pdf`);
 }

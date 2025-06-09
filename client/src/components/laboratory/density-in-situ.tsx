@@ -824,11 +824,11 @@ export default function DensityInSitu() {
               <div className="grid grid-cols-1 gap-3">
                 <div className="bg-blue-50 p-3 rounded-lg">
                   <div className="text-sm text-blue-700 mb-1">Índice de Vazios Topo (e)</div>
-                  <div className="text-lg font-bold text-blue-800 font-mono">{calculations.results.voidIndexTop.toFixed(3)}</div>
+                  <div className="text-lg font-bold text-blue-800 font-mono">{calculations.results.voidIndexTop?.toFixed(3) || '0.000'}</div>
                 </div>
                 <div className="bg-blue-50 p-3 rounded-lg">
                   <div className="text-sm text-blue-700 mb-1">Compacidade Relativa Topo (%)</div>
-                  <div className="text-lg font-bold text-blue-800 font-mono">{calculations.results.relativeCompactnessTop.toFixed(1)}</div>
+                  <div className="text-lg font-bold text-blue-800 font-mono">{calculations.results.relativeCompactnessTop?.toFixed(1) || '0.0'}</div>
                 </div>
               </div>
             </div>
@@ -838,11 +838,11 @@ export default function DensityInSitu() {
               <div className="grid grid-cols-1 gap-3">
                 <div className="bg-green-50 p-3 rounded-lg">
                   <div className="text-sm text-green-700 mb-1">Índice de Vazios Base (e)</div>
-                  <div className="text-lg font-bold text-green-800 font-mono">{calculations.results.voidIndexBase.toFixed(3)}</div>
+                  <div className="text-lg font-bold text-green-800 font-mono">{calculations.results.voidIndexBase?.toFixed(3) || '0.000'}</div>
                 </div>
                 <div className="bg-green-50 p-3 rounded-lg">
                   <div className="text-sm text-green-700 mb-1">Compacidade Relativa Base (%)</div>
-                  <div className="text-lg font-bold text-green-800 font-mono">{calculations.results.relativeCompactnessBase.toFixed(1)}</div>
+                  <div className="text-lg font-bold text-green-800 font-mono">{calculations.results.relativeCompactnessBase?.toFixed(1) || '0.0'}</div>
                 </div>
               </div>
             </div>
