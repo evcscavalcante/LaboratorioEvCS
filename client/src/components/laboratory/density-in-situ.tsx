@@ -99,7 +99,7 @@ export default function DensityInSitu() {
       voidIndexBase: 0,
       relativeCompactnessTop: 0,
       relativeCompactnessBase: 0,
-      status: "AGUARDANDO" as "AGUARDANDO" | "APROVADO" | "REPROVADO" 
+      status: "AGUARDANDO" as any 
     }
   });
 
@@ -187,7 +187,7 @@ export default function DensityInSitu() {
         voidIndexBase,
         relativeCompactnessTop,
         relativeCompactnessBase,
-        averageGammaDry: gammaNatDryAvg,
+
         voidIndex: (voidIndexTop + voidIndexBase) / 2,
         relativeCompactness: (relativeCompactnessTop + relativeCompactnessBase) / 2,
         status

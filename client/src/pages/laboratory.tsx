@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { FlaskRound, Save } from "lucide-react";
+import { FlaskRound, Save, PanelLeftOpen, PanelLeftClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DensityInSitu from "@/components/laboratory/density-in-situ";
 import DensityReal from "@/components/laboratory/density-real";
 import DensityMaxMin from "@/components/laboratory/density-max-min";
+import TestsSidebar from "@/components/dashboard/tests-sidebar";
 
 export default function Laboratory() {
   const [currentDateTime, setCurrentDateTime] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -27,73 +29,105 @@ export default function Laboratory() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleSelectTest = (testId: number, testType: string) => {
+    console.log('Visualizar ensaio:', testId, testType);
+    // Implementar navegação para visualizar ensaio
+  };
+
+  const handleEditTest = (testId: number, testType: string) => {
+    console.log('Editar ensaio:', testId, testType);
+    // Implementar navegação para editar ensaio
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-xl font-bold text-gray-900">
-                  <FlaskRound className="inline mr-2 text-blue-600" size={20} />
-                  Laboratório Ev.C.S
-                </h1>
-              </div>
-              <div className="hidden md:block ml-6">
-                <div className="text-sm text-gray-500">
-                  Sistema de Ensaios Geotécnicos - ABNT NBR 6457 e NBR 9813
+    <div className="flex min-h-screen bg-gray-50 font-sans">
+      {/* Sidebar */}
+      <div className={`transition-all duration-300 ${sidebarOpen ? 'w-80' : 'w-0'} overflow-hidden border-r bg-white`}>
+        {sidebarOpen && (
+          <TestsSidebar 
+            onSelectTest={handleSelectTest}
+            onEditTest={handleEditTest}
+          />
+        )}
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <h1 className="text-xl font-bold text-gray-900">
+                    <FlaskRound className="inline mr-2 text-blue-600" size={20} />
+                    Laboratório Ev.C.S
+                  </h1>
+                </div>
+                <div className="hidden md:block ml-6">
+                  <div className="text-sm text-gray-500">
+                    Sistema de Ensaios Geotécnicos - ABNT NBR 6457 e NBR 9813
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{currentDateTime}</span>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Save className="mr-2" size={16} />
-                Salvar Dados
-              </Button>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">{currentDateTime}</span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="flex items-center gap-2"
+                >
+                  {sidebarOpen ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
+                  {sidebarOpen ? 'Fechar' : 'Ensaios Salvos'}
+                </Button>
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Save className="mr-2" size={16} />
+                  Salvar Dados
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="density-in-situ" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-white border sticky top-0 z-10">
-            <TabsTrigger 
-              value="density-in-situ" 
-              className="py-4 px-2 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-            >
-              <span className="mr-2">⚖️</span>Densidade In Situ
-            </TabsTrigger>
-            <TabsTrigger 
-              value="density-real"
-              className="py-4 px-2 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-            >
-              <span className="mr-2">⚛️</span>Densidade Real dos Grãos
-            </TabsTrigger>
-            <TabsTrigger 
-              value="density-max-min"
-              className="py-4 px-2 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-            >
-              <span className="mr-2">↕️</span>Densidade Máx/Mín
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content */}
+        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Tabs defaultValue="density-in-situ" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-white border sticky top-0 z-10">
+              <TabsTrigger 
+                value="density-in-situ" 
+                className="py-4 px-2 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+              >
+                <span className="mr-2">⚖️</span>Densidade In Situ
+              </TabsTrigger>
+              <TabsTrigger 
+                value="density-real"
+                className="py-4 px-2 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+              >
+                <span className="mr-2">⚛️</span>Densidade Real dos Grãos
+              </TabsTrigger>
+              <TabsTrigger 
+                value="density-max-min"
+                className="py-4 px-2 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+              >
+                <span className="mr-2">↕️</span>Densidade Máx/Mín
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="density-in-situ">
-            <DensityInSitu />
-          </TabsContent>
+            <TabsContent value="density-in-situ">
+              <DensityInSitu />
+            </TabsContent>
 
-          <TabsContent value="density-real">
-            <DensityReal />
-          </TabsContent>
+            <TabsContent value="density-real">
+              <DensityReal />
+            </TabsContent>
 
-          <TabsContent value="density-max-min">
-            <DensityMaxMin />
-          </TabsContent>
-        </Tabs>
-      </main>
+            <TabsContent value="density-max-min">
+              <DensityMaxMin />
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
     </div>
   );
 }
