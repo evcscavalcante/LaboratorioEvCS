@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+  
+  /* Professional laboratory interface styles */
+  .data-table {
+    @apply w-full border-collapse;
+  }
+  
+  .data-table th,
+  .data-table td {
+    @apply border border-gray-300 px-4 py-3 text-sm;
+  }
+  
+  .data-table th {
+    @apply bg-gray-50 font-medium text-gray-700;
+  }
+  
+  .calculated-field {
+    @apply bg-blue-50 border-blue-200 font-mono text-blue-900;
+  }
+  
+  /* Status indicators */
+  .status-approved {
+    @apply bg-green-600 text-white;
+  }
+  
+  .status-rejected {
+    @apply bg-red-600 text-white;
+  }
+  
+  .status-pending {
+    @apply bg-orange-500 text-white;
+  }
+  
+  /* Form validation styles */
+  .form-error {
+    @apply border-red-500 bg-red-50;
+  }
+  
+  .form-success {
+    @apply border-green-500 bg-green-50;
+  }
+  
+  /* Print styles for PDF generation */
+  @media print {
+    .no-print {
+      @apply hidden;
+    }
+    
+    .print-header {
+      @apply text-center border-b-2 border-blue-600 pb-5 mb-8;
+    }
+    
+    .print-section {
+      @apply mb-6 break-inside-avoid;
+    }
+    
+    .print-table {
+      @apply w-full border-collapse text-sm;
+    }
+    
+    .print-table th,
+    .print-table td {
+      @apply border border-gray-400 px-2 py-1;
+    }
+    
+    .print-calculated {
+      @apply bg-blue-100;
+    }
+  }
+  
+  /* Responsive design improvements */
+  @media (max-width: 768px) {
+    .responsive-table {
+      @apply text-xs;
+    }
+    
+    .responsive-input {
+      @apply text-sm px-2 py-1;
+    }
+    
+    .responsive-button {
+      @apply text-sm px-3 py-2;
+    }
+  }
+  
+  /* Laboratory specific styles */
+  .lab-header {
+    @apply bg-white shadow-sm border-b;
+  }
+  
+  .lab-nav {
+    @apply bg-white border-b sticky top-0 z-10;
+  }
+  
+  .lab-card {
+    @apply bg-white rounded-xl shadow-sm p-6;
+  }
+  
+  .lab-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent;
+  }
+  
+  .lab-button-primary {
+    @apply bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors;
+  }
+  
+  .lab-button-success {
+    @apply bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors;
+  }
+  
+  .lab-button-secondary {
+    @apply bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors;
+  }
+  
+  .lab-results-summary {
+    @apply bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600;
+  }
+  
+  .lab-calculation-display {
+    @apply font-mono text-blue-700 font-bold;
+  }
+  
+  /* ABNT compliance styling */
+  .abnt-compliant {
+    @apply border-l-4 border-green-500 bg-green-50 p-3;
+  }
+  
+  .abnt-warning {
+    @apply border-l-4 border-yellow-500 bg-yellow-50 p-3;
+  }
+  
+  .abnt-error {
+    @apply border-l-4 border-red-500 bg-red-50 p-3;
+  }
+}
