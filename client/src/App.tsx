@@ -3,17 +3,26 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import MainLayout from "@/components/layout/main-layout";
 import NotFound from "@/pages/not-found";
-import Laboratory from "@/pages/laboratory";
+import Dashboard from "@/pages/dashboard";
 import Analytics from "@/pages/analytics";
+import DensidadeInSituPage from "@/pages/solos/densidade-in-situ";
+import DensidadeRealPage from "@/pages/solos/densidade-real";
+import DensidadeMaxMinPage from "@/pages/solos/densidade-max-min";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Laboratory} />
-      <Route path="/analytics" component={Analytics} />
-      <Route component={NotFound} />
-    </Switch>
+    <MainLayout>
+      <Switch>
+        <Route path="/" component={Dashboard} />
+        <Route path="/analytics" component={Analytics} />
+        <Route path="/solos/densidade-in-situ" component={DensidadeInSituPage} />
+        <Route path="/solos/densidade-real" component={DensidadeRealPage} />
+        <Route path="/solos/densidade-max-min" component={DensidadeMaxMinPage} />
+        <Route component={NotFound} />
+      </Switch>
+    </MainLayout>
   );
 }
 

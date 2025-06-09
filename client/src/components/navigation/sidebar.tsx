@@ -12,7 +12,8 @@ import {
   Building2,
   Target,
   Layers,
-  Scale
+  Scale,
+  LucideIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -23,13 +24,32 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
+interface MenuChild {
+  label: string;
+  icon: LucideIcon;
+  href: string;
+  active?: boolean;
+  disabled?: boolean;
+}
+
+interface MenuItem {
+  label: string;
+  icon: LucideIcon;
+  href?: string;
+  active?: boolean;
+  expandable?: boolean;
+  expanded?: boolean;
+  onToggle?: () => void;
+  children?: MenuChild[];
+}
+
 export default function Sidebar({ isOpen }: SidebarProps) {
   const [location] = useLocation();
   const [solosOpen, setSolosOpen] = useState(true);
   const [asfaltoOpen, setAsfaltoOpen] = useState(false);
   const [concretoOpen, setConcretoOpen] = useState(false);
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     {
       label: 'Dashboard',
       icon: Home,
@@ -94,7 +114,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         {
           label: 'Em Desenvolvimento',
           icon: Settings,
-          href: '#',
+          href: '/concreto',
           disabled: true
         }
       ]
@@ -142,8 +162,8 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-1 mt-1">
-                  {item.children?.map((child) => (
-                    <Link key={child.label} href={child.href}>
+                  {item.children?.map((child) => {
+                    const content = (
                       <Button
                         variant="ghost"
                         disabled={child.disabled}
@@ -158,12 +178,20 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                         <child.icon className="h-4 w-4 mr-3" />
                         <span className="text-sm">{child.label}</span>
                       </Button>
-                    </Link>
-                  ))}
+                    );
+
+                    return child.disabled ? (
+                      <div key={child.label}>{content}</div>
+                    ) : (
+                      <Link key={child.label} href={child.href}>
+                        {content}
+                      </Link>
+                    );
+                  })}
                 </CollapsibleContent>
               </Collapsible>
             ) : (
-              <Link href={item.href}>
+              <Link href={item.href || '#'}>
                 <Button
                   variant="ghost"
                   className={cn(
