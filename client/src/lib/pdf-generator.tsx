@@ -6,9 +6,9 @@ const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
-    padding: 30,
+    padding: 15,
     fontFamily: 'Helvetica',
-    fontSize: 10,
+    fontSize: 8,
   },
   header: {
     marginBottom: 20,
@@ -349,22 +349,22 @@ const MoistureTable: React.FC<{
   </View>
 );
 
-// Componente para Densidade In Situ - Formato Vale/SCL
+// Componente para Densidade In Situ - Formato Vale/SCL Compacto
 const DensityInSituDocument: React.FC<{ data: any; calculations: any }> = ({ data, calculations }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      {/* Header Principal */}
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, borderBottomWidth: 2, borderBottomColor: '#000', paddingBottom: 10}}>
-        <View style={{width: '15%', backgroundColor: '#00A651', padding: 5}}>
-          <Text style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold', textAlign: 'center'}}>VALE</Text>
+      {/* Header Principal Compacto */}
+      <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8, borderBottomWidth: 1, borderBottomColor: '#000', paddingBottom: 5}}>
+        <View style={{width: '15%', backgroundColor: '#00A651', padding: 3}}>
+          <Text style={{color: '#FFFFFF', fontSize: 12, fontWeight: 'bold', textAlign: 'center'}}>VALE</Text>
         </View>
         <View style={{width: '70%', textAlign: 'center'}}>
-          <Text style={{fontSize: 14, fontWeight: 'bold'}}>DETERMINAÇÃO DA COMPACIDADE RELATIVA</Text>
-          <Text style={{fontSize: 12}}>NBR 6457:2024; NBR 9813:2016.</Text>
+          <Text style={{fontSize: 11, fontWeight: 'bold'}}>DETERMINAÇÃO DA COMPACIDADE RELATIVA</Text>
+          <Text style={{fontSize: 9}}>NBR 6457:2024: NBR 9813:2016.</Text>
         </View>
-        <View style={{width: '15%', backgroundColor: '#1976D2', padding: 5}}>
-          <Text style={{color: '#FFFFFF', fontSize: 10, textAlign: 'center'}}>SCL</Text>
-          <Text style={{color: '#FFFFFF', fontSize: 8, textAlign: 'center'}}>CONSTRUÇÕES</Text>
+        <View style={{width: '15%', backgroundColor: '#1976D2', padding: 3}}>
+          <Text style={{color: '#FFFFFF', fontSize: 8, textAlign: 'center'}}>SCL</Text>
+          <Text style={{color: '#FFFFFF', fontSize: 7, textAlign: 'center'}}>CONSTRUÇÕES</Text>
         </View>
       </View>
 
