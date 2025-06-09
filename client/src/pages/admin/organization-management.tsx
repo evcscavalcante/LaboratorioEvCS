@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,6 +36,19 @@ export default function OrganizationManagement() {
     active: true
   });
 
+  // Reset form when dialogs close
+  const resetForm = useCallback(() => {
+    setFormData({
+      name: '',
+      description: '',
+      address: '',
+      phone: '',
+      email: '',
+      active: true
+    });
+    setSelectedOrg(null);
+  }, []);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -66,7 +79,7 @@ export default function OrganizationManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/organizations'] });
       setIsCreateDialogOpen(false);
-      setFormData({ name: '', description: '', address: '', phone: '', email: '', active: true });
+      resetForm();
       toast({ title: 'Organização criada com sucesso!' });
     },
     onError: (error) => {
@@ -83,7 +96,7 @@ export default function OrganizationManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/organizations'] });
       setIsEditDialogOpen(false);
-      setSelectedOrg(null);
+      resetForm();
       toast({ title: 'Organização atualizada com sucesso!' });
     },
     onError: (error) => {
@@ -105,11 +118,11 @@ export default function OrganizationManagement() {
     }
   });
 
-  const handleCreateOrg = () => {
+  const handleCreateOrg = useCallback(() => {
     createOrgMutation.mutate(formData);
-  };
+  }, [createOrgMutation, formData]);
 
-  const handleEditOrg = (org: Organization) => {
+  const handleEditOrg = useCallback((org: Organization) => {
     setSelectedOrg(org);
     setFormData({
       name: org.name,
@@ -120,13 +133,13 @@ export default function OrganizationManagement() {
       active: org.active ?? true
     });
     setIsEditDialogOpen(true);
-  };
+  }, []);
 
-  const handleUpdateOrg = () => {
+  const handleUpdateOrg = useCallback(() => {
     if (selectedOrg) {
       updateOrgMutation.mutate({ id: selectedOrg.id, orgData: formData });
     }
-  };
+  }, [updateOrgMutation, selectedOrg, formData]);
 
   const handleDeleteOrg = (orgId: number) => {
     const userCount = userCounts[orgId] || 0;
@@ -161,14 +174,20 @@ export default function OrganizationManagement() {
           </p>
         </div>
         
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <Dialog 
+          open={isCreateDialogOpen} 
+          onOpenChange={(open) => {
+            setIsCreateDialogOpen(open);
+            if (!open) resetForm();
+          }}
+        >
           <DialogTrigger asChild>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
               Nova Organização
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl" key="create-dialog">
             <DialogHeader>
               <DialogTitle>Criar Nova Organização</DialogTitle>
               <DialogDescription>
