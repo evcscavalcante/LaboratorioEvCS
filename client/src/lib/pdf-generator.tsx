@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   table: {
-    display: 'table',
     width: 'auto',
     borderStyle: 'solid',
     borderWidth: 1,
@@ -794,12 +793,12 @@ export async function generateDensityInSituPDF(data: any, calculations: any): Pr
     const blob = await asPdf.toBlob();
     
     const url = URL.createObjectURL(blob);
-    const link = window.document.createElement('a');
+    const link = globalThis.document.createElement('a');
     link.href = url;
     link.download = `densidade-in-situ-${data.registrationNumber || 'relatorio'}.pdf`;
-    window.document.body.appendChild(link);
+    globalThis.document.body.appendChild(link);
     link.click();
-    window.document.body.removeChild(link);
+    globalThis.document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Erro ao gerar PDF:', error);
