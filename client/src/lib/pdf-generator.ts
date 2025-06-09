@@ -1,428 +1,502 @@
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+/**
+ * Canvas-based report generator for high-quality technical reports
+ * Generates professional laboratory reports as downloadable images
+ */
 
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
+/**
+ * Generate report for Density In Situ test
+ */
+export async function generateDensityInSituPDF(data: any, calculations: any): Promise<void> {
+  try {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas context not available');
+    
+    canvas.width = 800;
+    canvas.height = 1000;
+    
+    // White background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Header
+    ctx.fillStyle = '#1976D2';
+    ctx.font = 'bold 28px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Laboratório Ev.C.S', canvas.width / 2, 50);
+    
+    ctx.fillStyle = '#666666';
+    ctx.font = '20px Arial';
+    ctx.fillText('Relatório de Densidade In Situ', canvas.width / 2, 80);
+    
+    ctx.fillStyle = '#000000';
+    ctx.font = '14px Arial';
+    ctx.fillText('Determinação da Densidade Natural - ABNT NBR 9813', canvas.width / 2, 105);
+    ctx.fillText(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, canvas.width / 2, 125);
+    
+    // Information section
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    let y = 170;
+    ctx.fillText('Informações Gerais', 50, y);
+    
+    y += 10;
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(50, y);
+    ctx.lineTo(750, y);
+    ctx.stroke();
+    
+    y += 25;
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.fillText(`Registro: ${data.registrationNumber}`, 50, y);
+    ctx.fillText(`Data: ${data.date}`, 400, y);
+    y += 20;
+    ctx.fillText(`Operador: ${data.operator}`, 50, y);
+    ctx.fillText(`Material: ${data.material}`, 400, y);
+    y += 20;
+    ctx.fillText(`Origem: ${data.origin || 'N/A'}`, 50, y);
+    ctx.fillText(`Coordenadas: ${data.coordinates || 'N/A'}`, 400, y);
+    
+    // Density determinations table
+    y += 40;
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    ctx.fillText('Determinações de Densidade', 50, y);
+    
+    y += 10;
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.beginPath();
+    ctx.moveTo(50, y);
+    ctx.lineTo(750, y);
+    ctx.stroke();
+    
+    y += 25;
+    
+    // Table header
+    ctx.fillStyle = '#F5F5F5';
+    ctx.fillRect(50, y - 15, 700, 25);
+    ctx.strokeStyle = '#CCCCCC';
+    ctx.strokeRect(50, y - 15, 700, 25);
+    
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 12px Arial';
+    ctx.fillText('Campo', 70, y);
+    ctx.fillText('Det 1', 300, y);
+    ctx.fillText('Det 2', 550, y);
+    
+    y += 25;
+    
+    // Table rows
+    const tableData = [
+      ['Molde + Solo (g)', data.det1?.moldeSolo?.toFixed(2) || '0.00', data.det2?.moldeSolo?.toFixed(2) || '0.00'],
+      ['Molde (g)', data.det1?.molde?.toFixed(2) || '0.00', data.det2?.molde?.toFixed(2) || '0.00'],
+      ['Solo (g)', calculations.det1?.soil?.toFixed(2) || '0.00', calculations.det2?.soil?.toFixed(2) || '0.00'],
+      ['Volume (cm³)', data.det1?.volume?.toFixed(2) || '0.00', data.det2?.volume?.toFixed(2) || '0.00'],
+      ['γnat úmido (g/cm³)', calculations.det1?.gammaNatWet?.toFixed(3) || '0.000', calculations.det2?.gammaNatWet?.toFixed(3) || '0.000'],
+      ['γnat seco (g/cm³)', calculations.det1?.gammaNatDry?.toFixed(3) || '0.000', calculations.det2?.gammaNatDry?.toFixed(3) || '0.000']
+    ];
+    
+    ctx.font = '11px Arial';
+    tableData.forEach((row, index) => {
+      const rowY = y + (index * 20);
+      
+      // Alternate row background
+      if (index % 2 === 1) {
+        ctx.fillStyle = '#F9F9F9';
+        ctx.fillRect(50, rowY - 12, 700, 20);
+      }
+      
+      // Row border
+      ctx.strokeStyle = '#EEEEEE';
+      ctx.strokeRect(50, rowY - 12, 700, 20);
+      
+      ctx.fillStyle = '#000000';
+      ctx.fillText(row[0], 70, rowY);
+      ctx.fillText(row[1], 300, rowY);
+      ctx.fillText(row[2], 550, rowY);
+    });
+    
+    y += tableData.length * 20 + 40;
+    
+    // Results section
+    ctx.fillStyle = '#F8F9FA';
+    ctx.fillRect(50, y - 20, 700, 150);
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.strokeRect(50, y - 20, 700, 150);
+    
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    ctx.fillText('Resultados Finais', 70, y);
+    
+    y += 25;
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.fillText(`γd Topo: ${calculations.results?.gammaDTop?.toFixed(3) || '0.000'} g/cm³`, 70, y);
+    y += 20;
+    ctx.fillText(`γd Base: ${calculations.results?.gammaDBase?.toFixed(3) || '0.000'} g/cm³`, 70, y);
+    y += 20;
+    ctx.fillText(`Índice de Vazios Topo: ${calculations.results?.voidIndexTop?.toFixed(3) || 'N/A'}`, 70, y);
+    y += 20;
+    ctx.fillText(`Índice de Vazios Base: ${calculations.results?.voidIndexBase?.toFixed(3) || 'N/A'}`, 70, y);
+    y += 20;
+    ctx.fillText(`Compacidade Relativa Topo: ${calculations.results?.relativeCompactnessTop?.toFixed(1) || 'N/A'}%`, 70, y);
+    y += 20;
+    ctx.fillText(`Compacidade Relativa Base: ${calculations.results?.relativeCompactnessBase?.toFixed(1) || 'N/A'}%`, 70, y);
+    
+    y += 40;
+    
+    // Status
+    const status = calculations.results?.status || 'AGUARDANDO';
+    let statusColor = status === 'APROVADO' ? '#4CAF50' : status === 'REPROVADO' ? '#F44336' : '#FF9800';
+    
+    ctx.fillStyle = statusColor;
+    ctx.fillRect(50, y - 20, 700, 40);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`STATUS DO ENSAIO: ${status}`, canvas.width / 2, y);
+    
+    // Footer
+    y = canvas.height - 50;
+    ctx.fillStyle = '#666666';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', canvas.width / 2, y);
+    ctx.fillText('Conforme normas ABNT NBR 6457 e NBR 9813', canvas.width / 2, y + 15);
+    
+    // Convert to blob and download
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `densidade-in-situ-${data.registrationNumber || 'relatorio'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao gerar relatório:', error);
+    throw error;
   }
 }
 
 /**
- * Generate PDF for Density In Situ test
+ * Generate report for Real Density test
  */
-export function generateDensityInSituPDF(data: any, calculations: any): void {
-  const doc = new jsPDF();
-  
-  // Header
-  doc.setFontSize(18);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Laboratório Ev.C.S', 105, 20, { align: 'center' });
-  
-  doc.setFontSize(14);
-  doc.setTextColor(102, 102, 102);
-  doc.text('Relatório de Densidade In Situ', 105, 30, { align: 'center' });
-  
-  doc.setFontSize(10);
-  doc.text('Conforme ABNT NBR 6457 e NBR 9813', 105, 38, { align: 'center' });
-  doc.text(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, 105, 44, { align: 'center' });
-  
-  // General Information
-  doc.setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text('Informações Gerais', 20, 60);
-  
-  const generalInfo = [
-    ['Registro:', data.registrationNumber || '-'],
-    ['Data:', data.date || '-'],
-    ['Hora:', data.time || '-'],
-    ['Operador:', data.operator || '-'],
-    ['Responsável Técnico:', data.technicalResponsible || '-'],
-    ['Material:', data.material || '-'],
-    ['Origem:', data.origin || '-'],
-    ['Coordenadas:', data.coordinates || '-']
-  ];
-  
-  doc.autoTable({
-    startY: 65,
-    head: [],
-    body: generalInfo,
-    theme: 'grid',
-    styles: { fontSize: 9 },
-    columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 40 },
-      1: { cellWidth: 60 }
-    }
-  });
-
-  // Density Determinations
-  doc.text('Densidade In Situ - Determinações', 20, (doc as any).lastAutoTable.finalY + 15);
-  
-  const densityData = [
-    ['Campo', 'Det 1', 'Det 2'],
-    ['Cilindro Nº', data.det1?.cylinderNumber || '-', data.det2?.cylinderNumber || '-'],
-    ['Molde + Solo (g)', (data.det1?.moldeSolo || 0).toFixed(2), (data.det2?.moldeSolo || 0).toFixed(2)],
-    ['Molde (g)', (data.det1?.molde || 0).toFixed(2), (data.det2?.molde || 0).toFixed(2)],
-    ['Solo (g)', calculations.det1.soil.toFixed(2), calculations.det2.soil.toFixed(2)],
-    ['Volume (cm³)', (data.det1?.volume || 0).toFixed(2), (data.det2?.volume || 0).toFixed(2)],
-    ['γnat úmido (g/cm³)', calculations.det1.gammaNatWet.toFixed(3), calculations.det2.gammaNatWet.toFixed(3)],
-    ['γnat seco (g/cm³)', calculations.det1.gammaNatDry.toFixed(3), calculations.det2.gammaNatDry.toFixed(3)]
-  ];
-  
-  doc.autoTable({
-    startY: (doc as any).lastAutoTable.finalY + 20,
-    head: [densityData[0]],
-    body: densityData.slice(1),
-    theme: 'striped',
-    headStyles: { fillColor: [25, 118, 210] },
-    styles: { fontSize: 9, halign: 'center' },
-    columnStyles: {
-      0: { halign: 'left', fontStyle: 'bold' }
-    }
-  });
-
-  // Results
-  doc.text('Resultados Finais', 20, (doc as any).lastAutoTable.finalY + 15);
-  
-  const results = [
-    ['γd Topo:', `${calculations.results.gammaDTop.toFixed(3)} g/cm³`],
-    ['γd Base:', `${calculations.results.gammaDBase.toFixed(3)} g/cm³`],
-    ['γd Médio:', `${calculations.gammaNatDryAvg.toFixed(3)} g/cm³`],
-    ['Umidade Média Topo:', `${calculations.moistureTop.average.toFixed(2)}%`],
-    ['Umidade Média Base:', `${calculations.moistureBase.average.toFixed(2)}%`]
-  ];
-  
-  doc.autoTable({
-    startY: (doc as any).lastAutoTable.finalY + 20,
-    head: [],
-    body: results,
-    theme: 'grid',
-    styles: { fontSize: 10 },
-    columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 70 },
-      1: { cellWidth: 50 }
-    }
-  });
-
-  // Detailed Results - Top and Base
-  doc.text('Índices de Vazios e Compacidade Relativa', 20, (doc as any).lastAutoTable.finalY + 15);
-  
-  const detailedResults = [
-    ['Parâmetro', 'Topo', 'Base'],
-    ['Índice de Vazios (e)', calculations.results.voidIndexTop.toFixed(3), calculations.results.voidIndexBase.toFixed(3)],
-    ['Compacidade Relativa (%)', calculations.results.relativeCompactnessTop.toFixed(1), calculations.results.relativeCompactnessBase.toFixed(1)]
-  ];
-  
-  doc.autoTable({
-    startY: (doc as any).lastAutoTable.finalY + 20,
-    head: [detailedResults[0]],
-    body: detailedResults.slice(1),
-    theme: 'striped',
-    headStyles: { fillColor: [25, 118, 210] },
-    styles: { fontSize: 10, halign: 'center' },
-    columnStyles: {
-      0: { halign: 'left', fontStyle: 'bold', cellWidth: 70 },
-      1: { cellWidth: 40 },
-      2: { cellWidth: 40 }
-    }
-  });
-
-  // Status
-  const statusColors = {
-    'APROVADO': [76, 175, 80],
-    'REPROVADO': [244, 67, 54],
-    'AGUARDANDO': [255, 152, 0]
-  };
-  
-  const statusColor = statusColors[calculations.results.status as keyof typeof statusColors] || [128, 128, 128];
-  doc.setFillColor(statusColor[0], statusColor[1], statusColor[2]);
-  doc.rect(20, (doc as any).lastAutoTable.finalY + 15, 170, 15, 'F');
-  
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(12);
-  doc.text(`STATUS DO ENSAIO: ${calculations.results.status}`, 105, (doc as any).lastAutoTable.finalY + 25, { align: 'center' });
-
-  // Footer
-  doc.setTextColor(128, 128, 128);
-  doc.setFontSize(8);
-  doc.text('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', 105, 280, { align: 'center' });
-  doc.text('Conforme normas ABNT NBR 6457 e NBR 9813', 105, 286, { align: 'center' });
-
-  // Save PDF
-  doc.save(`densidade-in-situ-${data.registrationNumber || 'relatorio'}.pdf`);
+export async function generateRealDensityPDF(data: any, calculations: any): Promise<void> {
+  try {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas context not available');
+    
+    canvas.width = 800;
+    canvas.height = 700;
+    
+    // White background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Header
+    ctx.fillStyle = '#1976D2';
+    ctx.font = 'bold 28px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Laboratório Ev.C.S', canvas.width / 2, 50);
+    
+    ctx.fillStyle = '#666666';
+    ctx.font = '20px Arial';
+    ctx.fillText('Relatório de Densidade Real dos Grãos', canvas.width / 2, 80);
+    
+    ctx.fillStyle = '#000000';
+    ctx.font = '14px Arial';
+    ctx.fillText('Determinação por Picnometria - ABNT NBR 6457', canvas.width / 2, 105);
+    ctx.fillText(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, canvas.width / 2, 125);
+    
+    // Information
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    let y = 170;
+    ctx.fillText('Informações Gerais', 50, y);
+    
+    y += 10;
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(50, y);
+    ctx.lineTo(750, y);
+    ctx.stroke();
+    
+    y += 25;
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.fillText(`Registro: ${data.registrationNumber}`, 50, y);
+    ctx.fillText(`Data: ${data.date}`, 400, y);
+    y += 20;
+    ctx.fillText(`Operador: ${data.operator}`, 50, y);
+    ctx.fillText(`Material: ${data.material}`, 400, y);
+    y += 20;
+    ctx.fillText(`Origem: ${data.origin || 'N/A'}`, 50, y);
+    
+    // Moisture content
+    y += 40;
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    ctx.fillText('Teor de Umidade', 50, y);
+    
+    y += 10;
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.beginPath();
+    ctx.moveTo(50, y);
+    ctx.lineTo(750, y);
+    ctx.stroke();
+    
+    y += 25;
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.fillText(`Umidade Média: ${calculations.moisture?.average?.toFixed(2) || '0.00'}%`, 50, y);
+    
+    // Picnometer table
+    y += 40;
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    ctx.fillText('Picnômetro - Determinações', 50, y);
+    
+    y += 10;
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.beginPath();
+    ctx.moveTo(50, y);
+    ctx.lineTo(750, y);
+    ctx.stroke();
+    
+    y += 25;
+    
+    // Table header
+    ctx.fillStyle = '#F5F5F5';
+    ctx.fillRect(50, y - 15, 700, 25);
+    ctx.strokeStyle = '#CCCCCC';
+    ctx.strokeRect(50, y - 15, 700, 25);
+    
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 12px Arial';
+    ctx.fillText('Campo', 70, y);
+    ctx.fillText('Det 1', 350, y);
+    ctx.fillText('Det 2', 600, y);
+    
+    y += 25;
+    
+    // Table data
+    const picData = [
+      ['Massa do Picnômetro (g)', data.picnometer1?.massaPicnometro?.toFixed(2) || '0.00', data.picnometer2?.massaPicnometro?.toFixed(2) || '0.00'],
+      ['Massa Pic + Amostra + Água (g)', data.picnometer1?.massaPicAmostraAgua?.toFixed(2) || '0.00', data.picnometer2?.massaPicAmostraAgua?.toFixed(2) || '0.00'],
+      ['Massa Pic + Água (g)', data.picnometer1?.massaPicAgua?.toFixed(2) || '0.00', data.picnometer2?.massaPicAgua?.toFixed(2) || '0.00'],
+      ['Temperatura (°C)', data.picnometer1?.temperatura?.toFixed(1) || '0.0', data.picnometer2?.temperatura?.toFixed(1) || '0.0'],
+      ['Massa Solo Úmido (g)', data.picnometer1?.massaSoloUmido?.toFixed(2) || '0.00', data.picnometer2?.massaSoloUmido?.toFixed(2) || '0.00'],
+      ['Densidade Real (g/cm³)', calculations.picnometer?.det1?.realDensity?.toFixed(3) || '0.000', calculations.picnometer?.det2?.realDensity?.toFixed(3) || '0.000']
+    ];
+    
+    ctx.font = '11px Arial';
+    picData.forEach((row, index) => {
+      const rowY = y + (index * 20);
+      
+      if (index % 2 === 1) {
+        ctx.fillStyle = '#F9F9F9';
+        ctx.fillRect(50, rowY - 12, 700, 20);
+      }
+      
+      ctx.strokeStyle = '#EEEEEE';
+      ctx.strokeRect(50, rowY - 12, 700, 20);
+      
+      ctx.fillStyle = '#000000';
+      ctx.fillText(row[0], 70, rowY);
+      ctx.fillText(row[1], 350, rowY);
+      ctx.fillText(row[2], 600, rowY);
+    });
+    
+    y += picData.length * 20 + 40;
+    
+    // Results
+    ctx.fillStyle = '#F8F9FA';
+    ctx.fillRect(50, y - 20, 700, 120);
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.strokeRect(50, y - 20, 700, 120);
+    
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    ctx.fillText('Resultados Finais', 70, y);
+    
+    y += 25;
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.fillText(`Densidade Real Média: ${calculations.results?.average?.toFixed(3) || '0.000'} g/cm³`, 70, y);
+    y += 20;
+    ctx.fillText(`Diferença entre Determinações: ${calculations.results?.difference?.toFixed(3) || '0.000'} g/cm³`, 70, y);
+    y += 20;
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#666666';
+    ctx.fillText('Critério de Aprovação: Diferença ≤ 0.02 g/cm³', 70, y);
+    
+    y += 30;
+    
+    // Status
+    const status = calculations.results?.status || 'AGUARDANDO';
+    let statusColor = status === 'APROVADO' ? '#4CAF50' : status === 'REPROVADO' ? '#F44336' : '#FF9800';
+    
+    ctx.fillStyle = statusColor;
+    ctx.fillRect(50, y - 20, 700, 40);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`STATUS DO ENSAIO: ${status}`, canvas.width / 2, y);
+    
+    // Footer
+    y = canvas.height - 50;
+    ctx.fillStyle = '#666666';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', canvas.width / 2, y);
+    ctx.fillText('Conforme norma ABNT NBR 6457', canvas.width / 2, y + 15);
+    
+    // Convert to blob and download
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `densidade-real-${data.registrationNumber || 'relatorio'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao gerar relatório:', error);
+    throw error;
+  }
 }
 
 /**
- * Generate PDF for Real Density test
+ * Generate report for Max/Min Density test
  */
-export function generateRealDensityPDF(data: any, calculations: any): void {
-  const doc = new jsPDF();
-
-  // Header
-  doc.setFontSize(20);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Laboratório Ev.C.S', 105, 20, { align: 'center' });
-  
-  doc.setFontSize(16);
-  doc.setTextColor(102, 102, 102);
-  doc.text('Relatório de Densidade Real dos Grãos', 105, 30, { align: 'center' });
-  
-  doc.setFontSize(12);
-  doc.text('Determinação por Picnometria - ABNT NBR 6457', 105, 40, { align: 'center' });
-  doc.text(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, 105, 48, { align: 'center' });
-
-  // General Information
-  doc.setFontSize(14);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Informações Gerais', 20, 65);
-  
-  doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`Registro: ${data.registrationNumber}`, 20, 75);
-  doc.text(`Data: ${data.date}`, 105, 75);
-  doc.text(`Operador: ${data.operator}`, 20, 82);
-  doc.text(`Material: ${data.material}`, 105, 82);
-  doc.text(`Origem: ${data.origin || 'N/A'}`, 20, 89);
-
-  // Moisture Content
-  doc.setFontSize(14);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Teor de Umidade', 20, 105);
-  
-  doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`Umidade Média: ${calculations.moisture.average.toFixed(2)}%`, 20, 115);
-
-  // Picnometer determinations table
-  doc.setFontSize(14);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Picnômetro - Determinações', 20, 130);
-
-  const picnometerData = [
-    ['Campo', 'Det 1', 'Det 2'],
-    ['Massa do Picnômetro (g)', data.picnometer1.massaPicnometro.toFixed(2), data.picnometer2.massaPicnometro.toFixed(2)],
-    ['Massa Pic + Amostra + Água (g)', data.picnometer1.massaPicAmostraAgua.toFixed(2), data.picnometer2.massaPicAmostraAgua.toFixed(2)],
-    ['Massa Pic + Água (g)', data.picnometer1.massaPicAgua.toFixed(2), data.picnometer2.massaPicAgua.toFixed(2)],
-    ['Temperatura (°C)', data.picnometer1.temperatura.toFixed(1), data.picnometer2.temperatura.toFixed(1)],
-    ['Densidade da Água (g/cm³)', calculations.picnometer.det1.waterDensity.toFixed(5), calculations.picnometer.det2.waterDensity.toFixed(5)],
-    ['Massa Solo Úmido (g)', data.picnometer1.massaSoloUmido.toFixed(2), data.picnometer2.massaSoloUmido.toFixed(2)],
-    ['Massa Solo Seco (g)', calculations.picnometer.det1.dryWeight.toFixed(2), calculations.picnometer.det2.dryWeight.toFixed(2)],
-    ['Densidade Real (g/cm³)', calculations.picnometer.det1.realDensity.toFixed(3), calculations.picnometer.det2.realDensity.toFixed(3)]
-  ];
-
-  (doc as any).autoTable({
-    startY: 140,
-    head: [picnometerData[0]],
-    body: picnometerData.slice(1),
-    theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0] },
-    columnStyles: {
-      0: { cellWidth: 70 },
-      1: { cellWidth: 35, halign: 'center' },
-      2: { cellWidth: 35, halign: 'center' }
-    },
-    didParseCell: function(data: any) {
-      if (data.row.index >= 4 && data.row.index <= 7 && data.column.index > 0) {
-        data.cell.styles.fillColor = [227, 242, 253];
+export async function generateMaxMinDensityPDF(data: any, calculations: any): Promise<void> {
+  try {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas context not available');
+    
+    canvas.width = 800;
+    canvas.height = 600;
+    
+    // White background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Header
+    ctx.fillStyle = '#1976D2';
+    ctx.font = 'bold 28px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Laboratório Ev.C.S', canvas.width / 2, 50);
+    
+    ctx.fillStyle = '#666666';
+    ctx.font = '20px Arial';
+    ctx.fillText('Relatório de Densidade Máxima e Mínima', canvas.width / 2, 80);
+    
+    ctx.fillStyle = '#000000';
+    ctx.font = '14px Arial';
+    ctx.fillText('Determinação dos Índices de Vazios - ABNT NBR 9813', canvas.width / 2, 105);
+    ctx.fillText(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, canvas.width / 2, 125);
+    
+    // Information
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    let y = 170;
+    ctx.fillText('Informações Gerais', 50, y);
+    
+    y += 10;
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(50, y);
+    ctx.lineTo(750, y);
+    ctx.stroke();
+    
+    y += 25;
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.fillText(`Registro: ${data.registrationNumber}`, 50, y);
+    ctx.fillText(`Data: ${data.date}`, 400, y);
+    y += 20;
+    ctx.fillText(`Operador: ${data.operator}`, 50, y);
+    ctx.fillText(`Material: ${data.material}`, 400, y);
+    y += 20;
+    ctx.fillText(`Origem: ${data.origin || 'N/A'}`, 50, y);
+    
+    // Results
+    y += 60;
+    ctx.fillStyle = '#F8F9FA';
+    ctx.fillRect(50, y - 20, 700, 120);
+    ctx.strokeStyle = '#E0E0E0';
+    ctx.strokeRect(50, y - 20, 700, 120);
+    
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1976D2';
+    ctx.fillText('Resultados Finais', 70, y);
+    
+    y += 25;
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.fillText(`γdmax Média: ${calculations.maxDensity?.average?.toFixed(3) || '0.000'} g/cm³`, 70, y);
+    y += 20;
+    ctx.fillText(`γdmin Média: ${calculations.minDensity?.average?.toFixed(3) || '0.000'} g/cm³`, 70, y);
+    y += 20;
+    ctx.fillText(`emax: ${calculations.results?.emax?.toFixed(3) || '0.000'}`, 70, y);
+    y += 20;
+    ctx.fillText(`emin: ${calculations.results?.emin?.toFixed(3) || '0.000'}`, 70, y);
+    
+    y += 40;
+    
+    // Status
+    const status = calculations.results?.status || 'AGUARDANDO';
+    let statusColor = status === 'APROVADO' ? '#4CAF50' : status === 'REPROVADO' ? '#F44336' : '#FF9800';
+    
+    ctx.fillStyle = statusColor;
+    ctx.fillRect(50, y - 20, 700, 40);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`STATUS DO ENSAIO: ${status}`, canvas.width / 2, y);
+    
+    // Footer
+    y = canvas.height - 50;
+    ctx.fillStyle = '#666666';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', canvas.width / 2, y);
+    ctx.fillText('Conforme norma ABNT NBR 9813', canvas.width / 2, y + 15);
+    
+    // Convert to blob and download
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `densidade-max-min-${data.registrationNumber || 'relatorio'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
       }
-    }
-  });
-
-  // Results
-  const finalY = (doc as any).lastAutoTable.finalY + 15;
-  doc.setFontSize(14);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Resultados Finais', 20, finalY);
-
-  doc.setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`Densidade Real Média: ${calculations.results.average.toFixed(3)} g/cm³`, 20, finalY + 15);
-  doc.text(`Diferença entre Determinações: ${calculations.results.difference.toFixed(3)} g/cm³`, 20, finalY + 25);
-
-  // Approval criteria
-  doc.setFontSize(10);
-  doc.setTextColor(102, 102, 102);
-  doc.text('Critério de Aprovação: Diferença ≤ 0.02 g/cm³', 20, finalY + 40);
-  doc.text('Conforme normas ABNT para ensaios de densidade real', 20, finalY + 47);
-
-  // Status
-  const statusY = finalY + 60;
-  let statusColor: [number, number, number];
-  switch (calculations.results.status) {
-    case 'APROVADO':
-      statusColor = [76, 175, 80];
-      break;
-    case 'REPROVADO':
-      statusColor = [244, 67, 54];
-      break;
-    default:
-      statusColor = [255, 152, 0];
+    });
+  } catch (error) {
+    console.error('Erro ao gerar relatório:', error);
+    throw error;
   }
-
-  doc.setFillColor(...statusColor);
-  doc.rect(20, statusY - 5, 170, 15, 'F');
-  doc.setFontSize(12);
-  doc.setTextColor(255, 255, 255);
-  doc.text(`STATUS DO ENSAIO: ${calculations.results.status}`, 105, statusY + 3, { align: 'center' });
-
-  // Footer
-  doc.setFontSize(8);
-  doc.setTextColor(102, 102, 102);
-  doc.text('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', 105, 280, { align: 'center' });
-  doc.text('Conforme norma ABNT NBR 6457', 105, 286, { align: 'center' });
-
-  // Save PDF
-  doc.save(`densidade-real-${data.registrationNumber || 'relatorio'}.pdf`);
-}
-
-/**
- * Generate PDF for Max/Min Density test
- */
-export function generateMaxMinDensityPDF(data: any, calculations: any): void {
-  const doc = new jsPDF();
-
-  // Header
-  doc.setFontSize(20);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Laboratório Ev.C.S', 105, 20, { align: 'center' });
-  
-  doc.setFontSize(16);
-  doc.setTextColor(102, 102, 102);
-  doc.text('Relatório de Densidade Máxima e Mínima', 105, 30, { align: 'center' });
-  
-  doc.setFontSize(12);
-  doc.text('Determinação dos Índices de Vazios - ABNT NBR 9813', 105, 40, { align: 'center' });
-  doc.text(`Data de geração: ${new Date().toLocaleString('pt-BR')}`, 105, 48, { align: 'center' });
-
-  // General Information
-  doc.setFontSize(14);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Informações Gerais', 20, 65);
-  
-  doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`Registro: ${data.registrationNumber}`, 20, 75);
-  doc.text(`Data: ${data.date}`, 105, 75);
-  doc.text(`Operador: ${data.operator}`, 20, 82);
-  doc.text(`Material: ${data.material}`, 105, 82);
-  doc.text(`Origem: ${data.origin || 'N/A'}`, 20, 89);
-
-  // Maximum Density Table
-  doc.setFontSize(14);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Densidade Máxima', 20, 105);
-
-  const maxDensityData = [
-    ['Campo', 'Det 1', 'Det 2', 'Det 3'],
-    ['Molde + Solo (g)', data.maxDensity1.moldeSolo.toFixed(2), data.maxDensity2.moldeSolo.toFixed(2), data.maxDensity3.moldeSolo.toFixed(2)],
-    ['Molde (g)', data.maxDensity1.molde.toFixed(2), data.maxDensity2.molde.toFixed(2), data.maxDensity3.molde.toFixed(2)],
-    ['Solo (g)', calculations.maxDensity.det1.soil.toFixed(2), calculations.maxDensity.det2.soil.toFixed(2), calculations.maxDensity.det3.soil.toFixed(2)],
-    ['Volume (cm³)', data.maxDensity1.volume.toFixed(2), data.maxDensity2.volume.toFixed(2), data.maxDensity3.volume.toFixed(2)],
-    ['γd (g/cm³)', calculations.maxDensity.det1.gammaDMax.toFixed(3), calculations.maxDensity.det2.gammaDMax.toFixed(3), calculations.maxDensity.det3.gammaDMax.toFixed(3)]
-  ];
-
-  (doc as any).autoTable({
-    startY: 115,
-    head: [maxDensityData[0]],
-    body: maxDensityData.slice(1),
-    theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2 },
-    headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0] },
-    columnStyles: {
-      0: { cellWidth: 50 },
-      1: { cellWidth: 30, halign: 'center' },
-      2: { cellWidth: 30, halign: 'center' },
-      3: { cellWidth: 30, halign: 'center' }
-    },
-    didParseCell: function(data: any) {
-      if ((data.row.index === 2 || data.row.index === 5) && data.column.index > 0) {
-        data.cell.styles.fillColor = [227, 242, 253];
-      }
-    }
-  });
-
-  let currentY = (doc as any).lastAutoTable.finalY + 10;
-  doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`γdmax Média: ${calculations.maxDensity.average.toFixed(3)} g/cm³`, 20, currentY);
-
-  // Minimum Density Table
-  currentY += 15;
-  doc.setFontSize(14);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Densidade Mínima', 20, currentY);
-
-  const minDensityData = [
-    ['Campo', 'Det 1', 'Det 2', 'Det 3'],
-    ['Molde + Solo (g)', data.minDensity1.moldeSolo.toFixed(2), data.minDensity2.moldeSolo.toFixed(2), data.minDensity3.moldeSolo.toFixed(2)],
-    ['Molde (g)', data.minDensity1.molde.toFixed(2), data.minDensity2.molde.toFixed(2), data.minDensity3.molde.toFixed(2)],
-    ['Solo (g)', calculations.minDensity.det1.soil.toFixed(2), calculations.minDensity.det2.soil.toFixed(2), calculations.minDensity.det3.soil.toFixed(2)],
-    ['Volume (cm³)', data.minDensity1.volume.toFixed(2), data.minDensity2.volume.toFixed(2), data.minDensity3.volume.toFixed(2)],
-    ['γd (g/cm³)', calculations.minDensity.det1.gammaDMin.toFixed(3), calculations.minDensity.det2.gammaDMin.toFixed(3), calculations.minDensity.det3.gammaDMin.toFixed(3)]
-  ];
-
-  (doc as any).autoTable({
-    startY: currentY + 10,
-    head: [minDensityData[0]],
-    body: minDensityData.slice(1),
-    theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2 },
-    headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0] },
-    columnStyles: {
-      0: { cellWidth: 50 },
-      1: { cellWidth: 30, halign: 'center' },
-      2: { cellWidth: 30, halign: 'center' },
-      3: { cellWidth: 30, halign: 'center' }
-    },
-    didParseCell: function(data: any) {
-      if ((data.row.index === 2 || data.row.index === 5) && data.column.index > 0) {
-        data.cell.styles.fillColor = [227, 242, 253];
-      }
-    }
-  });
-
-  currentY = (doc as any).lastAutoTable.finalY + 10;
-  doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`γdmin Média: ${calculations.minDensity.average.toFixed(3)} g/cm³`, 20, currentY);
-
-  // Results
-  currentY += 20;
-  doc.setFontSize(14);
-  doc.setTextColor(25, 118, 210);
-  doc.text('Resultados Finais', 20, currentY);
-
-  doc.setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`emax: ${calculations.results.emax.toFixed(3)}`, 20, currentY + 15);
-  doc.text(`emin: ${calculations.results.emin.toFixed(3)}`, 105, currentY + 15);
-
-  // Status
-  currentY += 35;
-  let statusColor: [number, number, number];
-  switch (calculations.results.status) {
-    case 'APROVADO':
-      statusColor = [76, 175, 80];
-      break;
-    case 'REPROVADO':
-      statusColor = [244, 67, 54];
-      break;
-    default:
-      statusColor = [255, 152, 0];
-  }
-
-  doc.setFillColor(...statusColor);
-  doc.rect(20, currentY - 5, 170, 15, 'F');
-  doc.setFontSize(12);
-  doc.setTextColor(255, 255, 255);
-  doc.text(`STATUS DO ENSAIO: ${calculations.results.status}`, 105, currentY + 3, { align: 'center' });
-
-  // Footer
-  doc.setFontSize(8);
-  doc.setTextColor(102, 102, 102);
-  doc.text('Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S', 105, 280, { align: 'center' });
-  doc.text('Conforme norma ABNT NBR 9813', 105, 286, { align: 'center' });
-
-  // Save PDF
-  doc.save(`densidade-max-min-${data.registrationNumber || 'relatorio'}.pdf`);
 }
