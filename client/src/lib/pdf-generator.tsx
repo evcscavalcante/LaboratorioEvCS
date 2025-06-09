@@ -991,10 +991,489 @@ const MaxMinDensityDocument: React.FC<{ data: any; calculations: any }> = ({ dat
   </Document>
 );
 
+// Componente para Densidade In Situ - Formato Vale/SCL Organizado
+const DensityInSituDocumentNew: React.FC<{ data: any; calculations: any }> = ({ data, calculations }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      {/* Header Principal */}
+      <View style={{textAlign: 'center', marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#000', paddingBottom: 5}}>
+        <Text style={{fontSize: 14, fontWeight: 'bold'}}>DETERMINAÇÃO DA COMPACIDADE RELATIVA</Text>
+        <Text style={{fontSize: 10, marginTop: 2}}>NBR 6457:2024: NBR 9813:2016.</Text>
+      </View>
+
+      {/* Informações Gerais em tabela organizada */}
+      <View style={styles.table}>
+        <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '12%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>OPERADOR:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '18%'}]}>
+            <Text style={{fontSize: 7}}>{data.operator || 'ALEXANDRE'}</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '8%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>NORTE:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '12%'}]}>
+            <Text style={{fontSize: 7}}>7.795.866,093</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '10%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>CAMADA N°:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '6%'}]}>
+            <Text style={{fontSize: 7}}>21ª</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '6%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>FVS:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '28%', borderRightWidth: 0}]}>
+            <Text style={{fontSize: 7}}>202</Text>
+          </View>
+        </View>
+
+        <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '12%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>RESPONSÁVEL PELO CÁLCULO:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '18%'}]}>
+            <Text style={{fontSize: 7}}>KLAIVERTY</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '8%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>ESTE:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '12%'}]}>
+            <Text style={{fontSize: 7}}>686.769,643</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '10%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>MATERIAL:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '40%', borderRightWidth: 0}]}>
+            <Text style={{fontSize: 7}}>{data.material || 'REJEITO FILTRADO'}</Text>
+          </View>
+        </View>
+
+        <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '12%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>VERIFICADOR:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '18%'}]}>
+            <Text style={{fontSize: 7}}>EVANDRO</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '8%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>COTA:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '12%'}]}>
+            <Text style={{fontSize: 7}}>797,618</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '10%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>ORIGEM:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '40%', borderRightWidth: 0}]}>
+            <Text style={{fontSize: 7}}>{data.origin || 'EDVC'}</Text>
+          </View>
+        </View>
+
+        <View style={styles.tableRow}>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '12%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>DATA:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '18%'}]}>
+            <Text style={{fontSize: 7}}>{data.date || '04/06/2025'}</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '8%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>QUADRANTE:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '12%'}]}>
+            <Text style={{fontSize: 7}}>A/B, FAIXA 1</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '10%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>REGISTRO:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '40%', borderRightWidth: 0}]}>
+            <Text style={{fontSize: 7}}>{data.registrationNumber || 'CR-250'}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Tempo e Dispositivos */}
+      <View style={styles.table}>
+        <View style={styles.tableRow}>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '15%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>TEMPO</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '35%'}]}>
+            <Text style={{fontSize: 7}}>● SOL FORTE   ○ CHUVA FRACA   ○ CHUVA FORTE   ○ NUBLADO</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '8%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>HORA:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '8%'}]}>
+            <Text style={{fontSize: 7}}>{data.time || '15:11'}</Text>
+          </View>
+          <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '15%'}]}>
+            <Text style={{fontSize: 7, fontWeight: 'bold'}}>CAMADA REENSAIADA:</Text>
+          </View>
+          <View style={[styles.tableCol, {width: '19%', borderRightWidth: 0}]}>
+            <Text style={{fontSize: 7}}>○ SIM   ● NÃO</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={{flexDirection: 'row', marginBottom: 8}}>
+        <Text style={{fontSize: 7, fontWeight: 'bold'}}>DISPOSITIVOS DE PRECISÃO</Text>
+        <Text style={{fontSize: 7, marginLeft: 20}}>BALANÇA: {data.balanceId || '46916'}</Text>
+        <Text style={{fontSize: 7, marginLeft: 20}}>ESTUFA: {data.ovenId || '718'}</Text>
+      </View>
+
+      {/* Tabelas de Densidade lado a lado */}
+      <View style={{flexDirection: 'row', marginBottom: 8}}>
+        {/* Densidade Máxima */}
+        <View style={{width: '48%', marginRight: '2%'}}>
+          <Text style={[styles.tableColHeader, {backgroundColor: '#E0E0E0', padding: 3, marginBottom: 2}]}>DENSIDADE SECA MÁXIMA</Text>
+          <View style={styles.table}>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6, fontWeight: 'bold'}}>DETERMINAÇÃO Nº</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>1</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>1</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>1</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>MOLDE + SOLO (g)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.maxDensity1?.moldeSolo || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.maxDensity2?.moldeSolo || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.maxDensity3?.moldeSolo || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>MOLDE (g)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.maxDensity1?.molde || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.maxDensity2?.molde || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.maxDensity3?.molde || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>SOLO (g)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{((data.maxDensity1?.moldeSolo || 0) - (data.maxDensity1?.molde || 0)).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{((data.maxDensity2?.moldeSolo || 0) - (data.maxDensity2?.molde || 0)).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{((data.maxDensity3?.moldeSolo || 0) - (data.maxDensity3?.molde || 0)).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>γd(g/cm³)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.maxDensity?.det1?.gammaDMax || 0).toFixed(3)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.maxDensity?.det2?.gammaDMax || 0).toFixed(3)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.maxDensity?.det3?.gammaDMax || 0).toFixed(3)}</Text>
+              </View>
+            </View>
+            <View style={styles.tableRow}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>γdmáx(g/cm³)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '60%', backgroundColor: '#E0E0E0', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center', fontWeight: 'bold'}}>{(calculations.maxDensity?.average || 0).toFixed(3)}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Densidade Mínima */}
+        <View style={{width: '48%', marginLeft: '2%'}}>
+          <Text style={[styles.tableColHeader, {backgroundColor: '#E0E0E0', padding: 3, marginBottom: 2}]}>DENSIDADE SECA MÍNIMA</Text>
+          <View style={styles.table}>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6, fontWeight: 'bold'}}>NÚMERO DO CILINDRO</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>1</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>1</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>1</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>MOLDE + SOLO (g)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.minDensity1?.moldeSolo || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.minDensity2?.moldeSolo || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.minDensity3?.moldeSolo || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>MOLDE (g)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.minDensity1?.molde || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.minDensity2?.molde || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.minDensity3?.molde || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>SOLO (g)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{((data.minDensity1?.moldeSolo || 0) - (data.minDensity1?.molde || 0)).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{((data.minDensity2?.moldeSolo || 0) - (data.minDensity2?.molde || 0)).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{((data.minDensity3?.moldeSolo || 0) - (data.minDensity3?.molde || 0)).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>γd(g/cm³)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.minDensity?.det1?.gammaDMin || 0).toFixed(3)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.minDensity?.det2?.gammaDMin || 0).toFixed(3)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '20%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.minDensity?.det3?.gammaDMin || 0).toFixed(3)}</Text>
+              </View>
+            </View>
+            <View style={styles.tableRow}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '40%'}]}>
+                <Text style={{fontSize: 6}}>γdmín(g/cm³)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '60%', backgroundColor: '#E0E0E0', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center', fontWeight: 'bold'}}>{(calculations.minDensity?.average || 0).toFixed(3)}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Densidade In Situ e Umidade lado a lado */}
+      <View style={{flexDirection: 'row', marginBottom: 8}}>
+        {/* Densidade In Situ */}
+        <View style={{width: '35%', marginRight: '2%'}}>
+          <Text style={[styles.tableColHeader, {backgroundColor: '#E0E0E0', padding: 3, marginBottom: 2}]}>DENSIDADE "IN SITU" - CILINDRO DE CRAVAÇÃO</Text>
+          <Text style={{fontSize: 6, textAlign: 'center', marginBottom: 2}}>NBR 9813:2016</Text>
+          <View style={styles.table}>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '50%'}]}>
+                <Text style={{fontSize: 6, fontWeight: 'bold'}}>NÚMERO DO CILINDRO</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '25%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{data.det1?.cylinderNumber || '3'}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '25%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{data.det2?.cylinderNumber || '4'}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '50%'}]}>
+                <Text style={{fontSize: 6}}>MOLDE + SOLO (g)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '25%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.det1?.moldeSolo || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '25%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(data.det2?.moldeSolo || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '50%'}]}>
+                <Text style={{fontSize: 6}}>γd(g/cm³)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '25%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.det1?.gammaDry || 0).toFixed(3)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '25%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.det2?.gammaDry || 0).toFixed(3)}</Text>
+              </View>
+            </View>
+            <View style={styles.tableRow}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '50%'}]}>
+                <Text style={{fontSize: 6}}>γd(g/cm³) Média</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '50%', backgroundColor: '#E0E0E0', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center', fontWeight: 'bold'}}>{(calculations.results?.averageGammaDry || 0).toFixed(3)}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Teor de Umidade */}
+        <View style={{width: '63%'}}>
+          <View style={{flexDirection: 'row', marginBottom: 2}}>
+            <Text style={[styles.tableColHeader, {backgroundColor: '#E0E0E0', padding: 3, width: '30%'}]}>TEOR DE UMIDADE</Text>
+            <Text style={[styles.tableColHeader, {backgroundColor: '#4CAF50', padding: 3, width: '35%', color: '#FFF'}]}>TOPO</Text>
+            <Text style={[styles.tableColHeader, {backgroundColor: '#FF9800', padding: 3, width: '35%', color: '#FFF'}]}>BASE</Text>
+          </View>
+          <View style={styles.table}>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '20%'}]}>
+                <Text style={{fontSize: 6, fontWeight: 'bold'}}>CÁPSULA Nº</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.3%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{data.moistureTop1?.capsule || '-'}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.3%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{data.moistureTop2?.capsule || '-'}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.4%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{data.moistureTop3?.capsule || '-'}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.3%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{data.moistureBase1?.capsule || '-'}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.3%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{data.moistureBase2?.capsule || '-'}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.4%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{data.moistureBase3?.capsule || '-'}</Text>
+              </View>
+            </View>
+            <View style={[styles.tableRow, {borderBottomWidth: 1, borderBottomColor: '#000'}]}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '20%'}]}>
+                <Text style={{fontSize: 6}}>UMIDADE (%)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.3%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.moistureTop?.det1?.moisture || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.3%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.moistureTop?.det2?.moisture || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.4%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.moistureTop?.det3?.moisture || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.3%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.moistureBase?.det1?.moisture || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.3%'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.moistureBase?.det2?.moisture || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '13.4%', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center'}}>{(calculations.moistureBase?.det3?.moisture || 0).toFixed(1)}</Text>
+              </View>
+            </View>
+            <View style={styles.tableRow}>
+              <View style={[styles.tableCol, {backgroundColor: '#F0F0F0', width: '20%'}]}>
+                <Text style={{fontSize: 6}}>UMIDADE MÉDIA (%)</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '40%', backgroundColor: '#4CAF50'}]}>
+                <Text style={{fontSize: 6, textAlign: 'center', color: '#FFF', fontWeight: 'bold'}}>{(calculations.moistureTop?.average || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.tableCol, {width: '40%', backgroundColor: '#FF9800', borderRightWidth: 0}]}>
+                <Text style={{fontSize: 6, textAlign: 'center', color: '#FFF', fontWeight: 'bold'}}>{(calculations.moistureBase?.average || 0).toFixed(1)}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Resultados Finais */}
+      <View style={{marginBottom: 8}}>
+        <View style={{flexDirection: 'row', marginBottom: 3}}>
+          <Text style={{fontSize: 7, fontWeight: 'bold'}}>MASSA ESPECÍFICA REAL DOS GRÃOS (g/cm³): {data.realDensityRef || '3.172'}</Text>
+        </View>
+        
+        {/* TOPO */}
+        <View style={{backgroundColor: '#4CAF50', padding: 2, marginBottom: 2}}>
+          <Text style={{fontSize: 7, fontWeight: 'bold', color: '#FFF', textAlign: 'center'}}>TOPO</Text>
+        </View>
+        <View style={{flexDirection: 'row', backgroundColor: '#F0F0F0', padding: 2, marginBottom: 1}}>
+          <Text style={{fontSize: 6}}>( {(calculations.det1?.gammaDry || 0).toFixed(3)} - {(calculations.minDensity?.average || 0).toFixed(3)} ) x {(calculations.maxDensity?.average || 0).toFixed(3)} = {(calculations.results?.relativeCompactnessTop || 0).toFixed(3)}</Text>
+          <Text style={{fontSize: 6, marginLeft: 10, fontWeight: 'bold'}}>CR    IV</Text>
+        </View>
+        <View style={{flexDirection: 'row', backgroundColor: '#F0F0F0', padding: 2, marginBottom: 3}}>
+          <Text style={{fontSize: 6}}>( {(calculations.maxDensity?.average || 0).toFixed(3)} - {(calculations.minDensity?.average || 0).toFixed(3)} ) x {(calculations.det1?.gammaDry || 0).toFixed(3)} = {(calculations.results?.voidIndexTop || 0).toFixed(3)}</Text>
+          <Text style={{fontSize: 6, marginLeft: 10, fontWeight: 'bold'}}>{((calculations.results?.relativeCompactnessTop || 0) * 100).toFixed(1)}%    {(calculations.results?.voidIndexTop || 0).toFixed(2)}</Text>
+        </View>
+
+        {/* BASE */}
+        <View style={{backgroundColor: '#FF9800', padding: 2, marginBottom: 2}}>
+          <Text style={{fontSize: 7, fontWeight: 'bold', color: '#FFF', textAlign: 'center'}}>BASE</Text>
+        </View>
+        <View style={{flexDirection: 'row', backgroundColor: '#F0F0F0', padding: 2, marginBottom: 1}}>
+          <Text style={{fontSize: 6, fontWeight: 'bold'}}>REGISTRO: {data.registrationNumber || 'MRG-020'}</Text>
+          <Text style={{fontSize: 6, marginLeft: 10}}>( {(calculations.det2?.gammaDry || 0).toFixed(3)} - {(calculations.minDensity?.average || 0).toFixed(3)} ) x {(calculations.maxDensity?.average || 0).toFixed(3)} = {(calculations.results?.relativeCompactnessBase || 0).toFixed(3)}</Text>
+          <Text style={{fontSize: 6, marginLeft: 10, fontWeight: 'bold'}}>CR    IV</Text>
+        </View>
+        <View style={{flexDirection: 'row', backgroundColor: '#F0F0F0', padding: 2}}>
+          <Text style={{fontSize: 6, marginLeft: 70}}>( {(calculations.maxDensity?.average || 0).toFixed(3)} - {(calculations.minDensity?.average || 0).toFixed(3)} ) x {(calculations.det2?.gammaDry || 0).toFixed(3)} = {(calculations.results?.voidIndexBase || 0).toFixed(3)}</Text>
+          <Text style={{fontSize: 6, marginLeft: 10, fontWeight: 'bold'}}>{((calculations.results?.relativeCompactnessBase || 0) * 100).toFixed(1)}%    {(calculations.results?.voidIndexBase || 0).toFixed(2)}</Text>
+        </View>
+      </View>
+
+      {/* Status e Observações */}
+      <View style={{flexDirection: 'row', marginBottom: 5}}>
+        <Text style={{fontSize: 7, fontWeight: 'bold', marginRight: 20}}>STATUS DO ENSAIO:</Text>
+        <View style={{backgroundColor: calculations.results?.status === 'APROVADO' ? '#4CAF50' : '#FFF', borderWidth: calculations.results?.status === 'APROVADO' ? 0 : 1, borderColor: '#000', padding: 3, marginRight: 10}}>
+          <Text style={{color: calculations.results?.status === 'APROVADO' ? '#FFF' : '#000', fontSize: 6, fontWeight: 'bold'}}>APROVADO</Text>
+        </View>
+        <View style={{backgroundColor: calculations.results?.status === 'REPROVADO' ? '#F44336' : '#FFF', borderWidth: calculations.results?.status === 'REPROVADO' ? 0 : 1, borderColor: '#000', padding: 3}}>
+          <Text style={{color: calculations.results?.status === 'REPROVADO' ? '#FFF' : '#000', fontSize: 6, fontWeight: 'bold'}}>REPROVADO</Text>
+        </View>
+      </View>
+
+      <View style={{marginTop: 5}}>
+        <Text style={{fontSize: 7, fontWeight: 'bold', marginBottom: 2}}>OBSERVAÇÕES:</Text>
+        <View style={{height: 20, borderWidth: 1, borderColor: '#CCC'}}></View>
+      </View>
+    </Page>
+  </Document>
+);
+
 // Funções de exportação
 export async function generateDensityInSituPDF(data: any, calculations: any): Promise<void> {
   try {
-    const pdfDocument = <DensityInSituDocument data={data} calculations={calculations} />;
+    const pdfDocument = <DensityInSituDocumentNew data={data} calculations={calculations} />;
     const asPdf = pdf(pdfDocument);
     const blob = await asPdf.toBlob();
     
