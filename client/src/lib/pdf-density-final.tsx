@@ -182,13 +182,13 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             <Text>BALANÇA:</Text>
           </View>
           <View style={[styles.cell, {width: '8%'}]}>
-            <Text>{data.balanceId || '46916'}</Text>
+            <Text>{data.balanceId || ''}</Text>
           </View>
           <View style={[styles.cell, styles.headerCell, {width: '7%'}]}>
             <Text>ESTUFA:</Text>
           </View>
           <View style={[styles.cellLast, {width: '30%'}]}>
-            <Text>{data.ovenId || '718'}</Text>
+            <Text>{data.ovenId || ''}</Text>
           </View>
         </View>
       </View>
@@ -342,6 +342,34 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             </View>
             <View style={styles.row}>
               <View style={[styles.cell, styles.headerCell, {width: '50%'}]}>
+                <Text>SOLO (g) = M+S - M</Text>
+              </View>
+              <View style={[styles.cell, {width: '16.7%'}]}>
+                <Text style={{textAlign: 'center'}}>{((data.minDensity1?.moldeSolo || 0) - (data.minDensity1?.molde || 0)).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cell, {width: '16.6%'}]}>
+                <Text style={{textAlign: 'center'}}>{((data.minDensity2?.moldeSolo || 0) - (data.minDensity2?.molde || 0)).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '16.7%'}]}>
+                <Text style={{textAlign: 'center'}}>{((data.minDensity3?.moldeSolo || 0) - (data.minDensity3?.molde || 0)).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '50%'}]}>
+                <Text>VOLUME (cm³)</Text>
+              </View>
+              <View style={[styles.cell, {width: '16.7%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.minDensity1?.volume || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cell, {width: '16.6%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.minDensity2?.volume || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '16.7%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.minDensity3?.volume || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '50%'}]}>
                 <Text>γd(g/cm³)</Text>
               </View>
               <View style={[styles.cell, {width: '16.7%'}]}>
@@ -371,7 +399,6 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
         {/* Densidade In Situ */}
         <View style={{width: '30%', marginRight: '2%'}}>
           <Text style={styles.sectionTitle}>DENSIDADE "IN SITU"</Text>
-          <Text style={{fontSize: 5, textAlign: 'center', marginBottom: 2}}>NBR 9813:2016</Text>
           <View style={styles.tableContainer}>
             <View style={styles.row}>
               <View style={[styles.cell, styles.headerCell, {width: '60%'}]}>
