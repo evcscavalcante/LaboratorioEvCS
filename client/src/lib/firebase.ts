@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
   authDomain: "laboratorio-evcs.firebaseapp.com",
   projectId: "laboratorio-evcs",
   storageBucket: "laboratorio-evcs.firebasestorage.app",

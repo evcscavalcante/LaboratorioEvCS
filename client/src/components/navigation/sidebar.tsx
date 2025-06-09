@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import UserMenu from '@/components/auth/user-menu';
+import { useAuth } from '@/contexts/auth-context';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -49,6 +50,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const [solosOpen, setSolosOpen] = useState(true);
   const [asfaltoOpen, setAsfaltoOpen] = useState(false);
   const [concretoOpen, setConcretoOpen] = useState(false);
+  const { currentUser } = useAuth();
 
   const menuItems: MenuItem[] = [
     {
@@ -137,7 +139,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
             <p className="text-sm text-gray-500">Sistema Geotécnico</p>
           </div>
         </div>
-        <UserMenu />
+        {currentUser && <UserMenu />}
       </div>
 
       {/* Navigation */}
