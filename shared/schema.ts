@@ -18,7 +18,7 @@ export const organizations = pgTable("organizations", {
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  firebaseUid: varchar("firebase_uid", { length: 255 }).unique().notNull(),
+  firebaseUid: varchar("firebase_uid", { length: 255 }).unique(),
   email: varchar("email", { length: 255 }).unique().notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   role: varchar("role", { length: 50 }).notNull().default("technician"), // admin, manager, supervisor, technician, viewer

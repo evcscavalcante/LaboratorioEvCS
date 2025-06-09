@@ -126,6 +126,33 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           disabled: true
         }
       ]
+    },
+    {
+      label: 'Administração',
+      icon: Shield,
+      expandable: true,
+      expanded: adminOpen,
+      onToggle: () => setAdminOpen(!adminOpen),
+      children: [
+        {
+          label: 'Painel Admin',
+          icon: Settings,
+          href: '/admin',
+          active: location === '/admin'
+        },
+        {
+          label: 'Usuários',
+          icon: Users,
+          href: '/admin/users',
+          active: location === '/admin/users'
+        },
+        {
+          label: 'Organizações',
+          icon: Building,
+          href: '/admin/organizations',
+          active: location === '/admin/organizations'
+        }
+      ]
     }
   ];
 
