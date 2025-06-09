@@ -1,0 +1,156 @@
+Objetivo
+Desenvolver uma aplicação web responsiva chamada Laboratório Ev.C.S para registro, cálculo e geração de relatórios técnicos de ensaios geotécnicos, com foco em:
+
+Densidade In Situ
+
+Densidade Real dos Grãos
+
+Densidade Máxima e Mínima
+
+O sistema deve automatizar os cálculos, validar os dados, armazenar os registros e exportar relatórios em PDF, conforme as normas da ABNT NBR 6457 e NBR 9813.
+
+🧪 CALCULADORA 1 – DENSIDADE IN SITU
+➤ Seção: Informações Gerais
+Campos de entrada:
+
+Número do Registro
+
+Data
+
+Operador
+
+Responsável Técnico
+
+Verificador
+
+Material
+
+Origem
+
+Norte / Este / Cota
+
+Quadrante
+
+Camada
+
+Hora
+
+➤ Seção: Dispositivos
+Campos de entrada:
+
+Identificação da balança
+
+Identificação da estufa
+
+➤ Seção: Referências
+Selecionar:
+
+Registro de Densidade Real
+
+Registro de Densidade Máx/Mín
+
+➤ Seção: Densidade In Situ (2 Determinações)
+Tabela com colunas paralelas (Det 1 e Det 2):
+
+Campo	Tipo	Fórmula
+Número do Cilindro	Texto	—
+Molde + Solo (g)	Número	Entrada manual
+Molde (g)	Número	Entrada manual
+Solo (g)	Automático	Solo = (Molde + Solo) - Molde
+Volume (cm³)	Número	Entrada manual
+γnat úmido (g/cm³)	Automático	γnat = Solo / Volume
+γnat seco (g/cm³)	Automático	γnat_seco = γnat_úmido / (1 + Umidade Média Topo / 100)
+
+🧮 Cálculo da média γnat seco:
+γnat_seco_média = (γnat_seco_1 + γnat_seco_2) / 2
+
+➤ Seção: Teor de Umidade (Topo e Base – 3 Determinações cada)
+Para cada linha:
+
+Campo	Tipo	Fórmula
+Cápsula Nº	Texto	—
+Solo Úmido + Tara	Número	—
+Solo Seco + Tara	Número	—
+Tara	Número	—
+Solo Seco (g)	Auto	Solo Seco = Solo Seco + Tara - Tara
+Água (g)	Auto	Água = Solo Úmido + Tara - Solo Seco + Tara
+Umidade (%)	Auto	Umidade = (Água / Solo Seco) * 100
+
+📌 Cálculo da Umidade Média:
+Umidade Média = (U1 + U2 + U3) / 3
+
+➤ Seção: Resultados (Topo e Base)
+Campo	Fórmula
+γd Topo (g/cm³)	γd_topo = γnat_seco_média
+γd Base (g/cm³)	γd_base = γnat_seco_média (se mesma média ou com separação opcional)
+Índice de Vazios (e)	e = (γs / γd) - 1 onde γs é da densidade real selecionada
+Compacidade Relativa (%)	CR = [(emax - e) / (emax - emin)] * 100 (valores via referência)
+
+➤ Seção: Ações
+Botões: Salvar, Gerar PDF, Limpar
+
+Mostrar Status do Ensaio: AGUARDANDO, APROVADO, REPROVADO (com base em regras como CR mínima)
+
+⚖️ CALCULADORA 2 – DENSIDADE REAL DOS GRÃOS
+➤ Informações Gerais
+Registro, Data, Operador, Material, Origem
+
+➤ Teor de Umidade (3 Determinações)
+Mesma estrutura da Densidade In Situ
+
+➤ Picnômetro (2 Determinações)
+Campo	Fórmula
+Massa do Picnômetro	—
+Massa Pic + Amostra + Água	—
+Massa Pic + Água	—
+Temperatura (°C)	—
+Densidade da Água	Obter via tabela (0.99823 a 1.000) (aproximação por JS ou lookup)
+Massa do Solo Úmido	—
+Massa do Solo Seco	m_sec = m_umido / (1 + Umidade Média)
+Densidade Real	ρs = m_sec / [(m_pic_amostra_agua - m_pic_agua) / densidade_agua - m_sec]
+
+➤ Resultados
+Diferença entre ρs1 e ρs2
+
+Média final
+
+Status (APROVADO se diferença ≤ 0.05 g/cm³)
+
+🧱 CALCULADORA 3 – DENSIDADE MÁXIMA E MÍNIMA
+➤ Informações Gerais
+Registro, Data, Operador, Material, Origem
+
+➤ Densidade Máxima (3 Determinações)
+Campo	Fórmula
+Molde + Solo	—
+Molde	—
+Solo (g)	Automático: (Molde + Solo) - Molde
+Volume (cm³)	—
+γd	Solo / Volume
+Umidade (%)	Informada ou opcional
+γs (g/cm³)	γs = γd * (1 + Umidade / 100)
+
+➤ Densidade Mínima (3 Determinações)
+Mesmos campos da Densidade Máxima
+
+➤ Resultados
+γdmax = média das 3 determinações máximas
+
+γdmin = média das 3 mínimas
+
+💾 Armazenamento
+Estrutura JSON organizada por tipo de ensaio (densidadeInSitu, densidadeReal, densidadeMaxMin)
+
+Cada entrada salva deve conter todos os campos inseridos, calculados e meta (data, autor, etc)
+
+📋 Considerações Técnicas
+Todos os cálculos devem ocorrer em tempo real com JS
+
+Campos calculados são readonly, com destaque visual
+
+Tabelas devem ser responsivas com <table class="data-table">
+
+Botão “Gerar PDF” deve capturar dados e renderizar com jsPDF ou html2pdf
+
+Devem existir mensagens de erro e validação de campos obrigatórios
+
