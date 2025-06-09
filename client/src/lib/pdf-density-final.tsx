@@ -86,19 +86,19 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             <Text>NORTE:</Text>
           </View>
           <View style={[styles.cell, {width: '12%'}]}>
-            <Text>7.795.866,093</Text>
+            <Text>{data.coordinates || ''}</Text>
           </View>
           <View style={[styles.cell, styles.headerCell, {width: '8%'}]}>
             <Text>CAMADA:</Text>
           </View>
           <View style={[styles.cell, {width: '7%'}]}>
-            <Text>21ª</Text>
+            <Text>{data.layer || ''}</Text>
           </View>
           <View style={[styles.cell, styles.headerCell, {width: '5%'}]}>
             <Text>FVS:</Text>
           </View>
           <View style={[styles.cellLast, {width: '35%'}]}>
-            <Text>202</Text>
+            <Text>{data.quadrant || ''}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -106,19 +106,19 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             <Text>RESPONSÁVEL:</Text>
           </View>
           <View style={[styles.cell, {width: '13%'}]}>
-            <Text>KLAIVERTY</Text>
+            <Text>{data.technicalResponsible || ''}</Text>
           </View>
           <View style={[styles.cell, styles.headerCell, {width: '8%'}]}>
             <Text>ESTE:</Text>
           </View>
           <View style={[styles.cell, {width: '12%'}]}>
-            <Text>686.769,643</Text>
+            <Text>{data.coordinates ? data.coordinates.split(',')[1] : ''}</Text>
           </View>
           <View style={[styles.cell, styles.headerCell, {width: '8%'}]}>
             <Text>MATERIAL:</Text>
           </View>
           <View style={[styles.cellLast, {width: '47%'}]}>
-            <Text>{data.material || 'REJEITO FILTRADO'}</Text>
+            <Text>{data.material || ''}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -126,19 +126,19 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             <Text>VERIFICADOR:</Text>
           </View>
           <View style={[styles.cell, {width: '13%'}]}>
-            <Text>EVANDRO</Text>
+            <Text>{data.verifier || ''}</Text>
           </View>
           <View style={[styles.cell, styles.headerCell, {width: '8%'}]}>
             <Text>COTA:</Text>
           </View>
           <View style={[styles.cell, {width: '12%'}]}>
-            <Text>797,618</Text>
+            <Text>{data.coordinates ? data.coordinates.split(',')[2] : ''}</Text>
           </View>
           <View style={[styles.cell, styles.headerCell, {width: '8%'}]}>
             <Text>ORIGEM:</Text>
           </View>
           <View style={[styles.cellLast, {width: '47%'}]}>
-            <Text>{data.origin || 'EDVC'}</Text>
+            <Text>{data.origin || ''}</Text>
           </View>
         </View>
         <View style={styles.lastRow}>
@@ -152,7 +152,7 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             <Text>QUADRANTE:</Text>
           </View>
           <View style={[styles.cell, {width: '12%'}]}>
-            <Text>A/B, FAIXA 1</Text>
+            <Text>{data.quadrant || ''}</Text>
           </View>
           <View style={[styles.cell, styles.headerCell, {width: '8%'}]}>
             <Text>REGISTRO:</Text>
@@ -243,7 +243,35 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             </View>
             <View style={styles.row}>
               <View style={[styles.cell, styles.headerCell, {width: '50%'}]}>
-                <Text>γd(g/cm³)</Text>
+                <Text>SOLO (g) = M+S - M</Text>
+              </View>
+              <View style={[styles.cell, {width: '16.7%'}]}>
+                <Text style={{textAlign: 'center'}}>{((data.maxDensity1?.moldeSolo || 0) - (data.maxDensity1?.molde || 0)).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cell, {width: '16.6%'}]}>
+                <Text style={{textAlign: 'center'}}>{((data.maxDensity2?.moldeSolo || 0) - (data.maxDensity2?.molde || 0)).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '16.7%'}]}>
+                <Text style={{textAlign: 'center'}}>{((data.maxDensity3?.moldeSolo || 0) - (data.maxDensity3?.molde || 0)).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '50%'}]}>
+                <Text>VOLUME (cm³)</Text>
+              </View>
+              <View style={[styles.cell, {width: '16.7%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.maxDensity1?.volume || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cell, {width: '16.6%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.maxDensity2?.volume || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '16.7%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.maxDensity3?.volume || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '50%'}]}>
+                <Text>γd = SOLO/VOL (g/cm³)</Text>
               </View>
               <View style={[styles.cell, {width: '16.7%'}]}>
                 <Text style={{textAlign: 'center'}}>{(calculations.maxDensity?.det1?.gammaDMax || 0).toFixed(3)}</Text>
@@ -369,7 +397,62 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             </View>
             <View style={styles.row}>
               <View style={[styles.cell, styles.headerCell, {width: '60%'}]}>
-                <Text>γd(g/cm³)</Text>
+                <Text>MOLDE (g)</Text>
+              </View>
+              <View style={[styles.cell, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.det1?.molde || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.det2?.molde || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '60%'}]}>
+                <Text>SOLO = M+S - M (g)</Text>
+              </View>
+              <View style={[styles.cell, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(calculations.det1?.soil || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(calculations.det2?.soil || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '60%'}]}>
+                <Text>VOLUME (cm³)</Text>
+              </View>
+              <View style={[styles.cell, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.det1?.volume || 0).toFixed(0)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(data.det2?.volume || 0).toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '60%'}]}>
+                <Text>γúmido = SOLO/VOL</Text>
+              </View>
+              <View style={[styles.cell, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(calculations.det1?.gammaNatWet || 0).toFixed(3)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(calculations.det2?.gammaNatWet || 0).toFixed(3)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '60%'}]}>
+                <Text>UMIDADE APLICADA (%)</Text>
+              </View>
+              <View style={[styles.cell, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(calculations.moistureTop?.average || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '20%'}]}>
+                <Text style={{textAlign: 'center'}}>{(calculations.moistureBase?.average || 0).toFixed(1)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '60%'}]}>
+                <Text>γd = γúmido/(1+w/100)</Text>
               </View>
               <View style={[styles.cell, {width: '20%'}]}>
                 <Text style={{textAlign: 'center'}}>{(calculations.det1?.gammaDry || 0).toFixed(3)}</Text>
@@ -417,7 +500,62 @@ const DensityInSituFinalDocument: React.FC<{ data: any; calculations: any }> = (
             </View>
             <View style={styles.row}>
               <View style={[styles.cell, styles.headerCell, {width: '25%'}]}>
-                <Text>UMIDADE (%)</Text>
+                <Text>SOLO ÚMIDO+TARA (g)</Text>
+              </View>
+              <View style={[styles.cell, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(data.moistureTop1?.wetTare || 0).toFixed(1)} | {(data.moistureTop2?.wetTare || 0).toFixed(1)} | {(data.moistureTop3?.wetTare || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(data.moistureBase1?.wetTare || 0).toFixed(1)} | {(data.moistureBase2?.wetTare || 0).toFixed(1)} | {(data.moistureBase3?.wetTare || 0).toFixed(1)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '25%'}]}>
+                <Text>SOLO SECO+TARA (g)</Text>
+              </View>
+              <View style={[styles.cell, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(data.moistureTop1?.dryTare || 0).toFixed(1)} | {(data.moistureTop2?.dryTare || 0).toFixed(1)} | {(data.moistureTop3?.dryTare || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(data.moistureBase1?.dryTare || 0).toFixed(1)} | {(data.moistureBase2?.dryTare || 0).toFixed(1)} | {(data.moistureBase3?.dryTare || 0).toFixed(1)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '25%'}]}>
+                <Text>TARA (g)</Text>
+              </View>
+              <View style={[styles.cell, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(data.moistureTop1?.tare || 0).toFixed(1)} | {(data.moistureTop2?.tare || 0).toFixed(1)} | {(data.moistureTop3?.tare || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(data.moistureBase1?.tare || 0).toFixed(1)} | {(data.moistureBase2?.tare || 0).toFixed(1)} | {(data.moistureBase3?.tare || 0).toFixed(1)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '25%'}]}>
+                <Text>SOLO SECO = SST - T</Text>
+              </View>
+              <View style={[styles.cell, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(calculations.moistureTop?.det1?.dryWeight || 0).toFixed(1)} | {(calculations.moistureTop?.det2?.dryWeight || 0).toFixed(1)} | {(calculations.moistureTop?.det3?.dryWeight || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(calculations.moistureBase?.det1?.dryWeight || 0).toFixed(1)} | {(calculations.moistureBase?.det2?.dryWeight || 0).toFixed(1)} | {(calculations.moistureBase?.det3?.dryWeight || 0).toFixed(1)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '25%'}]}>
+                <Text>ÁGUA = SUT - SST</Text>
+              </View>
+              <View style={[styles.cell, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(calculations.moistureTop?.det1?.water || 0).toFixed(1)} | {(calculations.moistureTop?.det2?.water || 0).toFixed(1)} | {(calculations.moistureTop?.det3?.water || 0).toFixed(1)}</Text>
+              </View>
+              <View style={[styles.cellLast, {width: '37.5%', textAlign: 'center'}]}>
+                <Text>{(calculations.moistureBase?.det1?.water || 0).toFixed(1)} | {(calculations.moistureBase?.det2?.water || 0).toFixed(1)} | {(calculations.moistureBase?.det3?.water || 0).toFixed(1)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.cell, styles.headerCell, {width: '25%'}]}>
+                <Text>UMIDADE = (ÁGUA/SS)*100</Text>
               </View>
               <View style={[styles.cell, {width: '37.5%', textAlign: 'center'}]}>
                 <Text>{(calculations.moistureTop?.det1?.moisture || 0).toFixed(1)} | {(calculations.moistureTop?.det2?.moisture || 0).toFixed(1)} | {(calculations.moistureTop?.det3?.moisture || 0).toFixed(1)}</Text>
