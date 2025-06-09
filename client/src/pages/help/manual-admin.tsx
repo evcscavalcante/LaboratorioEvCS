@@ -41,7 +41,7 @@ export default function ManualAdmin() {
               <h5 className="font-medium mb-2">Como Acessar:</h5>
               <ol className="list-decimal list-inside text-sm space-y-1">
                 <li>Login no sistema</li>
-                <li>Menu: <strong>Administração > Painel Admin</strong></li>
+                <li>Menu: <strong>Administração {">"} Painel Admin</strong></li>
                 <li>Visão geral com estatísticas</li>
                 <li>Acesso a todas as funcionalidades</li>
               </ol>
@@ -76,7 +76,7 @@ export default function ManualAdmin() {
               <div>
                 <h5 className="font-medium mb-2">Fluxo Recomendado:</h5>
                 <ol className="list-decimal list-inside text-sm space-y-1">
-                  <li>Administração > Usuários > "Novo Usuário"</li>
+                  <li>Administração {">"} Usuários {">"} "Novo Usuário"</li>
                   <li>Nome completo real</li>
                   <li>Email de trabalho válido</li>
                   <li>Perfil baseado na função</li>

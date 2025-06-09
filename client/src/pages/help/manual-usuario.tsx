@@ -87,7 +87,7 @@ export default function ManualUsuario() {
           <div>
             <h4 className="font-semibold mb-3 text-lg">Densidade In Situ (NBR 9813)</h4>
             <p className="text-sm text-muted-foreground mb-3">
-              <strong>Acesso:</strong> Menu &gt; Solos &gt; Densidade In Situ
+              <strong>Acesso:</strong> Menu {">"} Solos {">"} Densidade In Situ
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,7 +127,7 @@ export default function ManualUsuario() {
           <div>
             <h4 className="font-semibold mb-3 text-lg">Densidade Real (Picnômetro)</h4>
             <p className="text-sm text-muted-foreground mb-3">
-              <strong>Acesso:</strong> Menu &gt; Solos &gt; Densidade Real
+              <strong>Acesso:</strong> Menu {">"} Solos {">"} Densidade Real
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -158,7 +158,7 @@ export default function ManualUsuario() {
           <div>
             <h4 className="font-semibold mb-3 text-lg">Densidade Máxima e Mínima</h4>
             <p className="text-sm text-muted-foreground mb-3">
-              <strong>Acesso:</strong> Menu &gt; Solos &gt; Densidade Máx/Mín
+              <strong>Acesso:</strong> Menu {">"} Solos {">"} Densidade Máx/Mín
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

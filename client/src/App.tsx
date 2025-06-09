@@ -16,6 +16,8 @@ import DensidadeMaxMinPage from "@/pages/solos/densidade-max-min";
 import AdminDashboard from "@/pages/admin/dashboard";
 import UserManagement from "@/pages/admin/user-management";
 import OrganizationManagement from "@/pages/admin/organization-management";
+import ManualUsuario from "@/pages/help/manual-usuario";
+import ManualAdmin from "@/pages/help/manual-admin";
 
 function Router() {
   return (
@@ -30,6 +32,8 @@ function Router() {
           <Route path="/admin" component={AdminDashboard} />
           <Route path="/admin/users" component={UserManagement} />
           <Route path="/admin/organizations" component={OrganizationManagement} />
+          <Route path="/help/manual-usuario" component={ManualUsuario} />
+          <Route path="/help/manual-admin" component={ManualAdmin} />
           <Route component={NotFound} />
         </Switch>
       </MainLayout>
