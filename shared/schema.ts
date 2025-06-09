@@ -40,30 +40,7 @@ export const userSessions = pgTable("user_sessions", {
   active: boolean("active").default(true)
 });
 
-// Relations
-export const organizationsRelations = relations(organizations, ({ many }) => ({
-  users: many(users)
-}));
-
-export const usersRelations = relations(users, ({ one, many }) => ({
-  organization: one(organizations, {
-    fields: [users.organizationId],
-    references: [organizations.id]
-  }),
-  sessions: many(userSessions),
-  densityInSituTests: many(densityInSituTests),
-  realDensityTests: many(realDensityTests),
-  maxMinDensityTests: many(maxMinDensityTests)
-}));
-
-export const userSessionsRelations = relations(userSessions, ({ one }) => ({
-  user: one(users, {
-    fields: [userSessions.userId],
-    references: [users.id]
-  })
-}));
-
-// Updated test tables to include user tracking
+// Test Tables with User References
 export const densityInSituTests = pgTable("density_in_situ_tests", {
   id: serial("id").primaryKey(),
   registrationNumber: text("registration_number").notNull(),
@@ -129,6 +106,9 @@ export const realDensityTests = pgTable("real_density_tests", {
   operator: text("operator").notNull(),
   material: text("material").notNull(),
   origin: text("origin"),
+  userId: integer("user_id").references(() => users.id),
+  createdBy: varchar("created_by", { length: 255 }),
+  updatedBy: varchar("updated_by", { length: 255 }),
   moisture: json("moisture").$type<{
     det1: { capsule: string; wetTare: number; dryTare: number; tare: number; };
     det2: { capsule: string; wetTare: number; dryTare: number; tare: number; };
@@ -155,9 +135,6 @@ export const realDensityTests = pgTable("real_density_tests", {
     average: number;
     status: "AGUARDANDO" | "APROVADO" | "REPROVADO";
   }>(),
-  userId: integer("user_id").references(() => users.id),
-  createdBy: varchar("created_by", { length: 255 }),
-  updatedBy: varchar("updated_by", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -168,6 +145,9 @@ export const maxMinDensityTests = pgTable("max_min_density_tests", {
   operator: text("operator").notNull(),
   material: text("material").notNull(),
   origin: text("origin"),
+  userId: integer("user_id").references(() => users.id),
+  createdBy: varchar("created_by", { length: 255 }),
+  updatedBy: varchar("updated_by", { length: 255 }),
   maxDensity: json("max_density").$type<{
     det1: { moldeSolo: number; molde: number; volume: number; moisture?: number; };
     det2: { moldeSolo: number; molde: number; volume: number; moisture?: number; };
@@ -185,13 +165,54 @@ export const maxMinDensityTests = pgTable("max_min_density_tests", {
     emin: number;
     status: "AGUARDANDO" | "APROVADO" | "REPROVADO";
   }>(),
-  userId: integer("user_id").references(() => users.id),
-  createdBy: varchar("created_by", { length: 255 }),
-  updatedBy: varchar("updated_by", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// User management schemas
+// Relations
+export const organizationsRelations = relations(organizations, ({ many }) => ({
+  users: many(users)
+}));
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [users.organizationId],
+    references: [organizations.id]
+  }),
+  sessions: many(userSessions),
+  densityInSituTests: many(densityInSituTests),
+  realDensityTests: many(realDensityTests),
+  maxMinDensityTests: many(maxMinDensityTests)
+}));
+
+export const userSessionsRelations = relations(userSessions, ({ one }) => ({
+  user: one(users, {
+    fields: [userSessions.userId],
+    references: [users.id]
+  })
+}));
+
+export const densityInSituTestsRelations = relations(densityInSituTests, ({ one }) => ({
+  user: one(users, {
+    fields: [densityInSituTests.userId],
+    references: [users.id]
+  })
+}));
+
+export const realDensityTestsRelations = relations(realDensityTests, ({ one }) => ({
+  user: one(users, {
+    fields: [realDensityTests.userId],
+    references: [users.id]
+  })
+}));
+
+export const maxMinDensityTestsRelations = relations(maxMinDensityTests, ({ one }) => ({
+  user: one(users, {
+    fields: [maxMinDensityTests.userId],
+    references: [users.id]
+  })
+}));
+
+// Schemas
 export const insertOrganizationSchema = createInsertSchema(organizations).omit({
   id: true,
   createdAt: true,
@@ -211,7 +232,6 @@ export const insertUserSessionSchema = createInsertSchema(userSessions).omit({
   logoutAt: true,
 });
 
-// Test schemas
 export const insertDensityInSituTestSchema = createInsertSchema(densityInSituTests).omit({
   id: true,
   createdAt: true,
@@ -227,7 +247,7 @@ export const insertMaxMinDensityTestSchema = createInsertSchema(maxMinDensityTes
   createdAt: true,
 });
 
-// User management types
+// Types
 export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
@@ -236,7 +256,6 @@ export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type UserSession = typeof userSessions.$inferSelect;
 
-// Test types
 export type InsertDensityInSituTest = z.infer<typeof insertDensityInSituTestSchema>;
 export type InsertRealDensityTest = z.infer<typeof insertRealDensityTestSchema>;
 export type InsertMaxMinDensityTest = z.infer<typeof insertMaxMinDensityTestSchema>;
