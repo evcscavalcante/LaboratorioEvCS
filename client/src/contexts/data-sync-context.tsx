@@ -200,13 +200,13 @@ export function DataSyncProvider({ children }: DataSyncProviderProps) {
     if (isOnline && db) {
       try {
         const collectionPath = `users/${currentUser.uid}/${collectionName}`;
-        const collectionRef = collection(db, collectionPath);
+        const collectionRef = firebaseCollection(db, collectionPath);
         const q = query(collectionRef, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
         
         const firebaseData = querySnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...(doc.data() as any)
         }));
         
         // Update local storage with Firebase data
