@@ -13,7 +13,7 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  // Intercept API calls and use hybrid storage for Firebase/offline sync
+  // Intercept API calls and use hybrid storage for Firebase/offline sync (only for test data)
   if (method === 'POST' && url.includes('/api/density-in-situ')) {
     const result = await hybridStorage.createDensityInSituTest(data as any);
     return new Response(JSON.stringify(result), { status: 200 });
@@ -29,6 +29,7 @@ export async function apiRequest(
     return new Response(JSON.stringify(result), { status: 200 });
   }
 
+  // For all other API calls (users, organizations, etc.), use direct server API
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
