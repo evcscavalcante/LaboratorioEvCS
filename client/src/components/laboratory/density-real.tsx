@@ -56,14 +56,14 @@ export default function DensityReal() {
       massaPicnometro: 0,
       massaPicAmostraAgua: 0,
       massaPicAgua: 0,
-      temperatura: 20,
+      temperatura: 0,
       massaSoloUmido: 0
     },
     picnometer2: {
       massaPicnometro: 0,
       massaPicAmostraAgua: 0,
       massaPicAgua: 0,
-      temperatura: 20,
+      temperatura: 0,
       massaSoloUmido: 0
     }
   });
@@ -547,8 +547,9 @@ export default function DensityReal() {
                   <Input
                     type="number"
                     step="0.1"
-                    value={data.picnometer1.temperatura || ""}
-                    onChange={(e) => updateNestedData("picnometer1", "temperatura", parseFloat(e.target.value) || 20)}
+                    value={data.picnometer1.temperatura === 0 ? "" : data.picnometer1.temperatura}
+                    onChange={(e) => updateNestedData("picnometer1", "temperatura", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                    placeholder="20.0"
                     className="text-sm"
                   />
                 </TableCell>
@@ -556,8 +557,9 @@ export default function DensityReal() {
                   <Input
                     type="number"
                     step="0.1"
-                    value={data.picnometer2.temperatura || ""}
-                    onChange={(e) => updateNestedData("picnometer2", "temperatura", parseFloat(e.target.value) || 20)}
+                    value={data.picnometer2.temperatura === 0 ? "" : data.picnometer2.temperatura}
+                    onChange={(e) => updateNestedData("picnometer2", "temperatura", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                    placeholder="20.0"
                     className="text-sm"
                   />
                 </TableCell>
