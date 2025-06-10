@@ -51,7 +51,7 @@ Sistema web completo para laboratórios geotécnicos que automatiza cálculos de
 ## 📦 Instalação
 
 ### Pré-requisitos
-- Node.js 18+
+- Node.js 20+
 - PostgreSQL
 - Conta Firebase
 
