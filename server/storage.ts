@@ -16,18 +16,21 @@ export interface IStorage {
   getDensityInSituTest(id: number): Promise<DensityInSituTest | undefined>;
   getDensityInSituTests(): Promise<DensityInSituTest[]>;
   updateDensityInSituTest(id: number, test: Partial<InsertDensityInSituTest>): Promise<DensityInSituTest | undefined>;
+  deleteDensityInSituTest(id: number): Promise<boolean>;
   
   // Real Density
   createRealDensityTest(test: InsertRealDensityTest): Promise<RealDensityTest>;
   getRealDensityTest(id: number): Promise<RealDensityTest | undefined>;
   getRealDensityTests(): Promise<RealDensityTest[]>;
   updateRealDensityTest(id: number, test: Partial<InsertRealDensityTest>): Promise<RealDensityTest | undefined>;
+  deleteRealDensityTest(id: number): Promise<boolean>;
   
   // Max Min Density
   createMaxMinDensityTest(test: InsertMaxMinDensityTest): Promise<MaxMinDensityTest>;
   getMaxMinDensityTest(id: number): Promise<MaxMinDensityTest | undefined>;
   getMaxMinDensityTests(): Promise<MaxMinDensityTest[]>;
   updateMaxMinDensityTest(id: number, test: Partial<InsertMaxMinDensityTest>): Promise<MaxMinDensityTest | undefined>;
+  deleteMaxMinDensityTest(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -71,6 +74,10 @@ export class MemStorage implements IStorage {
     const updated = { ...existing, ...updates };
     this.densityInSituTests.set(id, updated);
     return updated;
+  }
+
+  async deleteDensityInSituTest(id: number): Promise<boolean> {
+    return this.densityInSituTests.delete(id);
   }
 
   // Real Density Methods

@@ -69,6 +69,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/density-in-situ/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteDensityInSituTest(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Test not found" });
+      }
+      res.json({ message: "Test deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete density in situ test" });
+    }
+  });
+
   // Real Density Routes
   app.get("/api/real-density", async (req, res) => {
     try {
@@ -124,6 +137,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/real-density/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteRealDensityTest(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Test not found" });
+      }
+      res.json({ message: "Test deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete real density test" });
+    }
+  });
+
   // Max Min Density Routes
   app.get("/api/max-min-density", async (req, res) => {
     try {
@@ -176,6 +202,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ message: "Failed to update max min density test" });
       }
+    }
+  });
+
+  app.delete("/api/max-min-density/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteMaxMinDensityTest(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Test not found" });
+      }
+      res.json({ message: "Test deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete max min density test" });
     }
   });
 
