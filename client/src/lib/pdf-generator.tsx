@@ -1473,7 +1473,7 @@ const DensityInSituDocumentNew: React.FC<{ data: any; calculations: any }> = ({ 
 
 // Funções de exportação
 export async function generateDensityInSituPDF(data: any, calculations: any): Promise<void> {
-  const doc = <DensityInSituDocumentNew data={data} calculations={calculations} />;
+  const doc = <DensityInSituDocument data={data} calculations={calculations} />;
 
   const blob = await pdf(doc).toBlob();
   const url = URL.createObjectURL(blob);
