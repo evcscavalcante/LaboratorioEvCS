@@ -140,6 +140,15 @@
     .laboratory-page th {
       @apply text-xs font-medium;
     }
+    
+    /* Compact all inputs in tables */
+    .laboratory-page table td input {
+      @apply text-xs min-h-[44px] px-1;
+    }
+    
+    .laboratory-page table td input[type="number"] {
+      @apply font-mono text-center text-xs;
+    }
   }
   
   /* Extra small mobile screens */
@@ -191,6 +200,17 @@
     
     .laboratory-page [class*="CardHeader"] {
       @apply p-1 pb-0;
+    }
+    
+    /* Ultra compact inputs for moisture tables */
+    .laboratory-page table td input {
+      @apply text-xs min-h-[40px] px-0;
+      font-size: 14px !important;
+    }
+    
+    .laboratory-page table td input[type="number"] {
+      @apply font-mono text-center;
+      font-size: 14px !important;
     }
   }
 }

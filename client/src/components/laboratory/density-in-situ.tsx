@@ -680,15 +680,15 @@ export default function DensityInSitu() {
               <TableBody>
                 <TableRow>
                   <TableCell className="font-medium">Cápsula Nº</TableCell>
-                  <TableCell><Input value={data.moistureTop1.capsule} onChange={(e) => updateNestedData("moistureTop1", "capsule", e.target.value)} placeholder="C-01" className="text-xs" /></TableCell>
-                  <TableCell><Input value={data.moistureTop2.capsule} onChange={(e) => updateNestedData("moistureTop2", "capsule", e.target.value)} placeholder="C-02" className="text-xs" /></TableCell>
-                  <TableCell><Input value={data.moistureTop3.capsule} onChange={(e) => updateNestedData("moistureTop3", "capsule", e.target.value)} placeholder="C-03" className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop1.capsule} onChange={(e) => updateNestedData("moistureTop1", "capsule", e.target.value)} placeholder="C-01" className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop2.capsule} onChange={(e) => updateNestedData("moistureTop2", "capsule", e.target.value)} placeholder="C-02" className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop3.capsule} onChange={(e) => updateNestedData("moistureTop3", "capsule", e.target.value)} placeholder="C-03" className="text-xs" /></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Solo Úmido+Tara</TableCell>
-                  <TableCell><Input type="number" step="0.01" value={data.moistureTop1.wetTare || ""} onChange={(e) => updateNestedData("moistureTop1", "wetTare", parseFloat(e.target.value) || 0)} className="text-xs" /></TableCell>
-                  <TableCell><Input type="number" step="0.01" value={data.moistureTop2.wetTare || ""} onChange={(e) => updateNestedData("moistureTop2", "wetTare", parseFloat(e.target.value) || 0)} className="text-xs" /></TableCell>
-                  <TableCell><Input type="number" step="0.01" value={data.moistureTop3.wetTare || ""} onChange={(e) => updateNestedData("moistureTop3", "wetTare", parseFloat(e.target.value) || 0)} className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input type="number" step="0.01" value={data.moistureTop1.wetTare || ""} onChange={(e) => updateNestedData("moistureTop1", "wetTare", parseFloat(e.target.value) || 0)} className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input type="number" step="0.01" value={data.moistureTop2.wetTare || ""} onChange={(e) => updateNestedData("moistureTop2", "wetTare", parseFloat(e.target.value) || 0)} className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input type="number" step="0.01" value={data.moistureTop3.wetTare || ""} onChange={(e) => updateNestedData("moistureTop3", "wetTare", parseFloat(e.target.value) || 0)} className="text-xs" /></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Solo Seco+Tara</TableCell>
