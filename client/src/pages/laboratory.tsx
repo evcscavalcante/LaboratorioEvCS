@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { FlaskRound, Save, PanelLeftOpen, PanelLeftClose, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { getQueryFn } from "@/lib/queryClient";
 import DensityInSitu from "@/components/laboratory/density-in-situ";
 import DensityReal from "@/components/laboratory/density-real";
 import DensityMaxMin from "@/components/laboratory/density-max-min";
@@ -11,6 +13,36 @@ import TestsSidebar from "@/components/dashboard/tests-sidebar";
 export default function Laboratory() {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [location] = useLocation();
+  
+  // Parse URL parameters
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const testType = urlParams.get('test');
+  const testId = urlParams.get('id');
+  const mode = urlParams.get('mode'); // 'view' or 'edit'
+  
+  // Set initial tab based on URL hash or parameters
+  const [activeTab, setActiveTab] = useState(() => {
+    const hash = window.location.hash.substring(1);
+    if (hash) return hash;
+    if (testType === 'density-in-situ') return 'density-in-situ';
+    if (testType === 'real-density') return 'density-real';
+    if (testType === 'max-min-density') return 'density-max-min';
+    return 'density-in-situ';
+  });
+
+  // Listen for hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.substring(1);
+      if (hash && ['density-in-situ', 'density-real', 'density-max-min'].includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -99,7 +131,7 @@ export default function Laboratory() {
 
         {/* Main Content */}
         <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Tabs defaultValue="density-in-situ" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-white border sticky top-0 z-10">
               <TabsTrigger 
                 value="density-in-situ" 

@@ -12,11 +12,25 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
 
   const handleSelectTest = (testId: number, testType: string) => {
-    setLocation(`/laboratory?test=${testType}&id=${testId}&mode=view`);
+    // Navigate to laboratory page with the correct tab
+    const tabMap: Record<string, string> = {
+      'density-in-situ': 'density-in-situ',
+      'real-density': 'density-real', 
+      'max-min-density': 'density-max-min'
+    };
+    const tab = tabMap[testType] || 'density-in-situ';
+    setLocation(`/laboratory#${tab}`);
   };
 
   const handleEditTest = (testId: number, testType: string) => {
-    setLocation(`/laboratory?test=${testType}&id=${testId}&mode=edit`);
+    // Same navigation for now - editing will be handled within the calculator
+    const tabMap: Record<string, string> = {
+      'density-in-situ': 'density-in-situ',
+      'real-density': 'density-real',
+      'max-min-density': 'density-max-min'
+    };
+    const tab = tabMap[testType] || 'density-in-situ';
+    setLocation(`/laboratory#${tab}`);
   };
 
   // Fetch all test data for dashboard metrics
