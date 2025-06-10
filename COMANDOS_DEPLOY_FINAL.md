@@ -1,66 +1,34 @@
-# Comandos Deploy Firebase - Página em Branco
+# Deploy Final - Comandos Necessários
 
-## Problema
-A página está em branco porque o build não está funcionando devido a componentes UI faltantes.
+Execute na pasta do projeto baixado:
 
-## Solução Rápida
-
-Execute estes comandos na pasta do projeto:
-
+## 1. Login no Firebase
 ```bash
-# 1. Na pasta: C:\Users\Salum\Downloads\Laboratorio-EvCS\Laboratorio-EvCS
+firebase login
+```
 
-# 2. Fazer build simplificado apenas do frontend
-npx vite build --outDir ../dist
-
-# 3. Verificar se criou arquivos
-dir dist
-
-# 4. Deploy no Firebase
+## 2. Deploy do Sistema
+```bash
 firebase deploy --only hosting
 ```
 
-## Se não funcionar
+## Configuração Atual
+- ✅ Arquivo `dist/index.html` atualizado com credenciais corretas
+- ✅ Sistema completo com 3 calculadoras geotécnicas  
+- ✅ Autenticação Firebase configurada
+- ✅ Interface profissional responsiva
 
-### Alternativa 1: Build manual
-```bash
-# Copiar HTML base
-copy client\index.html dist\index.html
+## Sistema Inclui:
+1. **Densidade In Situ (NBR 9813)**
+   - Cálculo densidade úmida e seca
+   - Validação automática ABNT
+   
+2. **Densidade Real (Picnômetro)**  
+   - Método picnômetro completo
+   - Correção por temperatura
+   
+3. **Densidade Máxima e Mínima**
+   - Índices de vazios máximo/mínimo
+   - Análise de compacidade
 
-# Compilar apenas JS essencial
-npx esbuild client/src/main.tsx --bundle --outfile=dist/main.js --format=esm --loader:.tsx=tsx
-
-# Deploy
-firebase deploy --only hosting
-```
-
-### Alternativa 2: Deploy direto dos arquivos
-```bash
-# Usar pasta client como fonte
-# Alterar firebase.json:
-{
-  "hosting": {
-    "public": "client"
-  }
-}
-
-# Deploy
-firebase deploy --only hosting
-```
-
-## Verificar Resultado
-
-Após deploy, acesse:
-- https://laboratorio-evcs.web.app
-
-O sistema deve carregar as calculadoras e interface completa.
-
-## Debug no Navegador
-
-Se ainda estiver em branco:
-1. Pressionar F12
-2. Aba Console - ver erros
-3. Aba Network - ver se arquivos carregam
-4. Aba Sources - verificar se main.js existe
-
-O problema principal é o build complexo. A solução simplificada deve resolver.
+Após o deploy, acesse: https://laboratorio-evcs.web.app
