@@ -130,17 +130,29 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
   // Buscar todos os ensaios
   const { data: densityInSituTests = [] } = useQuery({
     queryKey: ['/api/density-in-situ'],
-    queryFn: getQueryFn({ on401: 'returnNull' })
+    queryFn: getQueryFn({ on401: 'returnNull' }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
 
   const { data: realDensityTests = [] } = useQuery({
     queryKey: ['/api/real-density'],
-    queryFn: getQueryFn({ on401: 'returnNull' })
+    queryFn: getQueryFn({ on401: 'returnNull' }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
 
   const { data: maxMinDensityTests = [] } = useQuery({
     queryKey: ['/api/max-min-density'],
-    queryFn: getQueryFn({ on401: 'returnNull' })
+    queryFn: getQueryFn({ on401: 'returnNull' }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
 
   // Delete mutations
