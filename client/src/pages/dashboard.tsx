@@ -4,9 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { getQueryFn } from "@/lib/queryClient";
+import TestsSidebar from "@/components/dashboard/tests-sidebar";
+import { useLocation } from "wouter";
 
 export default function Dashboard() {
   const [currentDateTime, setCurrentDateTime] = useState("");
+  const [, setLocation] = useLocation();
+
+  const handleSelectTest = (testId: number, testType: string) => {
+    setLocation(`/laboratory?test=${testType}&id=${testId}&mode=view`);
+  };
+
+  const handleEditTest = (testId: number, testType: string) => {
+    setLocation(`/laboratory?test=${testType}&id=${testId}&mode=edit`);
+  };
 
   // Fetch all test data for dashboard metrics
   const { data: densityInSituTests = [] } = useQuery({
@@ -285,6 +296,14 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Tests Management Sidebar */}
+      <div className="mt-8">
+        <TestsSidebar 
+          onSelectTest={handleSelectTest}
+          onEditTest={handleEditTest}
+        />
       </div>
     </div>
   );
