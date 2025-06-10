@@ -3,12 +3,12 @@ import { getAuth, Auth } from "firebase/auth";
 import { getFirestore, Firestore, enableNetwork, disableNetwork, enableIndexedDbPersistence } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
-  authDomain: "laboratorio-evcs.firebaseapp.com",
-  projectId: "laboratorio-evcs",
-  storageBucket: "laboratorio-evcs.firebasestorage.app",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
+  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || "laboratorio-evcs"}.firebaseapp.com`,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "laboratorio-evcs",
+  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || "laboratorio-evcs"}.firebasestorage.app`,
   messagingSenderId: "53045134219",
-  appId: "1:53045134219:web:e80d49f77f58870ac8e58e",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:53045134219:web:e80d49f77f58870ac8e58e",
   measurementId: "G-R8M9D9H8XB"
 };
 

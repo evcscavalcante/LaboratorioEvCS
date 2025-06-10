@@ -7,11 +7,11 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { currentUser } = useAuth();
+  const { currentUser, loading } = useAuth();
 
-  // Permitir acesso sem autenticação se a API key não estiver configurada
+  // Permitir acesso temporário sem autenticação para demonstração
   const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-  if (!apiKey || apiKey === "GOOGLE_API_KEY") {
+  if (!apiKey || loading) {
     return <>{children}</>;
   }
 
