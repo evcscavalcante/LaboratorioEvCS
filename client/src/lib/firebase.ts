@@ -3,7 +3,7 @@ import { getAuth, Auth } from "firebase/auth";
 import { getFirestore, Firestore, enableNetwork, disableNetwork, enableIndexedDbPersistence } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
+  apiKey: "AIzaSyCmzJ4uB_b85aIz8WUNbwApB0ibhU78uEY",
   authDomain: "laboratorio-evcs.firebaseapp.com",
   projectId: "laboratorio-evcs",
   storageBucket: "laboratorio-evcs.firebasestorage.app",
