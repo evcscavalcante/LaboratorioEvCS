@@ -197,7 +197,7 @@ export default function DensityMaxMin() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="laboratory-page space-y-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Densidade Máxima e Mínima</h2>
         <p className="text-gray-600">Determinação dos índices de vazios máximo e mínimo</p>

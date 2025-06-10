@@ -282,7 +282,7 @@ export default function DensityInSitu() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="laboratory-page space-y-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Calculadora de Densidade In Situ</h2>
         <p className="text-gray-600">Determinação da densidade natural do solo em campo</p>
@@ -484,9 +484,10 @@ export default function DensityInSitu() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50">
+          <div className="mobile-responsive-table">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
                 <TableHead className="text-left">Campo</TableHead>
                 <TableHead className="text-center">Det 1</TableHead>
                 <TableHead className="text-center">Det 2</TableHead>
@@ -646,6 +647,7 @@ export default function DensityInSitu() {
               </TableRow>
             </TableBody>
           </Table>
+          </div>
           <div className="mt-4 p-4 bg-blue-50 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700">Média γnat seco (g/cm³):</span>

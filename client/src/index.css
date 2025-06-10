@@ -12,10 +12,23 @@
     @apply min-h-[48px] text-base font-mono text-right;
   }
   
-  /* Ensure number inputs are readable on mobile */
-  input[type="number"] {
+  /* Global input improvements for mobile */
+  input[type="text"], 
+  input[type="number"], 
+  input[type="email"], 
+  input[type="date"], 
+  input[type="time"] {
     font-size: 16px !important; /* Prevents zoom on iOS */
     min-height: 48px;
+  }
+  
+  /* All laboratory inputs get mobile optimization */
+  .laboratory-page input {
+    @apply min-h-[48px] text-base;
+  }
+  
+  .laboratory-page input[type="number"] {
+    @apply font-mono text-right;
   }
   
   /* Mobile-specific improvements */
@@ -28,13 +41,35 @@
       @apply min-h-[52px] text-lg;
     }
     
+    .laboratory-page input {
+      @apply min-h-[52px] text-lg;
+    }
+    
+    .laboratory-page input[type="number"] {
+      @apply text-lg font-mono text-center;
+    }
+    
     /* Table cells for mobile */
     .mobile-table-cell {
       @apply p-2;
     }
     
     .mobile-table-cell input {
-      @apply w-full min-h-[48px] text-center text-base font-medium;
+      @apply w-full min-h-[52px] text-center text-lg font-medium;
+    }
+    
+    /* Table improvements for mobile */
+    .mobile-responsive-table {
+      @apply block overflow-x-auto whitespace-nowrap;
+    }
+    
+    .mobile-responsive-table table {
+      @apply w-full min-w-full;
+    }
+    
+    .mobile-responsive-table th,
+    .mobile-responsive-table td {
+      @apply px-2 py-3;
     }
   }
 }
