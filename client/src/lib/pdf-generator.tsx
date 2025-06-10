@@ -1473,34 +1473,7 @@ const DensityInSituDocumentNew: React.FC<{ data: any; calculations: any }> = ({ 
 
 // Funções de exportação
 export async function generateDensityInSituPDF(data: any, calculations: any): Promise<void> {
-  const doc = (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.title}>RELATÓRIO DE DENSIDADE IN SITU</Text>
-        <Text style={styles.subtitle}>NBR 9813</Text>
-        
-        <View style={styles.resultSection}>
-          <Text style={styles.text}>Registro: {data.registrationNumber}</Text>
-          <Text style={styles.text}>Data: {data.date}</Text>
-          <Text style={styles.text}>Operador: {data.operator}</Text>
-          <Text style={styles.text}>Material: {data.material}</Text>
-        </View>
-
-        <View style={styles.resultSection}>
-          <Text style={styles.sectionTitle}>Resultados</Text>
-          {calculations && (
-            <>
-              <Text style={styles.text}>Densidade Seca (Topo): {calculations.gammaDTop?.toFixed(3)} g/cm³</Text>
-              <Text style={styles.text}>Densidade Seca (Base): {calculations.gammaDBase?.toFixed(3)} g/cm³</Text>
-              <Text style={styles.text}>Índice de Vazios: {calculations.voidIndex?.toFixed(3)}</Text>
-              <Text style={styles.text}>Compacidade Relativa: {calculations.relativeCompactness?.toFixed(1)}%</Text>
-              <Text style={styles.text}>Status: {calculations.status}</Text>
-            </>
-          )}
-        </View>
-      </Page>
-    </Document>
-  );
+  const doc = <DensityInSituDocument data={data} calculations={calculations} />;
 
   const blob = await pdf(doc).toBlob();
   const url = URL.createObjectURL(blob);
