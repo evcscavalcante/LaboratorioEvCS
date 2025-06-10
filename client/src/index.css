@@ -34,28 +34,31 @@
   /* Mobile-specific improvements */
   @media (max-width: 768px) {
     .calculator-input {
-      @apply min-h-[52px] text-lg;
+      @apply min-h-[56px] text-xl px-4;
     }
     
     .calculator-number-input {
-      @apply min-h-[52px] text-lg;
+      @apply min-h-[56px] text-xl px-4;
     }
     
     .laboratory-page input {
-      @apply min-h-[52px] text-lg;
+      @apply min-h-[56px] text-xl px-4;
+      font-size: 18px !important;
     }
     
     .laboratory-page input[type="number"] {
-      @apply text-lg font-mono text-center;
+      @apply text-xl font-mono text-center px-2;
+      font-size: 20px !important;
     }
     
     /* Table cells for mobile */
     .mobile-table-cell {
-      @apply p-2;
+      @apply p-3;
     }
     
     .mobile-table-cell input {
-      @apply w-full min-h-[52px] text-center text-lg font-medium;
+      @apply w-full min-h-[56px] text-center text-xl font-medium px-2;
+      font-size: 20px !important;
     }
     
     /* Table improvements for mobile */
@@ -69,7 +72,39 @@
     
     .mobile-responsive-table th,
     .mobile-responsive-table td {
-      @apply px-2 py-3;
+      @apply px-3 py-4;
+    }
+    
+    /* Additional mobile input improvements */
+    .laboratory-page label {
+      @apply text-base font-semibold mb-2;
+    }
+    
+    /* Mobile button improvements */
+    .laboratory-page button {
+      @apply min-h-[48px] px-6 text-base;
+    }
+    
+    /* Card spacing for mobile */
+    .laboratory-page .grid {
+      @apply gap-6;
+    }
+  }
+  
+  /* Extra small mobile screens */
+  @media (max-width: 480px) {
+    .laboratory-page input {
+      @apply min-h-[60px] text-xl;
+      font-size: 20px !important;
+    }
+    
+    .laboratory-page input[type="number"] {
+      font-size: 22px !important;
+    }
+    
+    .mobile-table-cell input {
+      @apply min-h-[60px] text-xl;
+      font-size: 22px !important;
     }
   }
 }
