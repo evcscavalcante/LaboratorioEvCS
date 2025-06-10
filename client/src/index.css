@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-optimized input styles for calculator fields */
+@layer components {
+  .calculator-input {
+    @apply min-h-[48px] text-base font-medium;
+  }
+  
+  .calculator-number-input {
+    @apply min-h-[48px] text-base font-mono text-right;
+  }
+  
+  /* Ensure number inputs are readable on mobile */
+  input[type="number"] {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    min-height: 48px;
+  }
+  
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    .calculator-input {
+      @apply min-h-[52px] text-lg;
+    }
+    
+    .calculator-number-input {
+      @apply min-h-[52px] text-lg;
+    }
+    
+    /* Table cells for mobile */
+    .mobile-table-cell {
+      @apply p-2;
+    }
+    
+    .mobile-table-cell input {
+      @apply w-full min-h-[48px] text-center text-base font-medium;
+    }
+  }
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(20, 14.3%, 4.1%);

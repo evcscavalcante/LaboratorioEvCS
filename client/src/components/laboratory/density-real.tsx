@@ -237,6 +237,7 @@ export default function DensityReal() {
               <Label htmlFor="registrationNumber">Número do Registro</Label>
               <Input
                 id="registrationNumber"
+                className="calculator-input"
                 value={data.registrationNumber}
                 onChange={(e) => updateData("registrationNumber", e.target.value)}
                 placeholder="Ex: DR-001/2024"

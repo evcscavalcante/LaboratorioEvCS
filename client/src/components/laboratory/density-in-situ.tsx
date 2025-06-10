@@ -305,6 +305,7 @@ export default function DensityInSitu() {
               <Label htmlFor="registrationNumber">Número do Registro</Label>
               <Input
                 id="registrationNumber"
+                className="calculator-input"
                 value={data.registrationNumber}
                 onChange={(e) => updateData("registrationNumber", e.target.value)}
                 placeholder="Ex: EG-001/2024"
@@ -494,15 +495,17 @@ export default function DensityInSitu() {
             <TableBody>
               <TableRow>
                 <TableCell className="font-medium">Número do Cilindro</TableCell>
-                <TableCell>
+                <TableCell className="mobile-table-cell">
                   <Input
+                    className="calculator-input"
                     value={data.det1.cylinderNumber}
                     onChange={(e) => updateNestedData("det1", "cylinderNumber", e.target.value)}
                     placeholder="CIL-01"
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="mobile-table-cell">
                   <Input
+                    className="calculator-input"
                     value={data.det2.cylinderNumber}
                     onChange={(e) => updateNestedData("det2", "cylinderNumber", e.target.value)}
                     placeholder="CIL-02"
@@ -511,19 +514,21 @@ export default function DensityInSitu() {
               </TableRow>
               <TableRow>
                 <TableCell className="font-medium">Molde + Solo (g)</TableCell>
-                <TableCell>
+                <TableCell className="mobile-table-cell">
                   <Input
                     type="number"
                     step="0.01"
+                    className="calculator-number-input"
                     value={data.det1.moldeSolo || ""}
                     onChange={(e) => updateNestedData("det1", "moldeSolo", parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="mobile-table-cell">
                   <Input
                     type="number"
                     step="0.01"
+                    className="calculator-number-input"
                     value={data.det2.moldeSolo || ""}
                     onChange={(e) => updateNestedData("det2", "moldeSolo", parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
@@ -532,19 +537,21 @@ export default function DensityInSitu() {
               </TableRow>
               <TableRow>
                 <TableCell className="font-medium">Molde (g)</TableCell>
-                <TableCell>
+                <TableCell className="mobile-table-cell">
                   <Input
                     type="number"
                     step="0.01"
+                    className="calculator-number-input"
                     value={data.det1.molde || ""}
                     onChange={(e) => updateNestedData("det1", "molde", parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="mobile-table-cell">
                   <Input
                     type="number"
                     step="0.01"
+                    className="calculator-number-input"
                     value={data.det2.molde || ""}
                     onChange={(e) => updateNestedData("det2", "molde", parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
@@ -574,19 +581,21 @@ export default function DensityInSitu() {
               </TableRow>
               <TableRow>
                 <TableCell className="font-medium">Volume (cm³)</TableCell>
-                <TableCell>
+                <TableCell className="mobile-table-cell">
                   <Input
                     type="number"
                     step="0.01"
+                    className="calculator-number-input"
                     value={data.det1.volume || ""}
                     onChange={(e) => updateNestedData("det1", "volume", parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="mobile-table-cell">
                   <Input
                     type="number"
                     step="0.01"
+                    className="calculator-number-input"
                     value={data.det2.volume || ""}
                     onChange={(e) => updateNestedData("det2", "volume", parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
