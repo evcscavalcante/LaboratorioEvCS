@@ -1,0 +1,55 @@
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-3bd9cd68775354fb.js:1
+(anonymous) @ framework-3bd9cd68775354fb.js:1
+uD @ framework-3bd9cd68775354fb.js:1
+uI @ framework-3bd9cd68775354fb.js:1
+uM @ framework-3bd9cd68775354fb.js:1
+uS @ framework-3bd9cd68775354fb.js:1
+C @ framework-3bd9cd68775354fb.js:1
+z @ framework-3bd9cd68775354fb.js:1Understand this error
+workspace_iframe.html:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+workspace_iframe.html:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+workspace_iframe.html:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+tests-sidebar.tsx:46 
+            
+            
+           GET https://b6a8d3c1-e838-442d-8c81-ea011035e3fb-00-2n964999y03ol.janeway.replit.dev/api/density-in-situ/1749596113310 404 (Not Found)
+window.fetch @ Network.js:219
+handleDownloadPDF @ tests-sidebar.tsx:46
+onClick @ tests-sidebar.tsx:386
+callCallback2 @ chunk-XQLYTHWV.js?v=913a93f4:3674
+invokeGuardedCallbackDev @ chunk-XQLYTHWV.js?v=913a93f4:3699
+invokeGuardedCallback @ chunk-XQLYTHWV.js?v=913a93f4:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-XQLYTHWV.js?v=913a93f4:3736
+executeDispatch @ chunk-XQLYTHWV.js?v=913a93f4:7014
+processDispatchQueueItemsInOrder @ chunk-XQLYTHWV.js?v=913a93f4:7034
+processDispatchQueue @ chunk-XQLYTHWV.js?v=913a93f4:7043
+dispatchEventsForPlugins @ chunk-XQLYTHWV.js?v=913a93f4:7051
+(anonymous) @ chunk-XQLYTHWV.js?v=913a93f4:7174
+batchedUpdates$1 @ chunk-XQLYTHWV.js?v=913a93f4:18913
+batchedUpdates @ chunk-XQLYTHWV.js?v=913a93f4:3579
+dispatchEventForPluginEventSystem @ chunk-XQLYTHWV.js?v=913a93f4:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-XQLYTHWV.js?v=913a93f4:5478
+dispatchEvent @ chunk-XQLYTHWV.js?v=913a93f4:5472
+dispatchDiscreteEvent @ chunk-XQLYTHWV.js?v=913a93f4:5449Understand this error
+Console.js:61 Erro ao gerar PDF: Error: Erro ao buscar dados do ensaio
+    at handleDownloadPDF (tests-sidebar.tsx:47:33)
+Mt.forEach.n.<computed> @ Console.js:61
+handleDownloadPDF @ tests-sidebar.tsx:121
+await in handleDownloadPDF
+onClick @ tests-sidebar.tsx:386
+callCallback2 @ chunk-XQLYTHWV.js?v=913a93f4:3674
+invokeGuardedCallbackDev @ chunk-XQLYTHWV.js?v=913a93f4:3699
+invokeGuardedCallback @ chunk-XQLYTHWV.js?v=913a93f4:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-XQLYTHWV.js?v=913a93f4:3736
+executeDispatch @ chunk-XQLYTHWV.js?v=913a93f4:7014
+processDispatchQueueItemsInOrder @ chunk-XQLYTHWV.js?v=913a93f4:7034
+processDispatchQueue @ chunk-XQLYTHWV.js?v=913a93f4:7043
+dispatchEventsForPlugins @ chunk-XQLYTHWV.js?v=913a93f4:7051
+(anonymous) @ chunk-XQLYTHWV.js?v=913a93f4:7174
+batchedUpdates$1 @ chunk-XQLYTHWV.js?v=913a93f4:18913
+batchedUpdates @ chunk-XQLYTHWV.js?v=913a93f4:3579
+dispatchEventForPluginEventSystem @ chunk-XQLYTHWV.js?v=913a93f4:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-XQLYTHWV.js?v=913a93f4:5478
+dispatchEvent @ chunk-XQLYTHWV.js?v=913a93f4:5472
+dispatchDiscreteEvent @ chunk-XQLYTHWV.js?v=913a93f4:5449Understand this error
