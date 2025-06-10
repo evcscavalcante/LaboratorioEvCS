@@ -11,6 +11,10 @@ import {
 } from "@shared/schema";
 
 export interface IStorage {
+  // User operations for Replit Auth
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+
   // Density In Situ
   createDensityInSituTest(test: InsertDensityInSituTest): Promise<DensityInSituTest>;
   getDensityInSituTest(id: number): Promise<DensityInSituTest | undefined>;
