@@ -87,6 +87,12 @@ que realiza o build e publica no Firebase sempre que houver push na branch `main
 Para funcionar, adicione a chave de serviço do Firebase como secret
 `FIREBASE_SERVICE_ACCOUNT` no GitHub.
 
+### Deploy para GitHub Pages
+Também é possível publicar os arquivos estáticos no GitHub Pages.
+Utilize o workflow [`github-pages.yml`](.github/workflows/github-pages.yml),
+que envia o conteúdo de `dist/public` para a branch `gh-pages`.
+Habilite o GitHub Pages apontando para essa branch nas configurações do repositório.
+
 ## 🌐 URLs de Produção
 
 - **Site Principal**: https://laboratorio-evcs.web.app
