@@ -109,6 +109,10 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
+  async deleteRealDensityTest(id: number): Promise<boolean> {
+    return this.realDensityTests.delete(id);
+  }
+
   // Max Min Density Methods
   async createMaxMinDensityTest(insertTest: InsertMaxMinDensityTest): Promise<MaxMinDensityTest> {
     const id = this.currentId++;
@@ -136,6 +140,10 @@ export class MemStorage implements IStorage {
     const updated = { ...existing, ...updates };
     this.maxMinDensityTests.set(id, updated);
     return updated;
+  }
+
+  async deleteMaxMinDensityTest(id: number): Promise<boolean> {
+    return this.maxMinDensityTests.delete(id);
   }
 }
 

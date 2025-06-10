@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { 
   Search, 
   FileText, 
@@ -16,7 +17,8 @@ import {
   Download,
   Trash2
 } from 'lucide-react';
-import { getQueryFn } from '@/lib/queryClient';
+import { getQueryFn, apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 import StatusIndicator from '@/components/laboratory/status-indicator';
 
 interface TestsSidebarProps {
@@ -28,6 +30,9 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
   const [searchTerm, setSearchTerm] = useState('');
   const [testTypeFilter, setTestTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Buscar todos os ensaios
   const { data: densityInSituTests = [] } = useQuery({
@@ -44,6 +49,72 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     queryKey: ['/api/max-min-density'],
     queryFn: getQueryFn({ on401: 'returnNull' })
   });
+
+  // Delete mutations
+  const deleteDensityInSituMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest("DELETE", `/api/density-in-situ/${id}`);
+    },
+    onSuccess: () => {
+      toast({ title: "Ensaio excluído com sucesso!" });
+      queryClient.invalidateQueries({ queryKey: ['/api/density-in-situ'] });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Erro ao excluir ensaio", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    }
+  });
+
+  const deleteRealDensityMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest("DELETE", `/api/real-density/${id}`);
+    },
+    onSuccess: () => {
+      toast({ title: "Ensaio excluído com sucesso!" });
+      queryClient.invalidateQueries({ queryKey: ['/api/real-density'] });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Erro ao excluir ensaio", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    }
+  });
+
+  const deleteMaxMinDensityMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest("DELETE", `/api/max-min-density/${id}`);
+    },
+    onSuccess: () => {
+      toast({ title: "Ensaio excluído com sucesso!" });
+      queryClient.invalidateQueries({ queryKey: ['/api/max-min-density'] });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Erro ao excluir ensaio", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    }
+  });
+
+  const handleDeleteTest = (testId: number, testType: string) => {
+    switch (testType) {
+      case 'density-in-situ':
+        deleteDensityInSituMutation.mutate(testId);
+        break;
+      case 'real-density':
+        deleteRealDensityMutation.mutate(testId);
+        break;
+      case 'max-min-density':
+        deleteMaxMinDensityMutation.mutate(testId);
+        break;
+    }
+  };
 
   // Combinar todos os ensaios
   const allTests = [
@@ -212,6 +283,40 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
                       >
                         <Download size={12} />
                       </Button>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Trash2 size={12} />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja excluir este ensaio? Esta ação não pode ser desfeita.
+                              <br />
+                              <strong>Registro:</strong> {test.registrationNumber || 'Sem registro'}
+                              <br />
+                              <strong>Tipo:</strong> {test.typeName}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteTest(test.id, test.type)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Excluir
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 </Card>
