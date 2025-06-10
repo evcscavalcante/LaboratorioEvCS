@@ -270,29 +270,38 @@
     </div>
 
     <script>
-        // Sistema de autenticação local enquanto Firebase é configurado
-        let auth = null;
-        let firebaseReady = false;
+        // Sistema de autenticação funcional
+        let auth, firebaseReady = false;
         
-        // Tentar inicializar Firebase se disponível
-        const firebaseConfig = {
-            apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
-            authDomain: "laboratorio-evcs.firebaseapp.com", 
-            projectId: "laboratorio-evcs",
-            storageBucket: "laboratorio-evcs.firebasestorage.app",
-            messagingSenderId: "53045134219",
-            appId: "1:53045134219:web:e80d49f77f58870ac8e58e",
-            measurementId: "G-R8M9D9H8XB"
-        };
+        // Aguardar Firebase carregar
+        window.addEventListener('load', () => {
+            if (typeof firebase !== 'undefined') {
+                try {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
+                        authDomain: "laboratorio-evcs.firebaseapp.com",
+                        projectId: "laboratorio-evcs",
+                        storageBucket: "laboratorio-evcs.firebasestorage.app",
+                        messagingSenderId: "53045134219",
+                        appId: "1:53045134219:web:e80d49f77f58870ac8e58e"
+                    };
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            firebaseReady = true;
-        } catch (error) {
-            console.log('Firebase não disponível, usando autenticação local');
-            firebaseReady = false;
-        }
+                    firebase.initializeApp(firebaseConfig);
+                    auth = firebase.auth();
+                    firebaseReady = true;
+                    
+                    auth.onAuthStateChanged((user) => {
+                        if (user) {
+                            showCalculators(user.displayName || user.email || 'Usuário Logado');
+                        } else if (!document.getElementById('user-name').textContent.includes('Demo')) {
+                            hideCalculators();
+                        }
+                    });
+                } catch (error) {
+                    console.log('Firebase initialization failed:', error);
+                }
+            }
+        });
 
         // Sistema de autenticação híbrido (Firebase + Local)
         document.getElementById('login-google-btn').addEventListener('click', () => {
