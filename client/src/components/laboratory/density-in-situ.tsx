@@ -150,21 +150,28 @@ export default function DensityInSitu() {
     const gammaDBase = det2GammaNatDry;
 
     // Calculate void indices and relative compactness
-    // Using standard soil mechanics formulas
-    const gammaS = 2.67; // Typical specific gravity for soil solids
-    const gammaDMax = 2.1; // Reference maximum dry density (would come from max/min test)
-    const gammaDMin = 1.4; // Reference minimum dry density (would come from max/min test)
+    // Only calculate if we have actual data
+    const gammaS = 0; // Will be filled from real density test results
+    const gammaDMax = 0; // Will be filled from max/min density test results
+    const gammaDMin = 0; // Will be filled from max/min density test results
     
     // Void index calculations: e = (γs/γd) - 1
-    const voidIndexTop = gammaDTop > 0 ? (gammaS / gammaDTop) - 1 : 0;
-    const voidIndexBase = gammaDBase > 0 ? (gammaS / gammaDBase) - 1 : 0;
+    const voidIndexTop = (gammaDTop > 0 && gammaS > 0) ? (gammaS / gammaDTop) - 1 : 0;
+    const voidIndexBase = (gammaDBase > 0 && gammaS > 0) ? (gammaS / gammaDBase) - 1 : 0;
     
     // Relative compactness calculations: CR = (emax - e) / (emax - emin) × 100
-    const emax = (gammaS / gammaDMin) - 1;
-    const emin = (gammaS / gammaDMax) - 1;
+    let relativeCompactnessTop = 0;
+    let relativeCompactnessBase = 0;
     
-    const relativeCompactnessTop = emax !== emin ? ((emax - voidIndexTop) / (emax - emin)) * 100 : 0;
-    const relativeCompactnessBase = emax !== emin ? ((emax - voidIndexBase) / (emax - emin)) * 100 : 0;
+    if (gammaS > 0 && gammaDMax > 0 && gammaDMin > 0 && gammaDMax > gammaDMin) {
+      const emax = (gammaS / gammaDMin) - 1;
+      const emin = (gammaS / gammaDMax) - 1;
+      
+      if (emax !== emin) {
+        relativeCompactnessTop = ((emax - voidIndexTop) / (emax - emin)) * 100;
+        relativeCompactnessBase = ((emax - voidIndexBase) / (emax - emin)) * 100;
+      }
+    }
 
     // Average values for overall assessment
     const gammaNatDryAvg = (gammaDTop + gammaDBase) / 2;
