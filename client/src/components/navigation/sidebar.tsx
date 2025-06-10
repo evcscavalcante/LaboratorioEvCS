@@ -24,8 +24,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
-import UserMenu from '@/components/auth/user-menu';
-import { useAuth } from '@/contexts/auth-context';
 import SyncStatus from '@/components/ui/sync-status';
 
 interface SidebarProps {
@@ -59,7 +57,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const [concretoOpen, setConcretoOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  const { currentUser } = useAuth();
+  // Removed auth dependency
 
   const menuItems: MenuItem[] = [
     {
@@ -198,7 +196,6 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         </div>
         <div className="flex items-center gap-2">
           <SyncStatus />
-          {currentUser && <UserMenu />}
         </div>
       </div>
 
