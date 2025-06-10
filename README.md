@@ -100,6 +100,8 @@ Habilite o GitHub Pages apontando para essa branch nas configurações do reposi
 
 ## 👥 Sistema de Usuários
 
+Para acessar o sistema utilize a tela de login em `/login`, onde é possível realizar o login, criar uma nova conta e recuperar a senha.
+
 ### Níveis de Acesso
 - **Administrador**: Acesso total ao sistema
 - **Gerente**: Gerencia sua organização completa
