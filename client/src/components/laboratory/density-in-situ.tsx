@@ -483,9 +483,9 @@ export default function DensityInSitu() {
             Densidade In Situ (2 Determinações)
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-2 md:p-6">
           <div className="mobile-responsive-table">
-            <Table>
+            <Table className="table-compact">
               <TableHeader>
                 <TableRow className="bg-gray-50">
                 <TableHead className="text-left">Campo</TableHead>

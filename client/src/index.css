@@ -31,39 +31,49 @@
     @apply font-mono text-right;
   }
   
+  /* Compact table styles */
+  .table-compact {
+    @apply border-collapse;
+  }
+  
+  .table-compact th,
+  .table-compact td {
+    @apply p-2 border border-gray-200;
+  }
+  
   /* Mobile-specific improvements */
   @media (max-width: 768px) {
     .calculator-input {
-      @apply min-h-[56px] text-xl px-4;
+      @apply min-h-[48px] text-lg px-2;
     }
     
     .calculator-number-input {
-      @apply min-h-[56px] text-xl px-4;
+      @apply min-h-[48px] text-lg px-2;
     }
     
     .laboratory-page input {
-      @apply min-h-[56px] text-xl px-4;
-      font-size: 18px !important;
+      @apply min-h-[48px] text-lg px-2;
+      font-size: 16px !important;
     }
     
     .laboratory-page input[type="number"] {
-      @apply text-xl font-mono text-center px-2;
-      font-size: 20px !important;
+      @apply text-lg font-mono text-center px-1;
+      font-size: 18px !important;
     }
     
-    /* Table cells for mobile */
+    /* Compact table cells for mobile */
     .mobile-table-cell {
-      @apply p-3;
+      @apply p-1;
     }
     
     .mobile-table-cell input {
-      @apply w-full min-h-[56px] text-center text-xl font-medium px-2;
-      font-size: 20px !important;
+      @apply w-full min-h-[48px] text-center text-lg font-medium px-1;
+      font-size: 18px !important;
     }
     
-    /* Table improvements for mobile */
+    /* Compact table improvements for mobile */
     .mobile-responsive-table {
-      @apply block overflow-x-auto whitespace-nowrap;
+      @apply block overflow-x-auto;
     }
     
     .mobile-responsive-table table {
@@ -72,39 +82,89 @@
     
     .mobile-responsive-table th,
     .mobile-responsive-table td {
-      @apply px-3 py-4;
+      @apply px-1 py-1;
     }
     
-    /* Additional mobile input improvements */
+    .table-compact th,
+    .table-compact td {
+      @apply p-1 text-xs;
+    }
+    
+    .table-compact th {
+      @apply text-xs font-medium;
+    }
+    
+    /* Compact mobile layout */
     .laboratory-page label {
-      @apply text-base font-semibold mb-2;
+      @apply text-sm font-semibold mb-1;
     }
     
-    /* Mobile button improvements */
     .laboratory-page button {
-      @apply min-h-[48px] px-6 text-base;
+      @apply min-h-[44px] px-3 text-sm;
     }
     
-    /* Card spacing for mobile */
+    /* Reduced card spacing for mobile */
     .laboratory-page .grid {
-      @apply gap-6;
+      @apply gap-3;
+    }
+    
+    /* Compact card content */
+    .laboratory-page .space-y-6 {
+      @apply space-y-3;
+    }
+    
+    /* Reduce container padding */
+    .laboratory-page {
+      @apply px-2;
+    }
+    
+    /* Compact card padding */
+    .laboratory-page [class*="CardContent"] {
+      @apply p-3;
+    }
+    
+    .laboratory-page [class*="CardHeader"] {
+      @apply p-3 pb-2;
     }
   }
   
   /* Extra small mobile screens */
   @media (max-width: 480px) {
     .laboratory-page input {
-      @apply min-h-[60px] text-xl;
-      font-size: 20px !important;
+      @apply min-h-[48px] text-lg px-1;
+      font-size: 16px !important;
     }
     
     .laboratory-page input[type="number"] {
-      font-size: 22px !important;
+      font-size: 18px !important;
+      @apply px-0;
+    }
+    
+    .mobile-table-cell {
+      @apply p-0;
     }
     
     .mobile-table-cell input {
-      @apply min-h-[60px] text-xl;
-      font-size: 22px !important;
+      @apply min-h-[48px] text-lg px-0;
+      font-size: 18px !important;
+    }
+    
+    .mobile-responsive-table th,
+    .mobile-responsive-table td {
+      @apply px-0 py-1;
+    }
+    
+    /* Maximum space utilization */
+    .laboratory-page {
+      @apply px-1;
+    }
+    
+    .laboratory-page .grid {
+      @apply gap-2;
+    }
+    
+    .laboratory-page .space-y-6 {
+      @apply space-y-2;
     }
   }
 }
