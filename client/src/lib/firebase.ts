@@ -12,15 +12,17 @@ const firebaseConfig = {
   measurementId: "G-R8M9D9H8XB"
 };
 
-let app: FirebaseApp | undefined;
-let auth: Auth | undefined;
-let db: Firestore | undefined;
+let app: FirebaseApp;
+let auth: Auth;
+let db: Firestore;
 let persistenceEnabled = false;
 
+// Initialize Firebase
+app = initializeApp(firebaseConfig);
+auth = getAuth(app);
+db = getFirestore(app);
+
 try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
   
   // Enable persistence only once
   if (db && !persistenceEnabled) {

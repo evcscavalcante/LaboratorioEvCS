@@ -38,24 +38,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   async function signup(email: string, password: string, displayName: string) {
+    if (!auth) throw new Error('Firebase auth not initialized');
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCredential.user, { displayName });
     return userCredential;
   }
 
   function login(email: string, password: string) {
+    if (!auth) throw new Error('Firebase auth not initialized');
     return signInWithEmailAndPassword(auth, email, password);
   }
 
   function logout() {
+    if (!auth) throw new Error('Firebase auth not initialized');
     return signOut(auth);
   }
 
   function resetPassword(email: string) {
+    if (!auth) throw new Error('Firebase auth not initialized');
     return sendPasswordResetEmail(auth, email);
   }
 
   useEffect(() => {
+    if (!auth) {
+      console.warn('Firebase auth not initialized');
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
