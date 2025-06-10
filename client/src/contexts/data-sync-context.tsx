@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useAuth } from './auth-context';
 import { db } from '../lib/firebase';
 import { 
   collection as firebaseCollection, 
@@ -36,7 +35,6 @@ interface DataSyncProviderProps {
 }
 
 export function DataSyncProvider({ children }: DataSyncProviderProps) {
-  const { currentUser } = useAuth();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
@@ -47,10 +45,7 @@ export function DataSyncProvider({ children }: DataSyncProviderProps) {
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      console.log('Connection restored - starting sync');
-      if (currentUser && db) {
-        syncPendingData();
-      }
+      console.log('Connection restored');
     };
 
     const handleOffline = () => {
@@ -65,13 +60,11 @@ export function DataSyncProvider({ children }: DataSyncProviderProps) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [currentUser]);
+  }, []);
 
-  // Firebase persistence is handled in firebase.ts to avoid conflicts
-
-  // Sync pending data when coming online
+  // Simplified sync without authentication
   const syncPendingData = async () => {
-    if (!currentUser || !db || !isOnline) return;
+    if (!isOnline) return;
 
     setIsSyncing(true);
     setSyncStatus('syncing');
