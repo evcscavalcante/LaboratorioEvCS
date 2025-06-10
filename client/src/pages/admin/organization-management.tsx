@@ -259,7 +259,10 @@ export default function OrganizationManagement() {
             </div>
             
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button variant="outline" onClick={() => {
+                setIsCreateDialogOpen(false);
+                resetForm();
+              }}>
                 Cancelar
               </Button>
               <Button onClick={handleCreateOrg} disabled={createOrgMutation.isPending}>
@@ -405,7 +408,10 @@ export default function OrganizationManagement() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button variant="outline" onClick={() => {
+              setIsEditDialogOpen(false);
+              resetForm();
+            }}>
               Cancelar
             </Button>
             <Button onClick={handleUpdateOrg} disabled={updateOrgMutation.isPending}>

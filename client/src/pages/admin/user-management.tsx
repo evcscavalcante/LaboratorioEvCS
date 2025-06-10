@@ -80,7 +80,7 @@ export default function UserManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/users'] });
       setIsCreateDialogOpen(false);
-      setFormData({ name: '', email: '', role: 'technician', organizationId: null, active: true });
+      resetForm();
       toast({ title: 'Usuário criado com sucesso!' });
     },
     onError: (error) => {
@@ -97,7 +97,7 @@ export default function UserManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/users'] });
       setIsEditDialogOpen(false);
-      setSelectedUser(null);
+      resetForm();
       toast({ title: 'Usuário atualizado com sucesso!' });
     },
     onError: (error) => {
@@ -118,6 +118,17 @@ export default function UserManagement() {
       toast({ title: 'Erro ao remover usuário', description: error.message, variant: 'destructive' });
     }
   });
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      role: 'technician',
+      organizationId: null,
+      active: true
+    });
+    setSelectedUser(null);
+  };
 
   const handleCreateUser = () => {
     createUserMutation.mutate(formData);
@@ -250,7 +261,10 @@ export default function UserManagement() {
             </div>
             
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button variant="outline" onClick={() => {
+                setIsCreateDialogOpen(false);
+                resetForm();
+              }}>
                 Cancelar
               </Button>
               <Button onClick={handleCreateUser} disabled={createUserMutation.isPending}>
@@ -396,7 +410,10 @@ export default function UserManagement() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button variant="outline" onClick={() => {
+              setIsEditDialogOpen(false);
+              resetForm();
+            }}>
               Cancelar
             </Button>
             <Button onClick={handleUpdateUser} disabled={updateUserMutation.isPending}>
