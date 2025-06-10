@@ -14,14 +14,28 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      // Simulate authentication - in production this would call a real API
+      // Simulate authentication with role assignment
       if (credentials.username && credentials.password) {
-        // Store simple auth token
+        let userRole = "TECHNICIAN"; // Default role
+        
+        // Admin access for specific users
+        if (credentials.username.toLowerCase() === "admin" || 
+            credentials.username.toLowerCase() === "administrador") {
+          userRole = "ADMIN";
+        } else if (credentials.username.toLowerCase() === "manager" || 
+                   credentials.username.toLowerCase() === "gerente") {
+          userRole = "MANAGER";
+        } else if (credentials.username.toLowerCase() === "supervisor") {
+          userRole = "SUPERVISOR";
+        } else if (credentials.username.toLowerCase() === "viewer" || 
+                   credentials.username.toLowerCase() === "visualizador") {
+          userRole = "VIEWER";
+        }
+        
         localStorage.setItem("auth_token", "authenticated");
-        localStorage.setItem("user_role", "TECHNICIAN");
+        localStorage.setItem("user_role", userRole);
         localStorage.setItem("user_name", credentials.username);
         
-        // Reload page to trigger auth check
         window.location.reload();
       }
     } finally {
@@ -99,9 +113,18 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="text-xs text-gray-500 text-center mt-4">
-            <p>Para fins de demonstração, use qualquer usuário e senha.</p>
-            <p className="mt-1">Para solicitar acesso, entre em contato com o administrador.</p>
+          <div className="text-xs text-gray-500 text-center mt-4 space-y-2">
+            <div className="bg-blue-50 p-3 rounded border">
+              <p className="font-semibold text-blue-800 mb-2">Níveis de Acesso:</p>
+              <div className="text-left space-y-1">
+                <p><strong>admin</strong> ou <strong>administrador</strong> - Acesso total (criar, editar, excluir, gerenciar usuários)</p>
+                <p><strong>manager</strong> ou <strong>gerente</strong> - Gerenciamento completo</p>
+                <p><strong>supervisor</strong> - Criar, editar e aprovar ensaios</p>
+                <p><strong>Outros usuários</strong> - Técnico (criar e editar ensaios)</p>
+                <p><strong>viewer</strong> ou <strong>visualizador</strong> - Apenas visualizar</p>
+              </div>
+            </div>
+            <p>Qualquer senha funciona para demonstração.</p>
           </div>
         </CardContent>
       </Card>

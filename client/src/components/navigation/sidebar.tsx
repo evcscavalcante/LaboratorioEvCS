@@ -19,12 +19,16 @@ import {
   LucideIcon,
   HelpCircle,
   Book,
-  UserCog
+  UserCog,
+  LogOut,
+  User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import SyncStatus from '@/components/ui/sync-status';
+import { useAuth } from '@/hooks/useAuth';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -57,7 +61,8 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const [concretoOpen, setConcretoOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  // Removed auth dependency
+  const { user, logout } = useAuth();
+  const { userRole } = usePermissions();
 
   const menuItems: MenuItem[] = [
     {
