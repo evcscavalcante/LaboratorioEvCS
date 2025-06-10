@@ -81,6 +81,12 @@ npm run build
 firebase deploy --only hosting
 ```
 
+### Deploy Automático (GitHub Actions)
+Este repositório possui o workflow [`firebase-deploy.yml`](.github/workflows/firebase-deploy.yml)
+que realiza o build e publica no Firebase sempre que houver push na branch `main`.
+Para funcionar, adicione a chave de serviço do Firebase como secret
+`FIREBASE_SERVICE_ACCOUNT` no GitHub.
+
 ## 🌐 URLs de Produção
 
 - **Site Principal**: https://laboratorio-evcs.web.app
