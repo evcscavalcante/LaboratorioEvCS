@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { getQueryFn, apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { generateDensityInSituPDF, generateRealDensityPDF, generateMaxMinDensityPDF } from '@/lib/pdf-generator';
+import { calculateDensityInSitu, calculateRealDensity, calculateVoidParameters } from '@/lib/calculations';
 import StatusIndicator from '@/components/laboratory/status-indicator';
 
 interface TestsSidebarProps {
@@ -33,6 +35,97 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const handleDownloadPDF = async (testId: number, testType: string) => {
+    try {
+      let testData;
+      let calculations = null;
+
+      // Buscar dados do teste específico usando a API
+      if (testType === 'density-in-situ') {
+        const response = await fetch(`/api/density-in-situ/${testId}`);
+        if (!response.ok) throw new Error('Erro ao buscar dados do ensaio');
+        testData = await response.json();
+        
+        // Tentar calcular resultados se houver dados suficientes
+        try {
+          if (testData.det1 && testData.det2) {
+            const moistureTop = [testData.moistureTop1, testData.moistureTop2, testData.moistureTop3].filter(m => m && m.capsule);
+            const moistureBase = [testData.moistureBase1, testData.moistureBase2, testData.moistureBase3].filter(m => m && m.capsule);
+            
+            if (moistureTop.length > 0 && moistureBase.length > 0) {
+              calculations = calculateDensityInSitu(
+                testData.det1,
+                testData.det2,
+                moistureTop,
+                moistureBase
+              );
+            }
+          }
+        } catch (calcError) {
+          console.warn('Erro nos cálculos, gerando PDF sem resultados:', calcError);
+        }
+        
+        await generateDensityInSituPDF(testData, calculations);
+        
+      } else if (testType === 'real-density') {
+        const response = await fetch(`/api/real-density/${testId}`);
+        if (!response.ok) throw new Error('Erro ao buscar dados do ensaio');
+        testData = await response.json();
+        
+        try {
+          if (testData.moisture1 && testData.picnometer1) {
+            const moisture = [testData.moisture1, testData.moisture2, testData.moisture3].filter(m => m && m.capsule);
+            const picnometer = [testData.picnometer1, testData.picnometer2].filter(p => p && p.massaPicnometro);
+            
+            if (moisture.length > 0 && picnometer.length > 0) {
+              calculations = calculateRealDensity(moisture, picnometer);
+            }
+          }
+        } catch (calcError) {
+          console.warn('Erro nos cálculos, gerando PDF sem resultados:', calcError);
+        }
+        
+        await generateRealDensityPDF(testData, calculations);
+        
+      } else if (testType === 'max-min-density') {
+        const response = await fetch(`/api/max-min-density/${testId}`);
+        if (!response.ok) throw new Error('Erro ao buscar dados do ensaio');
+        testData = await response.json();
+        
+        try {
+          if (testData.maxDensity1 && testData.minDensity1) {
+            const maxDensity = [testData.maxDensity1, testData.maxDensity2, testData.maxDensity3].filter(d => d && d.moldeSolo);
+            const minDensity = [testData.minDensity1, testData.minDensity2, testData.minDensity3].filter(d => d && d.moldeSolo);
+            
+            if (maxDensity.length > 0 && minDensity.length > 0) {
+              calculations = calculateVoidParameters(
+                maxDensity,
+                minDensity,
+                parseFloat(testData.realDensityRef) || 2.65
+              );
+            }
+          }
+        } catch (calcError) {
+          console.warn('Erro nos cálculos, gerando PDF sem resultados:', calcError);
+        }
+        
+        await generateMaxMinDensityPDF(testData, calculations);
+      }
+
+      toast({
+        title: "PDF gerado com sucesso",
+        description: "O relatório foi baixado para seu dispositivo.",
+      });
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast({
+        title: "Erro ao gerar PDF",
+        description: "Ocorreu um erro ao gerar o relatório.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Buscar todos os ensaios
   const { data: densityInSituTests = [] } = useQuery({
@@ -278,7 +371,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
                         className="h-7 px-2 text-xs"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Implementar download PDF
+                          handleDownloadPDF(test.id, test.type);
                         }}
                       >
                         <Download size={12} />
