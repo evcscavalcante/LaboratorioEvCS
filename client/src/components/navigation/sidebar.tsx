@@ -154,6 +154,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           active: location === '/admin/users'
         },
         {
+          label: 'Gerenciar Usuários',
+          icon: UserCog,
+          href: '/admin/user-roles',
+          active: location === '/admin/user-roles'
+        },
+        {
           label: 'Organizações',
           icon: Building,
           href: '/admin/organizations',

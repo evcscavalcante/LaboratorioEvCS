@@ -15,6 +15,7 @@ import DensidadeRealPage from "@/pages/solos/densidade-real";
 import DensidadeMaxMinPage from "@/pages/solos/densidade-max-min";
 import AdminDashboard from "@/pages/admin/dashboard";
 import UserManagement from "@/pages/admin/user-management";
+import UserRoles from "@/pages/admin/user-roles";
 import OrganizationManagement from "@/pages/admin/organization-management";
 import ManualUsuario from "@/pages/help/manual-usuario";
 import ManualAdmin from "@/pages/help/manual-admin";
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/solos/densidade-max-min" component={DensidadeMaxMinPage} />
         <Route path="/admin" component={AdminDashboard} />
         <Route path="/admin/users" component={UserManagement} />
+        <Route path="/admin/user-roles" component={UserRoles} />
         <Route path="/admin/organizations" component={OrganizationManagement} />
         <Route path="/help/manual-usuario" component={ManualUsuario} />
         <Route path="/help/manual-admin" component={ManualAdmin} />

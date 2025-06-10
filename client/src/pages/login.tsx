@@ -14,22 +14,40 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      // Simulate authentication with role assignment
       if (credentials.username && credentials.password) {
         let userRole = "TECHNICIAN"; // Default role
         
-        // Admin access for specific users
-        if (credentials.username.toLowerCase() === "admin" || 
-            credentials.username.toLowerCase() === "administrador") {
+        // Check custom users first
+        const customUsers = JSON.parse(localStorage.getItem('custom_users') || '{}');
+        const customUser = customUsers[credentials.username.toLowerCase()];
+        
+        if (customUser && customUser.password === credentials.password) {
+          userRole = customUser.role;
+        }
+        // Default admin credentials
+        else if ((credentials.username.toLowerCase() === "admin" || 
+            credentials.username.toLowerCase() === "administrador") &&
+            credentials.password === "admin123") {
           userRole = "ADMIN";
-        } else if (credentials.username.toLowerCase() === "manager" || 
-                   credentials.username.toLowerCase() === "gerente") {
+        } else if ((credentials.username.toLowerCase() === "manager" || 
+                   credentials.username.toLowerCase() === "gerente") &&
+                  credentials.password === "manager123") {
           userRole = "MANAGER";
-        } else if (credentials.username.toLowerCase() === "supervisor") {
+        } else if (credentials.username.toLowerCase() === "supervisor" &&
+                  credentials.password === "super123") {
           userRole = "SUPERVISOR";
-        } else if (credentials.username.toLowerCase() === "viewer" || 
-                   credentials.username.toLowerCase() === "visualizador") {
+        } else if ((credentials.username.toLowerCase() === "viewer" || 
+                   credentials.username.toLowerCase() === "visualizador") &&
+                  credentials.password === "view123") {
           userRole = "VIEWER";
+        } else if (credentials.password === "demo123") {
+          // Any other user with demo123 gets technician access
+          userRole = "TECHNICIAN";
+        } else {
+          // Invalid credentials
+          alert("Credenciais inválidas. Verifique o usuário e senha.");
+          setIsLoading(false);
+          return;
         }
         
         localStorage.setItem("auth_token", "authenticated");
@@ -115,16 +133,18 @@ export default function Login() {
 
           <div className="text-xs text-gray-500 text-center mt-4 space-y-2">
             <div className="bg-blue-50 p-3 rounded border">
-              <p className="font-semibold text-blue-800 mb-2">Níveis de Acesso:</p>
+              <p className="font-semibold text-blue-800 mb-2">Credenciais de Acesso:</p>
               <div className="text-left space-y-1">
-                <p><strong>admin</strong> ou <strong>administrador</strong> - Acesso total (criar, editar, excluir, gerenciar usuários)</p>
-                <p><strong>manager</strong> ou <strong>gerente</strong> - Gerenciamento completo</p>
-                <p><strong>supervisor</strong> - Criar, editar e aprovar ensaios</p>
-                <p><strong>Outros usuários</strong> - Técnico (criar e editar ensaios)</p>
-                <p><strong>viewer</strong> ou <strong>visualizador</strong> - Apenas visualizar</p>
+                <p><strong>Administrador:</strong> admin / admin123</p>
+                <p><strong>Gerente:</strong> manager / manager123</p>
+                <p><strong>Supervisor:</strong> supervisor / super123</p>
+                <p><strong>Visualizador:</strong> viewer / view123</p>
+                <p><strong>Técnico:</strong> qualquer usuário / demo123</p>
               </div>
             </div>
-            <p>Qualquer senha funciona para demonstração.</p>
+            <div className="bg-amber-50 p-2 rounded border border-amber-200">
+              <p className="text-amber-700 text-xs">⚠️ Para acesso administrativo, use as credenciais exatas acima.</p>
+            </div>
           </div>
         </CardContent>
       </Card>
