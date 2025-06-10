@@ -1,227 +1,129 @@
-# Laboratório Ev.C.S - Sistema Geotécnico Profissional
+# Laboratório Ev.C.S - Sistema Geotécnico
 
-Sistema web completo para laboratórios geotécnicos que automatiza cálculos de densidade do solo, gera relatórios técnicos profissionais e gerencia usuários com controle de acesso hierárquico.
+Sistema web especializado para cálculos geotécnicos de densidade do solo seguindo normas ABNT.
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
 ### Calculadoras Geotécnicas
-- **Densidade In Situ** (NBR 9813): Cálculos automáticos com validação ABNT
-- **Densidade Real** (Picnômetro): Determinação precisa com controle de temperatura  
-- **Densidade Máxima e Mínima**: Índices de vazios e compacidade relativa
+- **Densidade In Situ (NBR 9813)**: Determinação da densidade do solo em campo
+- **Densidade Real (Picnômetro)**: Densidade real dos grãos pelo método do picnômetro
+- **Densidade Máxima e Mínima**: Índices de vazios para análise de compacidade
 
-### Sistema Administrativo
-- Dashboard com estatísticas em tempo real
-- Gerenciamento completo de usuários e organizações
-- Controle de permissões por níveis hierárquicos
-- Monitoramento de atividades do laboratório
+### Sistema de Autenticação
+- Login Google via Firebase
+- Autenticação email/senha
+- Modo demonstração para testes
 
-### Relatórios Profissionais
-- Geração automática de PDFs seguindo normas ABNT
-- Formatação técnica padrão laboratorial
-- Logo personalizado por organização
-- Dados reais dos ensaios (não valores simulados)
+### Geração de Relatórios
+- PDFs técnicos profissionais
+- Cálculos automáticos conforme ABNT
+- Validação de resultados
 
-### Recursos Avançados
-- Sincronização automática offline/online
-- Autenticação segura via Google
-- Interface responsiva (desktop, tablet, mobile)
-- Manuais integrados na aplicação
-- Backup automático na nuvem
-
-## 🏗️ Tecnologias
-
-### Frontend
-- React 18 com TypeScript
-- Vite para build otimizado
-- Tailwind CSS + shadcn/ui para interface moderna
-- React Query para gerenciamento de estado
-- Wouter para roteamento
-
-### Backend
-- Express.js com TypeScript
-- PostgreSQL com Drizzle ORM
-- Firebase para autenticação e storage
-- Zod para validação de dados
-
-### Deploy
-- Firebase Hosting para frontend
-- PostgreSQL para banco de dados
-- Configuração para ambiente de produção
-
-## 📦 Instalação
+## Configuração do Ambiente
 
 ### Pré-requisitos
-- Node.js 18+
-- PostgreSQL
-- Conta Firebase
+- Node.js 18+ 
+- npm ou yarn
+- Conta Firebase (para autenticação)
 
-### Configuração Local
+### Instalação
+
 ```bash
 # Clone o repositório
 git clone https://github.com/evcscavalcante/LaboratorioEvCS.git
 cd LaboratorioEvCS
 
 # Instale dependências
-npm install
+npm install --legacy-peer-deps
 
 # Configure variáveis de ambiente
-# DATABASE_URL=sua_url_postgresql
-# FIREBASE_CONFIG=sua_config_firebase
+cp .env.example .env
+# Edite .env com suas credenciais Firebase
 
 # Execute em desenvolvimento
 npm run dev
-```
 
-### Build para Produção
-```bash
-# Build do projeto
+# Build para produção
 npm run build
-
-# Deploy no Firebase
-firebase deploy --only hosting
 ```
 
-## 🌐 URLs de Produção
+### Configuração Firebase
 
-- **Site Principal**: https://laboratorio-evcs.web.app
-- **Alternativo**: https://laboratorio-evcs.firebaseapp.com
+1. Crie projeto no Firebase Console
+2. Habilite Authentication (Google + Email/Senha)
+3. Configure domínios autorizados
+4. Adicione credenciais ao .env:
 
-## 👥 Sistema de Usuários
-
-### Níveis de Acesso
-- **Administrador**: Acesso total ao sistema
-- **Gerente**: Gerencia sua organização completa
-- **Supervisor**: Supervisiona técnicos e valida ensaios
-- **Técnico**: Realiza ensaios e gera relatórios
-- **Visualizador**: Consulta dados apenas
-
-### Estrutura Organizacional
 ```
-Administrador
-├── Gerente (Por laboratório)
-│   ├── Supervisor (Por equipe)
-│   │   ├── Técnico (Operacional)
-│   │   └── Técnico (Operacional)
-│   └── Visualizador (Consultores)
+VITE_FIREBASE_API_KEY=sua_api_key
+VITE_FIREBASE_PROJECT_ID=seu_project_id
+VITE_FIREBASE_APP_ID=seu_app_id
 ```
 
-## 📊 Fluxo de Trabalho
-
-### Para Técnicos
-1. Login com conta Google
-2. Selecionar calculadora apropriada
-3. Preencher dados do ensaio
-4. Sistema calcula automaticamente
-5. Gerar PDF profissional
-6. Dados salvos automaticamente
-
-### Para Administradores
-1. Acessar painel administrativo
-2. Gerenciar usuários e organizações
-3. Monitorar atividades do laboratório
-4. Configurar permissões de acesso
-
-## 📚 Documentação
-
-### Manuais Integrados
-- **Manual do Usuário**: Acessível via menu "Ajuda" na aplicação
-- **Manual Administrativo**: Guia completo de gerenciamento
-- **Guia de Treinamento**: Como treinar equipes em 30 minutos
-
-### Arquivos de Documentação
-- `MANUAL_COMPLETO.md`: Manual completo do sistema
-- `MANUAL_ADMINISTRADOR.md`: Gestão e administração
-- `GUIA_TREINAMENTO.md`: Treinamento de usuários
-- `RESUMO_EXECUTIVO.md`: Visão geral do projeto
-
-## 🔧 Configuração Firebase
-
-### Autenticação
-- Google Sign-in habilitado
-- Controle de acesso por usuário
-- Backup automático de sessões
-
-### Hosting
-- Projeto: `laboratorio-evcs`
-- Configuração SPA com redirecionamentos
-- Cache otimizado para performance
-
-### Firestore
-- Sincronização automática de dados
-- Funcionamento offline
-- Backup incremental
-
-## 💡 Recursos Técnicos
-
-### Validações ABNT
-- Critérios automáticos de aprovação/reprovação
-- Cálculos seguindo normas técnicas
-- Verificação de dados obrigatórios
-
-### Performance
-- Build otimizado com Vite
-- Lazy loading de componentes
-- Cache inteligente de dados
-
-### Segurança
-- Autenticação via Firebase
-- Dados criptografados em transmissão
-- Controle granular de permissões
-
-## 🚀 Deploy
+## Deploy
 
 ### Firebase Hosting
 ```bash
-npm run build
-firebase deploy --only hosting
+firebase login
+firebase init hosting
+firebase deploy
 ```
 
-### Variáveis de Ambiente
-```env
-DATABASE_URL=postgresql://...
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_APP_ID=...
+### Outros Provedores
+O sistema é compatível com Vercel, Netlify e outros hosts estáticos.
+
+## Estrutura do Projeto
+
+```
+├── client/          # Frontend React + TypeScript
+│   ├── src/
+│   │   ├── components/  # Componentes reutilizáveis
+│   │   ├── pages/       # Páginas da aplicação
+│   │   ├── lib/         # Utilitários e configurações
+│   │   └── contexts/    # Contextos React
+├── server/          # Backend Express
+│   ├── routes.ts    # Rotas da API
+│   ├── storage.ts   # Camada de dados
+│   └── index.ts     # Servidor principal
+├── shared/          # Tipos e schemas compartilhados
+│   └── schema.ts    # Definições TypeScript
+└── dist/            # Build de produção
 ```
 
-## 📈 Benefícios
+## Testes
 
-### Operacionais
-- Redução de 70% no tempo de cálculo
-- Eliminação de erros manuais
-- Padronização de relatórios
-- Rastreabilidade completa
+```bash
+# Executar testes unitários
+npm test
 
-### Técnicos
-- Conformidade automática com ABNT
-- Cálculos validados e precisos
-- Backup seguro na nuvem
-- Acesso multiplataforma
+# Testes de integração
+npm run test:integration
 
-### Gerenciais
-- Controle total de usuários
-- Visibilidade da produtividade
-- Relatórios profissionais instantâneos
-- Escalabilidade para crescimento
+# Coverage
+npm run test:coverage
+```
 
-## 🤝 Contribuição
+## Contribuição
 
-Para contribuir com o projeto:
-1. Fork o repositório
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
+1. Fork o projeto
+2. Crie branch para feature (`git checkout -b feature/nova-calculadora`)
+3. Commit mudanças (`git commit -m 'Add: nova calculadora'`)
+4. Push para branch (`git push origin feature/nova-calculadora`)
+5. Abra Pull Request
 
-## 📄 Licença
+## Licença
 
-Este projeto é proprietário e desenvolvido para uso em laboratórios geotécnicos.
+MIT License - veja LICENSE.md para detalhes.
 
-## 📞 Suporte
+## Suporte
 
-Para suporte técnico ou dúvidas sobre implementação, consulte os manuais integrados na aplicação ou a documentação completa no repositório.
+Para suporte técnico:
+- Issues: https://github.com/evcscavalcante/LaboratorioEvCS/issues
+- Email: suporte@laboratorio-evcs.com
 
----
+## Normas Técnicas
 
-**Laboratório Ev.C.S** - Sistema Geotécnico Profissional  
-*Desenvolvido seguindo normas ABNT para excelência técnica*
+Sistema desenvolvido seguindo:
+- NBR 9813 - Densidade in situ
+- NBR 6508 - Densidade real dos grãos
+- NBR 12004 - Densidade máxima e mínima
