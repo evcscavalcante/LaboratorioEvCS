@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório Ev.C.S - Sistema Geotécnico</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .login-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .calculators {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .calculator {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 4px solid #2563eb;
+        }
+        .calculator h3 {
+            color: #1e293b;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        .calculator p {
+            color: #64748b;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        .btn-auth {
+            background: #dc2626;
+            margin: 0.5rem;
+        }
+        .btn-auth:hover {
+            background: #b91c1c;
+        }
+        .btn-demo {
+            background: #059669;
+            margin: 0.5rem;
+        }
+        .btn-demo:hover {
+            background: #047857;
+        }
+        .btn-secondary {
+            background: #6b7280;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .auth-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .email-form {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .auth-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .auth-status {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            color: #92400e;
+        }
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border-radius: 6px;
+            border-left: 4px solid #0ea5e9;
+        }
+        .hidden { display: none; }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+        #user-info {
+            background: #ecfdf5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Laboratório Ev.C.S - Sistema Geotécnico</h1>
+    </div>
+
+    <div class="container">
+        <div id="login-section" class="login-section">
+            <h2>Acesso ao Sistema</h2>
+            <p>Escolha uma forma de acesso às calculadoras geotécnicas</p>
+            
+            <div class="auth-options">
+                <button id="login-google-btn" class="btn btn-auth">🔑 Entrar com Google</button>
+                <button id="login-email-btn" class="btn btn-auth">📧 Entrar com Email</button>
+                <button id="demo-btn" class="btn btn-demo">🧪 Modo Demonstração (Recomendado)</button>
+            </div>
+            
+            <div id="auth-status" class="auth-status hidden">
+                <p>⚠️ Serviços de autenticação temporariamente indisponíveis</p>
+                <p><strong>Use o Modo Demonstração</strong> para acesso completo às calculadoras</p>
+            </div>
+
+            <div id="email-form" class="hidden email-form">
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="email-input" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha:</label>
+                    <input type="password" id="password-input" placeholder="Sua senha">
+                </div>
+                <div class="auth-buttons">
+                    <button id="signin-btn" class="btn">Entrar</button>
+                    <button id="signup-btn" class="btn">Criar Conta</button>
+                    <button id="back-btn" class="btn btn-secondary">Voltar</button>
+                </div>
+            </div>
+            
+            <div id="user-info" class="hidden">
+                <p><strong>Usuário logado:</strong> <span id="user-name"></span></p>
+                <button id="logout-btn" class="btn">Sair</button>
+            </div>
+        </div>
+
+        <div id="calculators" class="hidden">
+            <div class="calculators">
+                <div class="calculator">
+                    <h3>⚖️ Densidade In Situ (NBR 9813)</h3>
+                    <p>Determinação da densidade do solo em campo com validação automática segundo normas ABNT.</p>
+                    
+                    <div class="form-group">
+                        <label>Massa do Solo Úmido (g):</label>
+                        <input type="number" id="massa-solo" step="0.01" placeholder="Ex: 1500.50">
+                    </div>
+                    <div class="form-group">
+                        <label>Volume do Cilindro (cm³):</label>
+                        <input type="number" id="volume-cilindro" step="0.01" placeholder="Ex: 1000.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Umidade (%):</label>
+                        <input type="number" id="umidade" step="0.01" placeholder="Ex: 12.5">
+                    </div>
+                    
+                    <button class="btn" onclick="calcularDensidadeInSitu()">Calcular Densidade In Situ</button>
+                    <div id="resultado-in-situ"></div>
+                </div>
+
+                <div class="calculator">
+                    <h3>🧪 Densidade Real (Picnômetro)</h3>
+                    <p>Determinação da densidade real dos grãos usando método do picnômetro.</p>
+                    
+                    <div class="form-group">
+                        <label>Massa do Picnômetro (g):</label>
+                        <input type="number" id="massa-picnometro" step="0.01" placeholder="Ex: 150.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Massa Picnômetro + Solo (g):</label>
+                        <input type="number" id="massa-pic-solo" step="0.01" placeholder="Ex: 200.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Massa Picnômetro + Solo + Água (g):</label>
+                        <input type="number" id="massa-pic-solo-agua" step="0.01" placeholder="Ex: 650.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Temperatura (°C):</label>
+                        <input type="number" id="temperatura" step="0.1" placeholder="Ex: 20.0">
+                    </div>
+                    
+                    <button class="btn" onclick="calcularDensidadeReal()">Calcular Densidade Real</button>
+                    <div id="resultado-real"></div>
+                </div>
+
+                <div class="calculator">
+                    <h3>📊 Densidade Máxima e Mínima</h3>
+                    <p>Determinação de índices de vazios máximo e mínimo para análise de compacidade.</p>
+                    
+                    <div class="form-group">
+                        <label>Massa Solo Seco - Estado Solto (g):</label>
+                        <input type="number" id="massa-solto" step="0.01" placeholder="Ex: 1400.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Volume - Estado Solto (cm³):</label>
+                        <input type="number" id="volume-solto" step="0.01" placeholder="Ex: 1000.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Massa Solo Seco - Estado Compacto (g):</label>
+                        <input type="number" id="massa-compacto" step="0.01" placeholder="Ex: 1600.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Volume - Estado Compacto (cm³):</label>
+                        <input type="number" id="volume-compacto" step="0.01" placeholder="Ex: 1000.00">
+                    </div>
+                    
+                    <button class="btn" onclick="calcularMaxMin()">Calcular Densidade Máx/Mín</button>
+                    <div id="resultado-max-min"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Laboratório Ev.C.S</strong> - Sistema Geotécnico Profissional</p>
+        <p>Cálculos automáticos seguindo normas ABNT | Relatórios técnicos profissionais</p>
+    </div>
+
+    <script>
+        // Configuração Firebase com credenciais corretas
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
+            authDomain: "laboratorio-evcs.firebaseapp.com",
+            projectId: "laboratorio-evcs",
+            storageBucket: "laboratorio-evcs.firebasestorage.app",
+            messagingSenderId: "53045134219",
+            appId: "1:53045134219:web:e80d49f77f58870ac8e58e",
+            measurementId: "G-R8M9D9H8XB"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Sistema de autenticação múltipla com tratamento robusto de erros
+        document.getElementById('login-google-btn').addEventListener('click', () => {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider)
+                    .catch((error) => {
+                        console.log('Login error:', error.code, error.message);
+                        if (error.code === 'auth/configuration-not-found' || 
+                            error.code === 'auth/invalid-api-key' ||
+                            error.message.includes('400')) {
+                            showAuthWarning();
+                            alert('Serviço de autenticação indisponível. Use o Modo Demonstração para continuar.');
+                        } else {
+                            alert('Erro no login com Google. Tente o modo demonstração.');
+                        }
+                    });
+            } catch (error) {
+                console.log('Auth initialization error:', error);
+                alert('Serviço de login indisponível. Use o Modo Demonstração.');
+            }
+        });
+
+        document.getElementById('login-email-btn').addEventListener('click', () => {
+            document.querySelector('.auth-options').classList.add('hidden');
+            document.getElementById('email-form').classList.remove('hidden');
+        });
+
+        document.getElementById('demo-btn').addEventListener('click', () => {
+            showCalculators('Usuário Demo - Modo Demonstração');
+        });
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            document.querySelector('.auth-options').classList.remove('hidden');
+            document.getElementById('email-form').classList.add('hidden');
+        });
+
+        document.getElementById('signin-btn').addEventListener('click', () => {
+            const email = document.getElementById('email-input').value;
+            const password = document.getElementById('password-input').value;
+            
+            if (!email || !password) {
+                alert('Preencha email e senha');
+                return;
+            }
+
+            try {
+                auth.signInWithEmailAndPassword(email, password)
+                    .catch((error) => {
+                        if (error.code === 'auth/configuration-not-found' || 
+                            error.message.includes('400')) {
+                            alert('Serviço de autenticação indisponível. Use o Modo Demonstração.');
+                        } else {
+                            alert('Erro no login: ' + error.message);
+                        }
+                    });
+            } catch (error) {
+                alert('Serviço de login indisponível. Use o Modo Demonstração.');
+            }
+        });
+
+        document.getElementById('signup-btn').addEventListener('click', () => {
+            const email = document.getElementById('email-input').value;
+            const password = document.getElementById('password-input').value;
+            
+            if (!email || !password) {
+                alert('Preencha email e senha');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Senha deve ter pelo menos 6 caracteres');
+                return;
+            }
+
+            try {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => {
+                        alert('Conta criada com sucesso!');
+                    })
+                    .catch((error) => {
+                        if (error.code === 'auth/configuration-not-found' || 
+                            error.message.includes('400')) {
+                            alert('Serviço de criação de conta indisponível. Use o Modo Demonstração.');
+                        } else {
+                            alert('Erro ao criar conta: ' + error.message);
+                        }
+                    });
+            } catch (error) {
+                alert('Serviço indisponível. Use o Modo Demonstração.');
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            // Se estiver em modo demo, simplesmente volta para tela de login
+            if (document.getElementById('user-name').textContent.includes('Demo')) {
+                hideCalculators();
+            } else {
+                // Se estiver logado com Firebase, faz logout
+                auth.signOut();
+            }
+        });
+
+        function showCalculators(userName = 'Usuário') {
+            document.getElementById('login-section').querySelector('h2').textContent = 'Sistema Ativo';
+            document.querySelector('.auth-options').classList.add('hidden');
+            document.getElementById('email-form').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('user-name').textContent = userName;
+            document.getElementById('calculators').classList.remove('hidden');
+        }
+
+        function hideCalculators() {
+            document.getElementById('login-section').querySelector('h2').textContent = 'Acesso ao Sistema';
+            document.querySelector('.auth-options').classList.remove('hidden');
+            document.getElementById('email-form').classList.add('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+            document.getElementById('calculators').classList.add('hidden');
+        }
+
+        function showAuthWarning() {
+            document.getElementById('auth-status').classList.remove('hidden');
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                showCalculators(user.displayName || user.email || 'Usuário Logado');
+            } else {
+                hideCalculators();
+            }
+        });
+
+        // Calculadoras
+        function calcularDensidadeInSitu() {
+            const massaSolo = parseFloat(document.getElementById('massa-solo').value);
+            const volumeCilindro = parseFloat(document.getElementById('volume-cilindro').value);
+            const umidade = parseFloat(document.getElementById('umidade').value);
+
+            if (!massaSolo || !volumeCilindro || !umidade) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            const densidadeUmida = massaSolo / volumeCilindro;
+            const densidadeSeca = densidadeUmida / (1 + umidade/100);
+            const status = densidadeSeca > 1.6 ? 'APROVADO' : 'REPROVADO';
+
+            document.getElementById('resultado-in-situ').innerHTML = `
+                <div class="result">
+                    <h4>Resultados - Densidade In Situ</h4>
+                    <p><strong>Densidade Úmida:</strong> ${densidadeUmida.toFixed(3)} g/cm³</p>
+                    <p><strong>Densidade Seca:</strong> ${densidadeSeca.toFixed(3)} g/cm³</p>
+                    <p><strong>Status:</strong> ${status}</p>
+                    <p><strong>Norma:</strong> NBR 9813</p>
+                </div>
+            `;
+        }
+
+        function calcularDensidadeReal() {
+            const massaPic = parseFloat(document.getElementById('massa-picnometro').value);
+            const massaPicSolo = parseFloat(document.getElementById('massa-pic-solo').value);
+            const massaPicSoloAgua = parseFloat(document.getElementById('massa-pic-solo-agua').value);
+            const temp = parseFloat(document.getElementById('temperatura').value);
+
+            if (!massaPic || !massaPicSolo || !massaPicSoloAgua || !temp) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            const massaSolo = massaPicSolo - massaPic;
+            const densidadeAgua = 1.0 - (temp - 20) * 0.0002;
+            const volumeSolo = massaSolo - (massaPicSoloAgua - massaPicSolo) / densidadeAgua;
+            const densidadeReal = massaSolo / volumeSolo * densidadeAgua;
+
+            document.getElementById('resultado-real').innerHTML = `
+                <div class="result">
+                    <h4>Resultados - Densidade Real</h4>
+                    <p><strong>Massa do Solo:</strong> ${massaSolo.toFixed(2)} g</p>
+                    <p><strong>Densidade Real:</strong> ${densidadeReal.toFixed(3)} g/cm³</p>
+                    <p><strong>Temperatura:</strong> ${temp}°C</p>
+                    <p><strong>Método:</strong> Picnômetro</p>
+                </div>
+            `;
+        }
+
+        function calcularMaxMin() {
+            const massaSolto = parseFloat(document.getElementById('massa-solto').value);
+            const volumeSolto = parseFloat(document.getElementById('volume-solto').value);
+            const massaCompacto = parseFloat(document.getElementById('massa-compacto').value);
+            const volumeCompacto = parseFloat(document.getElementById('volume-compacto').value);
+
+            if (!massaSolto || !volumeSolto || !massaCompacto || !volumeCompacto) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            const densidadeMin = massaSolto / volumeSolto;
+            const densidadeMax = massaCompacto / volumeCompacto;
+            const densidadeReal = 2.65; // Valor típico
+            
+            const emaxIndex = (densidadeReal / densidadeMin) - 1;
+            const eminIndex = (densidadeReal / densidadeMax) - 1;
+
+            document.getElementById('resultado-max-min').innerHTML = `
+                <div class="result">
+                    <h4>Resultados - Densidade Máx/Mín</h4>
+                    <p><strong>Densidade Mínima:</strong> ${densidadeMin.toFixed(3)} g/cm³</p>
+                    <p><strong>Densidade Máxima:</strong> ${densidadeMax.toFixed(3)} g/cm³</p>
+                    <p><strong>Índice de Vazios Máximo:</strong> ${emaxIndex.toFixed(3)}</p>
+                    <p><strong>Índice de Vazios Mínimo:</strong> ${eminIndex.toFixed(3)}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
