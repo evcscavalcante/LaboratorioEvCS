@@ -278,6 +278,34 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         ))}
       </nav>
 
+      {/* User Info */}
+      <div className="absolute bottom-16 left-0 right-0 p-4 border-t border-gray-200">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm">
+            <User className="h-4 w-4 text-gray-600" />
+            <div>
+              <div className="font-medium text-gray-700">{user?.name || 'Usuário'}</div>
+              <div className="text-xs text-gray-500">
+                {userRole === 'ADMIN' && 'Administrador'}
+                {userRole === 'MANAGER' && 'Gerente'}
+                {userRole === 'SUPERVISOR' && 'Supervisor'}
+                {userRole === 'TECHNICIAN' && 'Técnico'}
+                {userRole === 'VIEWER' && 'Visualizador'}
+              </div>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sair
+          </Button>
+        </div>
+      </div>
+
       {/* Footer */}
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
         <div className="text-xs text-gray-500 text-center">
