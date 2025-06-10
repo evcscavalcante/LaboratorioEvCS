@@ -62,7 +62,7 @@ class HybridStorage {
     
     if (index === -1) return undefined;
     
-    tests[index] = { ...tests[index], ...updates, updatedAt: new Date().toISOString() };
+    tests[index] = { ...tests[index], ...updates };
     localStorage.setItem('labevcs_densityInSituTests', JSON.stringify(tests));
     
     return tests[index];
@@ -88,7 +88,7 @@ class HybridStorage {
     
     if (index === -1) return undefined;
     
-    tests[index] = { ...tests[index], ...updates, updatedAt: new Date().toISOString() };
+    tests[index] = { ...tests[index], ...updates };
     localStorage.setItem('labevcs_realDensityTests', JSON.stringify(tests));
     
     return tests[index];
@@ -114,7 +114,7 @@ class HybridStorage {
     
     if (index === -1) return undefined;
     
-    tests[index] = { ...tests[index], ...updates, updatedAt: new Date().toISOString() };
+    tests[index] = { ...tests[index], ...updates };
     localStorage.setItem('labevcs_maxMinDensityTests', JSON.stringify(tests));
     
     return tests[index];
