@@ -270,7 +270,11 @@
     </div>
 
     <script>
-        // Configuração Firebase com suas credenciais corretas
+        // Sistema de autenticação local enquanto Firebase é configurado
+        let auth = null;
+        let firebaseReady = false;
+        
+        // Tentar inicializar Firebase se disponível
         const firebaseConfig = {
             apiKey: "AIzaSyBQJvF9QGvHJ_Wf9vL8sKpXqRnMjEtGsDs",
             authDomain: "laboratorio-evcs.firebaseapp.com", 
@@ -281,18 +285,27 @@
             measurementId: "G-R8M9D9H8XB"
         };
 
-        // Inicialização Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            firebaseReady = true;
+        } catch (error) {
+            console.log('Firebase não disponível, usando autenticação local');
+            firebaseReady = false;
+        }
 
-        // Sistema de autenticação Google
+        // Sistema de autenticação híbrido (Firebase + Local)
         document.getElementById('login-google-btn').addEventListener('click', () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
-                .catch((error) => {
-                    console.log('Login error:', error.code, error.message);
-                    alert('Erro no login: ' + error.message);
-                });
+            if (firebaseReady) {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider)
+                    .catch((error) => {
+                        console.log('Login error:', error.code, error.message);
+                        alert('Serviço indisponível. Precisa configurar API key válida do Firebase.');
+                    });
+            } else {
+                alert('Serviço Google indisponível. Use Email/Senha ou Modo Demonstração.');
+            }
         });
 
         document.getElementById('login-email-btn').addEventListener('click', () => {
@@ -309,6 +322,9 @@
             document.getElementById('email-form').classList.add('hidden');
         });
 
+        // Sistema de autenticação local para email/senha
+        let localUsers = JSON.parse(localStorage.getItem('labUsers') || '{}');
+
         document.getElementById('signin-btn').addEventListener('click', () => {
             const email = document.getElementById('email-input').value;
             const password = document.getElementById('password-input').value;
@@ -318,10 +334,15 @@
                 return;
             }
 
-            auth.signInWithEmailAndPassword(email, password)
-                .catch((error) => {
-                    alert('Erro no login: ' + error.message);
-                });
+            if (firebaseReady) {
+                auth.signInWithEmailAndPassword(email, password)
+                    .catch((error) => {
+                        // Fallback para autenticação local
+                        localSignIn(email, password);
+                    });
+            } else {
+                localSignIn(email, password);
+            }
         });
 
         document.getElementById('signup-btn').addEventListener('click', () => {
@@ -338,22 +359,49 @@
                 return;
             }
 
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    alert('Conta criada com sucesso!');
-                })
-                .catch((error) => {
-                    alert('Erro ao criar conta: ' + error.message);
-                });
+            if (firebaseReady) {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => {
+                        alert('Conta criada com sucesso!');
+                    })
+                    .catch((error) => {
+                        // Fallback para criação local
+                        localSignUp(email, password);
+                    });
+            } else {
+                localSignUp(email, password);
+            }
         });
 
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            // Se estiver em modo demo, simplesmente volta para tela de login
-            if (document.getElementById('user-name').textContent.includes('Demo')) {
-                hideCalculators();
+        function localSignIn(email, password) {
+            if (localUsers[email] && localUsers[email].password === password) {
+                showCalculators(email);
+                alert('Login local realizado com sucesso!');
             } else {
-                // Se estiver logado com Firebase, faz logout
+                alert('Email ou senha incorretos');
+            }
+        }
+
+        function localSignUp(email, password) {
+            if (localUsers[email]) {
+                alert('Email já cadastrado');
+                return;
+            }
+            
+            localUsers[email] = { password, created: new Date().toISOString() };
+            localStorage.setItem('labUsers', JSON.stringify(localUsers));
+            showCalculators(email);
+            alert('Conta criada localmente com sucesso!');
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            if (document.getElementById('user-name').textContent.includes('Demo') || 
+                document.getElementById('user-name').textContent.includes('@')) {
+                hideCalculators();
+            } else if (firebaseReady) {
                 auth.signOut();
+            } else {
+                hideCalculators();
             }
         });
 
