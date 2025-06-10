@@ -423,7 +423,7 @@
 
         auth.onAuthStateChanged((user) => {
             if (user) {
-                showCalculators(user.displayName || user.email || 'Usuário Logado');
+                window.location.href = '/';
             } else {
                 hideCalculators();
             }
