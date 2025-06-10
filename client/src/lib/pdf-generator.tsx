@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
-import { generateDensityInSituPDFFinal } from './pdf-density-final';
+// Removed pdf-density-final import
 
 // Estilos profissionais para relatórios técnicos
 const styles = StyleSheet.create({
