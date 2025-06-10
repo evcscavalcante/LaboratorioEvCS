@@ -1471,9 +1471,215 @@ const DensityInSituDocumentNew: React.FC<{ data: any; calculations: any }> = ({ 
   </Document>
 );
 
+// Componente para Densidade In Situ - Modelo Padrão
+const DensityInSituStandardDocument: React.FC<{ data: any; calculations: any }> = ({ data, calculations }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Laboratório Ev.C.S</Text>
+        <Text style={styles.subtitle}>Relatório de Densidade In Situ</Text>
+        <Text style={styles.description}>Determinação da Compacidade Relativa - ABNT NBR 9813</Text>
+        <Text style={styles.description}>Data de geração: {new Date().toLocaleDateString('pt-BR')}</Text>
+      </View>
+
+      {/* Informações Gerais */}
+      <InfoTable data={data} />
+
+      {/* Determinações */}
+      <Text style={styles.sectionTitle}>Determinações In Situ</Text>
+      <View style={styles.table}>
+        <View style={styles.tableRow}>
+          <View style={styles.tableColHeader}>
+            <Text style={styles.tableCellHeader}>Determinação</Text>
+          </View>
+          <View style={styles.tableColHeader}>
+            <Text style={styles.tableCellHeader}>Nº Cilindro</Text>
+          </View>
+          <View style={styles.tableColHeader}>
+            <Text style={styles.tableCellHeader}>Molde + Solo (g)</Text>
+          </View>
+          <View style={styles.tableColHeader}>
+            <Text style={styles.tableCellHeader}>Molde (g)</Text>
+          </View>
+          <View style={styles.tableColHeader}>
+            <Text style={styles.tableCellHeader}>Volume (cm³)</Text>
+          </View>
+          <View style={styles.tableColHeader}>
+            <Text style={styles.tableCellHeader}>γd (g/cm³)</Text>
+          </View>
+        </View>
+        <View style={styles.tableRow}>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>1 (Topo)</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{data.det1?.cylinderNumber || '-'}</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{data.det1?.moldeSolo || '-'}</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{data.det1?.molde || '-'}</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{data.det1?.volume || '-'}</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{calculations?.gammaDTop?.toFixed(3) || '-'}</Text>
+          </View>
+        </View>
+        <View style={styles.tableRow}>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>2 (Base)</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{data.det2?.cylinderNumber || '-'}</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{data.det2?.moldeSolo || '-'}</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{data.det2?.molde || '-'}</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{data.det2?.volume || '-'}</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>{calculations?.gammaDBase?.toFixed(3) || '-'}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Umidade Topo */}
+      <MoistureTable 
+        title="Umidade - Topo (%)"
+        data1={data.moistureTop1}
+        data2={data.moistureTop2}
+        data3={data.moistureTop3}
+        calculations={calculations}
+        isBase={false}
+      />
+
+      {/* Umidade Base */}
+      <MoistureTable 
+        title="Umidade - Base (%)"
+        data1={data.moistureBase1}
+        data2={data.moistureBase2}
+        data3={data.moistureBase3}
+        calculations={calculations}
+        isBase={true}
+      />
+
+      {/* Resultados */}
+      <View style={styles.resultSection}>
+        <Text style={styles.resultTitle}>Resultados Calculados</Text>
+        
+        <View style={styles.table}>
+          <View style={styles.tableRow}>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCellHeader}>Parâmetro</Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCellHeader}>Topo</Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCellHeader}>Base</Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCellHeader}>Média</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCellLeft}>Densidade Seca (g/cm³)</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{calculations?.gammaDTop?.toFixed(3) || '-'}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{calculations?.gammaDBase?.toFixed(3) || '-'}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{((calculations?.gammaDTop + calculations?.gammaDBase) / 2)?.toFixed(3) || '-'}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCellLeft}>Índice de Vazios</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{calculations?.voidIndexTop?.toFixed(3) || '-'}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{calculations?.voidIndexBase?.toFixed(3) || '-'}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{calculations?.voidIndex?.toFixed(3) || '-'}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCellLeft}>Compacidade Relativa (%)</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{(calculations?.relativeCompactnessTop * 100)?.toFixed(1) || '-'}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{(calculations?.relativeCompactnessBase * 100)?.toFixed(1) || '-'}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{(calculations?.relativeCompactness * 100)?.toFixed(1) || '-'}</Text>
+            </View>
+          </View>
+        </View>
+
+        <Text style={styles.resultText}>
+          Status do Ensaio: <Text style={[styles.resultValue, { 
+            color: calculations?.results?.status === 'APROVADO' ? '#4CAF50' : 
+                   calculations?.results?.status === 'REPROVADO' ? '#F44336' : '#FF9800' 
+          }]}>
+            {calculations?.results?.status || 'AGUARDANDO'}
+          </Text>
+        </Text>
+
+        <Text style={styles.resultText}>
+          Referências: γdmáx = {data.maxMinDensityRef || '-'} | γs = {data.realDensityRef || '-'}
+        </Text>
+      </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Relatório gerado automaticamente pelo Sistema Laboratório Ev.C.S
+        </Text>
+        <Text style={styles.footerText}>
+          Baseado nas normas ABNT NBR 9813:2016
+        </Text>
+      </View>
+    </Page>
+  </Document>
+);
+
 // Funções de exportação
 export async function generateDensityInSituPDF(data: any, calculations: any): Promise<void> {
-  return generateDensityInSituPDFFinal(data, calculations);
+  try {
+    const pdfDocument = <DensityInSituStandardDocument data={data} calculations={calculations} />;
+    const asPdf = pdf(pdfDocument);
+    const blob = await asPdf.toBlob();
+    
+    const url = URL.createObjectURL(blob);
+    const link = globalThis.document.createElement('a');
+    link.href = url;
+    link.download = `densidade-in-situ-${data.registrationNumber || 'relatorio'}.pdf`;
+    globalThis.document.body.appendChild(link);
+    link.click();
+    globalThis.document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Erro ao gerar PDF:', error);
+    throw error;
+  }
 }
 
 export async function generateRealDensityPDF(data: any, calculations: any): Promise<void> {
