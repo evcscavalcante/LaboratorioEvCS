@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
-// Removed pdf-density-final import
+import { generateDensityInSituPDFFinal } from './pdf-density-final';
 
 // Estilos profissionais para relatórios técnicos
 const styles = StyleSheet.create({
@@ -1473,17 +1473,7 @@ const DensityInSituDocumentNew: React.FC<{ data: any; calculations: any }> = ({ 
 
 // Funções de exportação
 export async function generateDensityInSituPDF(data: any, calculations: any): Promise<void> {
-  const doc = <DensityInSituDocument data={data} calculations={calculations} />;
-
-  const blob = await pdf(doc).toBlob();
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `densidade-in-situ-${data.registrationNumber || 'teste'}.pdf`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  return generateDensityInSituPDFFinal(data, calculations);
 }
 
 export async function generateRealDensityPDF(data: any, calculations: any): Promise<void> {
