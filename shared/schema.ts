@@ -16,18 +16,29 @@ export const organizations = pgTable("organizations", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: json("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  }
+);
+
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  firebaseUid: varchar("firebase_uid", { length: 255 }).unique(),
-  email: varchar("email", { length: 255 }).unique().notNull(),
-  name: varchar("name", { length: 255 }).notNull(),
-  role: varchar("role", { length: 50 }).notNull().default("technician"), // admin, manager, supervisor, technician, viewer
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  role: varchar("role", { length: 50 }).notNull().default("TECHNICIAN"),
   organizationId: integer("organization_id").references(() => organizations.id),
-  permissions: json("permissions"), // JSON object with specific permissions
+  permissions: json("permissions"),
   active: boolean("active").default(true),
   lastLogin: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const userSessions = pgTable("user_sessions", {
