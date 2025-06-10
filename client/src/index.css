@@ -44,36 +44,33 @@
   /* Mobile-specific improvements */
   @media (max-width: 768px) {
     .calculator-input {
-      @apply min-h-[48px] text-lg px-2;
+      @apply min-h-[52px] text-lg;
     }
     
     .calculator-number-input {
-      @apply min-h-[48px] text-lg px-2;
+      @apply min-h-[52px] text-lg;
     }
     
     .laboratory-page input {
-      @apply min-h-[48px] text-lg px-2;
-      font-size: 16px !important;
+      @apply min-h-[52px] text-lg;
     }
     
     .laboratory-page input[type="number"] {
-      @apply text-lg font-mono text-center px-1;
-      font-size: 18px !important;
+      @apply text-lg font-mono text-center;
     }
     
-    /* Compact table cells for mobile */
+    /* Table cells for mobile */
     .mobile-table-cell {
-      @apply p-1;
+      @apply p-2;
     }
     
     .mobile-table-cell input {
-      @apply w-full min-h-[48px] text-center text-lg font-medium px-1;
-      font-size: 18px !important;
+      @apply w-full min-h-[52px] text-center text-lg font-medium;
     }
     
-    /* Compact table improvements for mobile */
+    /* Table improvements for mobile */
     .mobile-responsive-table {
-      @apply block overflow-x-auto;
+      @apply block overflow-x-auto whitespace-nowrap;
     }
     
     .mobile-responsive-table table {
@@ -82,135 +79,22 @@
     
     .mobile-responsive-table th,
     .mobile-responsive-table td {
-      @apply px-1 py-1;
+      @apply px-2 py-3;
     }
     
-    .table-compact th,
-    .table-compact td {
-      @apply p-1 text-xs;
-    }
-    
-    .table-compact th {
-      @apply text-xs font-medium;
-    }
-    
-    /* Compact mobile layout */
+    /* Additional mobile input improvements */
     .laboratory-page label {
-      @apply text-sm font-semibold mb-1;
+      @apply text-base font-semibold mb-2;
     }
     
+    /* Mobile button improvements */
     .laboratory-page button {
-      @apply min-h-[44px] px-3 text-sm;
+      @apply min-h-[48px] px-6 text-base;
     }
     
-    /* Reduced card spacing for mobile */
+    /* Card spacing for mobile */
     .laboratory-page .grid {
-      @apply gap-3;
-    }
-    
-    /* Compact card content */
-    .laboratory-page .space-y-6 {
-      @apply space-y-3;
-    }
-    
-    /* Reduce container padding */
-    .laboratory-page {
-      @apply px-2;
-    }
-    
-    /* Compact card padding */
-    .laboratory-page [class*="CardContent"] {
-      @apply p-2;
-    }
-    
-    .laboratory-page [class*="CardHeader"] {
-      @apply p-2 pb-1;
-    }
-    
-    /* Apply mobile-responsive-table to all tables */
-    .laboratory-page table {
-      @apply border-collapse;
-    }
-    
-    .laboratory-page th,
-    .laboratory-page td {
-      @apply px-1 py-1 text-sm;
-    }
-    
-    .laboratory-page th {
-      @apply text-xs font-medium;
-    }
-    
-    /* Compact all inputs in tables */
-    .laboratory-page table td input {
-      @apply text-xs min-h-[44px] px-1;
-    }
-    
-    .laboratory-page table td input[type="number"] {
-      @apply font-mono text-center text-xs;
-    }
-  }
-  
-  /* Extra small mobile screens */
-  @media (max-width: 480px) {
-    .laboratory-page input {
-      @apply min-h-[48px] text-base px-1;
-      font-size: 16px !important;
-    }
-    
-    .laboratory-page input[type="number"] {
-      font-size: 16px !important;
-      @apply px-0;
-    }
-    
-    .mobile-table-cell {
-      @apply p-0;
-    }
-    
-    .mobile-table-cell input {
-      @apply min-h-[48px] text-base px-0;
-      font-size: 16px !important;
-    }
-    
-    .laboratory-page th,
-    .laboratory-page td {
-      @apply px-0 py-0.5 text-xs;
-    }
-    
-    .laboratory-page th {
-      @apply text-xs font-medium;
-    }
-    
-    /* Maximum space utilization */
-    .laboratory-page {
-      @apply px-1;
-    }
-    
-    .laboratory-page .grid {
-      @apply gap-1;
-    }
-    
-    .laboratory-page .space-y-6 {
-      @apply space-y-1;
-    }
-    
-    .laboratory-page [class*="CardContent"] {
-      @apply p-1;
-    }
-    
-    .laboratory-page [class*="CardHeader"] {
-      @apply p-1 pb-0;
-    }
-    
-    /* Ultra compact inputs for moisture tables */
-    .laboratory-page table td input {
-      @apply text-xs min-h-[40px] px-0;
-      font-size: 14px !important;
-    }
-    
-    .laboratory-page table td input[type="number"] {
-      @apply font-mono text-center;
-      font-size: 14px !important;
+      @apply gap-6;
     }
   }
 }
