@@ -1,64 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Shield, Beaker, User, Lock } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Shield, Beaker, AlertTriangle } from "lucide-react";
+import { signInWithGoogle, auth } from "@/lib/firebase";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
-  const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [, setLocation] = useLocation();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation('/');
+    }
+  }, [isAuthenticated, setLocation]);
+
+  const handleGoogleLogin = async () => {
     try {
-      if (credentials.username && credentials.password) {
-        let userRole = "TECHNICIAN"; // Default role
-        
-        // Check custom users first
-        const customUsers = JSON.parse(localStorage.getItem('custom_users') || '{}');
-        const customUser = customUsers[credentials.username.toLowerCase()];
-        
-        if (customUser && customUser.password === credentials.password) {
-          userRole = customUser.role;
-        }
-        // Strict admin credentials - exact match required
-        else if (credentials.username === "admin" && credentials.password === "admin123@Lab2025!") {
-          userRole = "ADMIN";
-        } else if (credentials.username === "administrador" && credentials.password === "admin123@Lab2025!") {
-          userRole = "ADMIN";
-        } else if (credentials.username === "manager" && credentials.password === "manager123@Lab2025!") {
-          userRole = "MANAGER";
-        } else if (credentials.username === "gerente" && credentials.password === "manager123@Lab2025!") {
-          userRole = "MANAGER";
-        } else if (credentials.username === "supervisor" && credentials.password === "super123@Lab2025!") {
-          userRole = "SUPERVISOR";
-        } else if (credentials.username === "viewer" && credentials.password === "view123@Lab2025!") {
-          userRole = "VIEWER";
-        } else if (credentials.username === "visualizador" && credentials.password === "view123@Lab2025!") {
-          userRole = "VIEWER";
-        } else if (credentials.password === "demo123") {
-          // Technician access only for demo password
-          userRole = "TECHNICIAN";
-        } else {
-          // Invalid credentials
-          alert("Credenciais inválidas. Verifique o usuário e senha.");
-          setIsLoading(false);
-          return;
-        }
-        
-        localStorage.setItem("auth_token", "authenticated");
-        localStorage.setItem("user_role", userRole);
-        localStorage.setItem("user_name", credentials.username);
-        
-        window.location.reload();
-      }
-    } finally {
+      setIsLoading(true);
+      setError("");
+      await signInWithGoogle();
+    } catch (error: any) {
+      console.error("Login error:", error);
+      setError("Erro durante o login. Verifique sua conexão e tente novamente.");
       setIsLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Verificando autenticação...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
