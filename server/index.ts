@@ -7,6 +7,10 @@ const server = createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Mercado Pago Configuration
+const MERCADO_PAGO_ACCESS_TOKEN = 'APP_USR-7d9c3772-5ece-433a-bd1b-2aa3e69c1863';
+const MERCADO_PAGO_PUBLIC_KEY = 'APP_USR-49306117834096-061114-3b017dc53c5db61ee27eb900797c610e-130749701';
+
 const mockAuth = (req: any, res: any, next: any) => {
   req.user = { claims: { sub: "admin" } };
   req.isAuthenticated = () => true;
@@ -244,50 +248,165 @@ app.post('/api/payment/process', mockAuth, (req, res) => {
   res.json(payment);
 });
 
-app.post('/api/payment/pix', mockAuth, (req, res) => {
+app.post('/api/payment/pix', mockAuth, async (req, res) => {
   const { amount } = req.body;
   
-  const pixPayment = {
-    id: Date.now().toString(),
-    amount: parseFloat(amount),
-    pixCode: `00020126580014BR.GOV.BCB.PIX0136${Date.now()}520400005303986540${amount.toFixed(2)}5802BR5925LABORATORIO EVCS LTDA6009SAO PAULO62070503***6304${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
-    qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQR42mNkYPhfz0AAAAAXMMS0GAQAAAAAvD_BwAAAABJRU5ErkJggg==',
-    expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
-    status: 'PENDING'
-  };
-  
-  res.json(pixPayment);
+  try {
+    const paymentData = {
+      transaction_amount: parseFloat(amount),
+      description: 'Assinatura Laboratório Ev.C.S',
+      payment_method_id: 'pix',
+      payer: {
+        email: req.user?.email || 'customer@example.com',
+        first_name: 'Cliente',
+        last_name: 'Laboratório'
+      }
+    };
+
+    const response = await fetch('https://api.mercadopago.com/v1/payments', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MERCADO_PAGO_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(paymentData)
+    });
+
+    const payment = await response.json();
+
+    if (response.ok) {
+      res.json({
+        id: payment.id,
+        amount: payment.transaction_amount,
+        pixCode: payment.point_of_interaction?.transaction_data?.qr_code,
+        qrCodeBase64: payment.point_of_interaction?.transaction_data?.qr_code_base64,
+        expiresAt: payment.date_of_expiration,
+        status: payment.status,
+        mercadoPagoId: payment.id
+      });
+    } else {
+      console.error('Mercado Pago Error:', payment);
+      res.status(400).json({ error: 'Erro ao criar pagamento PIX', details: payment });
+    }
+  } catch (error) {
+    console.error('PIX Payment Error:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
 });
 
-app.post('/api/payment/credit-card', mockAuth, (req, res) => {
+app.post('/api/payment/credit-card', mockAuth, async (req, res) => {
   const { amount, cardData } = req.body;
   
-  // Mock credit card processing
-  const payment = {
-    id: Date.now().toString(),
-    amount: parseFloat(amount),
-    method: 'CREDIT_CARD',
-    status: Math.random() > 0.1 ? 'APPROVED' : 'DECLINED',
-    transactionId: 'TXN' + Date.now(),
-    installments: cardData.installments || 1
-  };
-  
-  res.json(payment);
+  try {
+    const paymentData = {
+      transaction_amount: parseFloat(amount),
+      token: cardData.token, // Token gerado no frontend
+      description: 'Assinatura Laboratório Ev.C.S',
+      installments: cardData.installments || 1,
+      payment_method_id: cardData.payment_method_id,
+      issuer_id: cardData.issuer_id,
+      payer: {
+        email: req.user?.email || 'customer@example.com',
+        identification: {
+          type: cardData.identification?.type || 'CPF',
+          number: cardData.identification?.number || '12345678901'
+        }
+      }
+    };
+
+    const response = await fetch('https://api.mercadopago.com/v1/payments', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MERCADO_PAGO_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(paymentData)
+    });
+
+    const payment = await response.json();
+
+    if (response.ok) {
+      res.json({
+        id: payment.id,
+        amount: payment.transaction_amount,
+        method: 'CREDIT_CARD',
+        status: payment.status,
+        transactionId: payment.id,
+        installments: payment.installments,
+        mercadoPagoId: payment.id,
+        statusDetail: payment.status_detail
+      });
+    } else {
+      console.error('Mercado Pago Credit Card Error:', payment);
+      res.status(400).json({ error: 'Erro ao processar cartão de crédito', details: payment });
+    }
+  } catch (error) {
+    console.error('Credit Card Payment Error:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
 });
 
-app.post('/api/payment/boleto', mockAuth, (req, res) => {
-  const { amount } = req.body;
-  
-  const boleto = {
-    id: Date.now().toString(),
-    amount: parseFloat(amount),
-    barcode: '03399999999999999999999999999999999999999999',
-    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-    boletoUrl: '/api/payment/boleto/' + Date.now(),
-    status: 'PENDING'
-  };
-  
-  res.json(boleto);
+// Endpoint para obter chave pública do Mercado Pago
+app.get('/api/payment/config', (req, res) => {
+  res.json({
+    mercadoPagoPublicKey: MERCADO_PAGO_PUBLIC_KEY,
+    environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
+  });
+});
+
+// Webhook para receber notificações do Mercado Pago
+app.post('/api/webhooks/mercadopago', express.raw({type: 'application/json'}), async (req, res) => {
+  try {
+    const notification = req.body;
+    console.log('Mercado Pago Webhook received:', notification);
+
+    if (notification.type === 'payment') {
+      const paymentId = notification.data.id;
+      
+      // Buscar dados do pagamento no Mercado Pago
+      const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        headers: {
+          'Authorization': `Bearer ${MERCADO_PAGO_ACCESS_TOKEN}`
+        }
+      });
+      
+      const paymentData = await response.json();
+      console.log('Payment status update:', paymentData.status);
+      
+      // Aqui você pode atualizar o status da assinatura no banco de dados
+      // baseado no status do pagamento (approved, pending, rejected, etc.)
+    }
+    
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(500).json({ error: 'Webhook processing failed' });
+  }
+});
+
+// Endpoint para verificar status de pagamento
+app.get('/api/payment/status/:paymentId', mockAuth, async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+    
+    const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+      headers: {
+        'Authorization': `Bearer ${MERCADO_PAGO_ACCESS_TOKEN}`
+      }
+    });
+    
+    const payment = await response.json();
+    
+    res.json({
+      id: payment.id,
+      status: payment.status,
+      statusDetail: payment.status_detail,
+      amount: payment.transaction_amount
+    });
+  } catch (error) {
+    console.error('Payment status check error:', error);
+    res.status(500).json({ error: 'Erro ao verificar status do pagamento' });
+  }
 });
 
 app.get("/health", (req, res) => {
@@ -346,6 +465,49 @@ app.get('*', (req, res) => {
         .module-btn:disabled { background: #9ca3af; cursor: not-allowed; }
         .welcome { text-align: center; margin-bottom: 40px; }
         .status-badge { display: inline-block; background: #d1fae5; color: #065f46; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; }
+        
+        /* Subscription Styles */
+        .subscription-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .plan-card { background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 24px; transition: all 0.2s; position: relative; }
+        .plan-card:hover { border-color: #3b82f6; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15); }
+        .plan-card.current-plan { border-color: #10b981; background: #f0fdf4; }
+        .plan-card h3 { font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 8px; }
+        .plan-price { font-size: 32px; font-weight: bold; color: #3b82f6; margin-bottom: 8px; }
+        .plan-price span { font-size: 16px; color: #6b7280; }
+        .plan-description { color: #6b7280; margin-bottom: 20px; }
+        .plan-features { list-style: none; margin-bottom: 24px; }
+        .plan-features li { padding: 4px 0; color: #374151; }
+        .plan-btn { width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .plan-btn:hover:not(:disabled) { background: #2563eb; }
+        .plan-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        /* Payment Modal */
+        .payment-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .payment-modal-content { background: white; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .billing-cycle-section, .payment-method-section { margin: 20px 0; }
+        .billing-cycle-section h4, .payment-method-section h4 { margin-bottom: 12px; color: #1f2937; }
+        .billing-cycle-section select { width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; }
+        .payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .payment-method-btn { padding: 16px 12px; border: 2px solid #e5e7eb; background: white; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .payment-method-btn:hover { border-color: #3b82f6; }
+        .payment-method-btn.selected { border-color: #3b82f6; background: #eff6ff; }
+        .price-summary { background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0; }
+        .price-line { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .price-line.total { font-weight: bold; border-top: 1px solid #e5e7eb; padding-top: 8px; }
+        .price-line.discount { color: #059669; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .cancel-btn, .confirm-btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .cancel-btn { background: #f3f4f6; color: #374151; }
+        .confirm-btn { background: #3b82f6; color: white; }
+        .confirm-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        /* Card Form */
+        .card-form { margin: 20px 0; }
+        .form-row { display: flex; gap: 12px; margin-bottom: 16px; }
+        .form-group { flex: 1; }
+        .form-group label { display: block; margin-bottom: 4px; font-size: 14px; color: #374151; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -757,7 +919,111 @@ app.get('*', (req, res) => {
             });
             
             event.target.classList.add('selected');
+            
+            // Remove any existing card form
+            const existingForm = document.getElementById('card-form-container');
+            if (existingForm) {
+                existingForm.remove();
+            }
+            
+            if (method === 'credit_card') {
+                showCardForm();
+            } else {
+                document.getElementById('process-payment-btn').disabled = false;
+            }
+        }
+        
+        async function showCardForm() {
+            // Carregar configuração do Mercado Pago
+            const configResponse = await fetch('/api/payment/config');
+            const config = await configResponse.json();
+            
+            const cardFormHTML = \`
+                <div id="card-form-container" class="card-form">
+                    <h4>Dados do Cartão</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="card-number">Número do Cartão</label>
+                            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="card-holder">Nome no Cartão</label>
+                            <input type="text" id="card-holder" placeholder="Nome como está no cartão">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="card-expiry">Vencimento</label>
+                            <input type="text" id="card-expiry" placeholder="MM/AA" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="card-cvv">CVV</label>
+                            <input type="text" id="card-cvv" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="card-installments">Parcelas</label>
+                            <select id="card-installments">
+                                <option value="1">1x sem juros</option>
+                                <option value="2">2x sem juros</option>
+                                <option value="3">3x sem juros</option>
+                                <option value="6">6x sem juros</option>
+                                <option value="12">12x sem juros</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="card-cpf">CPF do Portador</label>
+                            <input type="text" id="card-cpf" placeholder="000.000.000-00" maxlength="14">
+                        </div>
+                    </div>
+                </div>
+            \`;
+            
+            document.querySelector('.payment-method-section').insertAdjacentHTML('afterend', cardFormHTML);
+            
+            // Adicionar máscaras aos campos
+            addCardMasks();
+            
+            // Habilitar botão após preencher campos obrigatórios
             document.getElementById('process-payment-btn').disabled = false;
+        }
+        
+        function addCardMasks() {
+            // Máscara para número do cartão
+            document.getElementById('card-number').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+                const matches = value.match(/.{1,4}/g);
+                const match = matches && matches.join(' ');
+                e.target.value = match || '';
+            });
+            
+            // Máscara para data de vencimento
+            document.getElementById('card-expiry').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                e.target.value = value;
+            });
+            
+            // Máscara para CVV (apenas números)
+            document.getElementById('card-cvv').addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            });
+            
+            // Máscara para CPF
+            document.getElementById('card-cpf').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            });
         }
         
         function updatePriceBreakdown() {
@@ -784,30 +1050,101 @@ app.get('*', (req, res) => {
             
             const finalPrice = selectedPlan.basePrice * (1 - discount / 100);
             
+            document.getElementById('process-payment-btn').disabled = true;
+            document.getElementById('process-payment-btn').textContent = 'Processando...';
+            
             try {
-                const response = await fetch('/api/payment/process', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: finalPrice,
-                        method: selectedPaymentMethod,
-                        planId: selectedPlan.id,
-                        cycleId: cycleSelect.value
-                    })
-                });
-                
-                const payment = await response.json();
-                
                 if (selectedPaymentMethod === 'pix') {
-                    showPixPayment(payment);
+                    await processPixPayment(finalPrice);
+                } else if (selectedPaymentMethod === 'credit_card') {
+                    await processCreditCardPayment(finalPrice);
                 } else if (selectedPaymentMethod === 'boleto') {
-                    showBoletoPayment(payment);
-                } else {
-                    showCardPayment(payment);
+                    await processBoletoPayment(finalPrice);
                 }
-                
             } catch (error) {
                 alert('Erro ao processar pagamento: ' + error.message);
+                document.getElementById('process-payment-btn').disabled = false;
+                document.getElementById('process-payment-btn').textContent = 'Processar Pagamento';
+            }
+        }
+        
+        async function processPixPayment(amount) {
+            const response = await fetch('/api/payment/pix', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount })
+            });
+            
+            const payment = await response.json();
+            
+            if (response.ok) {
+                showPixPayment(payment);
+            } else {
+                throw new Error(payment.error || 'Erro ao gerar PIX');
+            }
+        }
+        
+        async function processCreditCardPayment(amount) {
+            // Coletar dados do cartão
+            const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+            const cardHolder = document.getElementById('card-holder').value;
+            const cardExpiry = document.getElementById('card-expiry').value;
+            const cardCvv = document.getElementById('card-cvv').value;
+            const installments = document.getElementById('card-installments').value;
+            const cpf = document.getElementById('card-cpf').value.replace(/\D/g, '');
+            
+            // Validar campos obrigatórios
+            if (!cardNumber || !cardHolder || !cardExpiry || !cardCvv || !cpf) {
+                throw new Error('Preencha todos os campos do cartão');
+            }
+            
+            const [expMonth, expYear] = cardExpiry.split('/');
+            
+            // Para integração real com Mercado Pago, você precisaria:
+            // 1. Carregar o SDK do Mercado Pago
+            // 2. Criar um token do cartão no frontend
+            // 3. Enviar apenas o token para o backend
+            
+            // Por agora, vou simular a criação do token
+            const cardData = {
+                token: 'fake_token_' + Date.now(), // Em produção, usar SDK do MP
+                payment_method_id: 'visa', // Detectar automaticamente
+                issuer_id: '25',
+                installments: parseInt(installments),
+                identification: {
+                    type: 'CPF',
+                    number: cpf
+                }
+            };
+            
+            const response = await fetch('/api/payment/credit-card', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount, cardData })
+            });
+            
+            const payment = await response.json();
+            
+            if (response.ok) {
+                showCardPayment(payment);
+            } else {
+                throw new Error(payment.error || 'Erro ao processar cartão');
+            }
+        }
+        
+        async function processBoletoPayment(amount) {
+            const response = await fetch('/api/payment/boleto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount })
+            });
+            
+            const payment = await response.json();
+            
+            if (response.ok) {
+                showBoletoPayment(payment);
+            } else {
+                throw new Error(payment.error || 'Erro ao gerar boleto');
             }
         }
         
@@ -816,19 +1153,42 @@ app.get('*', (req, res) => {
                 <div class="payment-modal-content">
                     <h3>Pagamento via PIX</h3>
                     <div style="text-align: center; padding: 20px;">
-                        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                            <h4>Código PIX:</h4>
-                            <div style="font-family: monospace; font-size: 12px; word-break: break-all; background: white; padding: 10px; border-radius: 4px;">
-                                \${payment.pixCode || 'PIX123456789ABCDEF'}
+                        \${payment.qrCodeBase64 ? \`
+                            <div style="margin: 20px 0;">
+                                <img src="data:image/png;base64,\${payment.qrCodeBase64}" 
+                                     alt="QR Code PIX" style="max-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px;">
                             </div>
-                            <button class="module-btn" onclick="navigator.clipboard.writeText('\${payment.pixCode || 'PIX123456789ABCDEF'}')">
-                                Copiar Código PIX
-                            </button>
+                        \` : ''}
+                        
+                        \${payment.pixCode ? \`
+                            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4>Código PIX:</h4>
+                                <div style="font-family: monospace; font-size: 12px; word-break: break-all; background: white; padding: 10px; border-radius: 4px;">
+                                    \${payment.pixCode}
+                                </div>
+                                <button class="module-btn" onclick="navigator.clipboard.writeText('\${payment.pixCode}'); alert('Código PIX copiado!')">
+                                    Copiar Código PIX
+                                </button>
+                            </div>
+                        \` : ''}
+                        
+                        <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin: 20px 0;">
+                            <p><strong>Valor:</strong> R$ \${payment.amount.toFixed(2).replace('.', ',')}</p>
+                            <p><strong>ID do Pagamento:</strong> \${payment.mercadoPagoId || payment.id}</p>
+                            <p><strong>Status:</strong> <span style="color: #d97706;">Aguardando Pagamento</span></p>
+                            \${payment.expiresAt ? \`<p><strong>Expira em:</strong> \${new Date(payment.expiresAt).toLocaleString('pt-BR')}</p>\` : ''}
                         </div>
-                        <p>Valor: <strong>R$ \${payment.amount.toFixed(2).replace('.', ',')}</strong></p>
-                        <p>Status: <span style="color: #d97706;">Aguardando Pagamento</span></p>
+                        
+                        <div style="background: #fef3c7; padding: 12px; border-radius: 6px; font-size: 14px; color: #92400e;">
+                            💡 Após o pagamento, a confirmação pode levar alguns minutos para aparecer.
+                        </div>
                     </div>
-                    <button class="module-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="cancel-btn" onclick="checkPaymentStatus('\${payment.mercadoPagoId || payment.id}')">
+                            Verificar Status
+                        </button>
+                        <button class="confirm-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>
+                    </div>
                 </div>
             \`;
         }
@@ -871,6 +1231,46 @@ app.get('*', (req, res) => {
             document.getElementById('payment-modal').style.display = 'none';
             selectedPlan = null;
             selectedPaymentMethod = null;
+        }
+        
+        async function checkPaymentStatus(paymentId) {
+            try {
+                const response = await fetch('/api/payment/status/' + paymentId);
+                const payment = await response.json();
+                
+                if (response.ok) {
+                    let statusText = 'Aguardando Pagamento';
+                    let statusColor = '#d97706';
+                    
+                    switch(payment.status) {
+                        case 'approved':
+                            statusText = 'Pagamento Aprovado';
+                            statusColor = '#059669';
+                            break;
+                        case 'pending':
+                            statusText = 'Aguardando Pagamento';
+                            statusColor = '#d97706';
+                            break;
+                        case 'rejected':
+                            statusText = 'Pagamento Rejeitado';
+                            statusColor = '#dc2626';
+                            break;
+                    }
+                    
+                    alert('Status do Pagamento: ' + statusText + '\\nID: ' + payment.id);
+                    
+                    if (payment.status === 'approved') {
+                        setTimeout(() => {
+                            closePaymentModal();
+                            loadSubscriptionPage();
+                        }, 2000);
+                    }
+                } else {
+                    alert('Erro ao verificar status do pagamento');
+                }
+            } catch (error) {
+                alert('Erro ao consultar pagamento: ' + error.message);
+            }
         }
         
         // Add event listener for billing cycle changes
