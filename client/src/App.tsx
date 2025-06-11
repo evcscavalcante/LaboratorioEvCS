@@ -10,6 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import Laboratory from "@/pages/laboratory";
 import Analytics from "@/pages/analytics";
 import SecureLogin from "@/pages/secure-login";
+import SubscriptionPage from "@/pages/subscription";
 import DensidadeInSituPage from "@/pages/solos/densidade-in-situ";
 import DensidadeRealPage from "@/pages/solos/densidade-real";
 import DensidadeMaxMinPage from "@/pages/solos/densidade-max-min";
@@ -44,6 +45,7 @@ function Router() {
         <Route path="/" component={Dashboard} />
         <Route path="/laboratory" component={Laboratory} />
         <Route path="/analytics" component={Analytics} />
+        <Route path="/subscription" component={SubscriptionPage} />
         <Route path="/solos/densidade-in-situ" component={DensidadeInSituPage} />
         <Route path="/solos/densidade-real" component={DensidadeRealPage} />
         <Route path="/solos/densidade-max-min" component={DensidadeMaxMinPage} />

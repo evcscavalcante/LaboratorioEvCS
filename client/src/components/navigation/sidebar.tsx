@@ -21,7 +21,8 @@ import {
   Book,
   UserCog,
   LogOut,
-  User
+  User,
+  CreditCard
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -77,6 +78,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       icon: BarChart3,
       href: '/analytics',
       active: location === '/analytics'
+    },
+    {
+      label: 'Assinatura',
+      icon: CreditCard,
+      href: '/subscription',
+      active: location === '/subscription'
     },
     {
       label: 'Solos',
