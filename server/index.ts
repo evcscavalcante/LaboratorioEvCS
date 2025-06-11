@@ -1,21 +1,9 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { createServer } from "http";
+import express from "express";
 import path from "path";
 import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-  console.log(`${formattedTime} [${source}] ${message}`);
-}
 
 const app = express();
 app.use(express.json());
@@ -208,80 +196,19 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  const server = createServer(app);
+// Serve static files
+const clientPath = path.join(__dirname, '../client');
+app.use(express.static(clientPath));
 
-  // Error handling middleware
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  const port = 5000;
-
-  // Setup Vite in development mode for proper frontend serving
-  if (process.env.NODE_ENV === "development") {
-    try {
-      const vite = await createViteServer({
-        server: { middlewareMode: true },
-        appType: 'custom',
-        root: path.join(__dirname, '../'),
-        configFile: path.join(__dirname, '../vite.config.ts'),
-      });
-
-      app.use(vite.middlewares);
-
-      // Handle SPA routing - serve index.html for non-API routes
-      app.use('*', async (req, res, next) => {
-        if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/health')) {
-          return next();
-        }
-
-        try {
-          const url = req.originalUrl;
-          const indexPath = path.join(__dirname, '../client/index.html');
-          let template = await import('fs').then(fs => fs.promises.readFile(indexPath, 'utf-8'));
-          const html = await vite.transformIndexHtml(url, template);
-          res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
-        } catch (e) {
-          vite.ssrFixStacktrace(e as Error);
-          next(e);
-        }
-      });
-    } catch (error) {
-      console.error('Failed to setup Vite:', error);
-      // Fallback to simple static serving if Vite fails
-      const clientPath = path.join(__dirname, '../client');
-      app.use(express.static(clientPath));
-      app.get('*', (req, res) => {
-        if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-          res.sendFile(path.join(clientPath, 'index.html'));
-        }
-      });
-    }
-  } else {
-    // Production mode - serve built files
-    const distPath = path.join(__dirname, '../dist/public');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-        res.sendFile(path.join(distPath, 'index.html'));
-      }
-    });
+// SPA routing
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(clientPath, 'index.html'));
   }
+});
 
-  server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
-    console.log(`Server is ready and listening on port ${port}`);
-    console.log(`Frontend available at http://localhost:${port}`);
-  });
-
-  // Handle server errors
-  server.on('error', (err) => {
-    console.error('Server error:', err);
-    process.exit(1);
-  });
-})();
+const port = 5000;
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+  console.log(`Health check: http://localhost:${port}/health`);
+});
