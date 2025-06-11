@@ -213,5 +213,12 @@ app.use((req, res, next) => {
   const port = 5000;
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
+    console.log(`Server is ready and listening on port ${port}`);
+  });
+
+  // Handle server errors
+  server.on('error', (err) => {
+    console.error('Server error:', err);
+    process.exit(1);
   });
 })();
