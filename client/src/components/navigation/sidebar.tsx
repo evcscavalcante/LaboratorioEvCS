@@ -113,6 +113,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       ]
     },
     {
+      label: 'Verificação de Balança',
+      icon: Scale,
+      href: '/balanca-verificacao',
+      active: location === '/balanca-verificacao'
+    },
+    {
       label: 'Asfalto',
       icon: Car,
       expandable: true,

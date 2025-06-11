@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Balança - Portaria INMETRO 157/2022</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .result-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .result-approved {
+            border-left-color: #27ae60;
+            background: linear-gradient(135deg, #d5f4e6 0%, #fafffe 100%);
+        }
+
+        .result-rejected {
+            border-left-color: #e74c3c;
+            background: linear-gradient(135deg, #fadbd8 0%, #fafffe 100%);
+        }
+
+        .result-status {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .status-approved {
+            color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        .status-rejected {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .calculation-details {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .explanation {
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .explanation h3 {
+            color: #2c3e50;
+            margin: 15px 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .explanation ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .explanation li {
+            margin-bottom: 5px;
+        }
+
+        .table-reference {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .table-reference table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .table-reference th,
+        .table-reference td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .table-reference th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .form-section,
+            .result-section {
+                padding: 20px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-box {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #0c5460;
+        }
+
+        .info-box h4 {
+            margin-bottom: 10px;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Verificação de Balança</h1>
+            <p>Portaria INMETRO nº 157/2022 - Tabela 5: Erros Máximos Admissíveis</p>
+        </div>
+
+        <div class="content">
+            <div class="form-section">
+                <h2>📊 Dados da Verificação</h2>
+
+                <div class="form-group">
+                    <label for="classExatidao">Classe de Exatidão da Balança:</label>
+                    <select id="classExatidao" required>
+                        <option value="">Selecione a classe</option>
+                        <option value="I">Classe I (Especial)</option>
+                        <option value="II">Classe II (Fina)</option>
+                        <option value="III">Classe III (Média)</option>
+                        <option value="IIII">Classe IIII (Ordinária)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="divisaoVerificacao">Divisão de Verificação (e) em gramas:</label>
+                    <input type="number" id="divisaoVerificacao" step="0.001" min="0.001" placeholder="Ex: 1, 0.1, 0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoAvaliacao">Tipo de Avaliação:</label>
+                    <select id="tipoAvaliacao" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="aprovacao">Aprovação de Modelo</option>
+                        <option value="verificacao">Verificação</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="pesoPadrao">Peso Padrão (kg):</label>
+                    <input type="number" id="pesoPadrao" step="0.001" min="0" placeholder="Ex: 9.900" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="resultadoMedicao">Resultado da Medição (kg):</label>
+                    <input type="number" id="resultadoMedicao" step="0.001" min="0" placeholder="Ex: 9.905" required>
+                </div>
+
+                <button class="calculate-btn" onclick="calcularConformidade()">
+                    🔍 Verificar Conformidade
+                </button>
+
+                <div class="info-box">
+                    <h4>ℹ️ Informações Importantes:</h4>
+                    <ul>
+                        <li><strong>Divisão de Verificação (e):</strong> Menor graduação confiável para fins metrológicos</li>
+                        <li><strong>Classe I:</strong> Alta precisão (laboratórios, pesquisa)</li>
+                        <li><strong>Classe II:</strong> Precisão elevada (farmácias, joalherias)</li>
+                        <li><strong>Classe III:</strong> Uso geral (comércio, indústria)</li>
+                        <li><strong>Classe IIII:</strong> Menor precisão (materiais de construção)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h2>📋 Resultado da Verificação</h2>
+
+                <div id="resultadoContainer" class="hidden">
+                    <div id="resultadoCard" class="result-card">
+                        <div id="statusResultado" class="result-status"></div>
+
+                        <div class="calculation-details">
+                            <div id="detalhesCalculo"></div>
+                        </div>
+
+                        <div class="explanation">
+                            <div id="explicacaoDetalhada"></div>
+                        </div>
+
+                        <div class="table-reference">
+                            <h4>📊 Referência da Tabela 5 - Portaria INMETRO 157/2022</h4>
+                            <div id="tabelaReferencia"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mensagemInicial" class="info-box">
+                    <h4>👆 Preencha os dados acima</h4>
+                    <p>Insira todos os dados necessários no formulário ao lado e clique em "Verificar Conformidade" para obter o resultado da análise baseada na Tabela 5 da Portaria INMETRO nº 157/2022.</p>
+                </div>
+            </div>
+        </div>
+        <h3> Desenvolvido por Evandro Cavalcante Souza</h3>
+    </div>
+
+    <script>
+        // Tabela 5 da Portaria INMETRO 157/2022
+        const tabela5 = {
+            'I': {
+                faixas: [
+                    { min: 0, max: 50000, aprovacao: 0.5, verificacao: 1.0 },
+                    { min: 50000, max: 200000, aprovacao: 1.0, verificacao: 2.0 },
+                    { min: 200000, max: Infinity, aprovacao: 1.5, verificacao: 2.0 }
+                ]
+            },
+            'II': {
+                faixas: [
+                    { min: 0, max: 5000, aprovacao: 0.5, verificacao: 1.0 },
+                    { min: 5000, max: 20000, aprovacao: 1.0, verificacao: 2.0 },
+                    { min: 20000, max: 100000, aprovacao: 1.5, verificacao: 2.0 }
+                ]
+            },
+            'III': {
+                faixas: [
+                    { min: 0, max: 500, aprovacao: 0.5, verificacao: 1.0 },
+                    { min: 500, max: 2000, aprovacao: 1.0, verificacao: 2.0 },
+                    { min: 2000, max: 10000, aprovacao: 1.5, verificacao: 2.0 }
+                ]
+            },
+            'IIII': {
+                faixas: [
+                    { min: 0, max: 50, aprovacao: 0.5, verificacao: 1.0 },
+                    { min: 50, max: 200, aprovacao: 1.0, verificacao: 2.0 },
+                    { min: 200, max: 1000, aprovacao: 1.5, verificacao: 2.0 }
+                ]
+            }
+        };
+
+        function calcularConformidade() {
+            // Obter valores dos campos
+            const classe = document.getElementById('classExatidao').value;
+            const e = parseFloat(document.getElementById('divisaoVerificacao').value);
+            const tipoAvaliacao = document.getElementById('tipoAvaliacao').value;
+            const pesoPadrao = parseFloat(document.getElementById('pesoPadrao').value);
+            const resultadoMedicao = parseFloat(document.getElementById('resultadoMedicao').value);
+
+            // Validar campos
+            if (!classe || !e || !tipoAvaliacao || !pesoPadrao || !resultadoMedicao) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            // Converter para gramas
+            const pesoPadraoGramas = pesoPadrao * 1000;
+            const resultadoMedicaoGramas = resultadoMedicao * 1000;
+
+            // Calcular erro
+            const erro = resultadoMedicaoGramas - pesoPadraoGramas;
+
+            // Calcular carga em múltiplos de e
+            const cargaEmE = pesoPadraoGramas / e;
+
+            // Encontrar faixa aplicável
+            const faixasClasse = tabela5[classe].faixas;
+            let faixaAplicavel = null;
+            
+            for (let faixa of faixasClasse) {
+                if (cargaEmE > faixa.min && cargaEmE <= faixa.max) {
+                    faixaAplicavel = faixa;
+                    break;
+                }
+            }
+
+            if (!faixaAplicavel) {
+                alert('Carga fora das faixas especificadas na Tabela 5.');
+                return;
+            }
+
+            // Obter EMA aplicável
+            const emaMultiplicador = tipoAvaliacao === 'aprovacao' ? faixaAplicavel.aprovacao : faixaAplicavel.verificacao;
+            const emaGramas = emaMultiplicador * e;
+
+            // Verificar conformidade
+            const conforme = Math.abs(erro) <= emaGramas;
+
+            // Exibir resultado
+            exibirResultado(conforme, erro, emaGramas, emaMultiplicador, e, classe, tipoAvaliacao, cargaEmE, faixaAplicavel, pesoPadraoGramas, resultadoMedicaoGramas);
+        }
+
+        function exibirResultado(conforme, erro, emaGramas, emaMultiplicador, e, classe, tipoAvaliacao, cargaEmE, faixaAplicavel, pesoPadraoGramas, resultadoMedicaoGramas) {
+            // Ocultar mensagem inicial e mostrar resultado
+            document.getElementById('mensagemInicial').classList.add('hidden');
+            document.getElementById('resultadoContainer').classList.remove('hidden');
+
+            // Configurar card de resultado
+            const resultadoCard = document.getElementById('resultadoCard');
+            const statusResultado = document.getElementById('statusResultado');
+            
+            if (conforme) {
+                resultadoCard.className = 'result-card result-approved';
+                statusResultado.className = 'result-status status-approved';
+                statusResultado.innerHTML = '✅ BALANÇA APROVADA';
+            } else {
+                resultadoCard.className = 'result-card result-rejected';
+                statusResultado.className = 'result-status status-rejected';
+                statusResultado.innerHTML = '❌ BALANÇA REPROVADA';
+            }
+
+            // Detalhes do cálculo
+            const detalhesCalculo = document.getElementById('detalhesCalculo');
+            detalhesCalculo.innerHTML = `
+                <strong>📊 Cálculos Realizados:</strong><br>
+                • Peso Padrão: ${pesoPadraoGramas.toFixed(3)} g<br>
+                • Resultado da Medição: ${resultadoMedicaoGramas.toFixed(3)} g<br>
+                • Erro Calculado: ${erro > 0 ? '+' : ''}${erro.toFixed(3)} g<br>
+                • Carga em múltiplos de 'e': ${cargaEmE.toFixed(1)}e<br>
+                • EMA Aplicável: ±${emaMultiplicador}e = ±${emaGramas.toFixed(3)} g
+            `;
+
+            // Explicação detalhada
+            const explicacaoDetalhada = document.getElementById('explicacaoDetalhada');
+            
+            let explicacao = `
+                <h3>🔍 Análise Detalhada:</h3>
+                <p><strong>Classe de Exatidão:</strong> ${classe} (${getClasseDescricao(classe)})</p>
+                <p><strong>Divisão de Verificação (e):</strong> ${e} g</p>
+                <p><strong>Tipo de Avaliação:</strong> ${tipoAvaliacao === 'aprovacao' ? 'Aprovação de Modelo' : 'Verificação'}</p>
+                
+                <h3>📏 Determinação da Faixa de Carga:</h3>
+                <p>A carga de <span class="highlight">${cargaEmE.toFixed(1)}e</span> se enquadra na faixa:</p>
+                <p><strong>${faixaAplicavel.min}e < m ≤ ${faixaAplicavel.max === Infinity ? '∞' : faixaAplicavel.max}e</strong></p>
+                
+                <h3>⚖️ Erro Máximo Admissível (EMA):</h3>
+                <p>Para a Classe ${classe}, na faixa identificada, o EMA para ${tipoAvaliacao === 'aprovacao' ? 'aprovação de modelo' : 'verificação'} é:</p>
+                <p><strong>±${emaMultiplicador}e = ±${emaGramas.toFixed(3)} g</strong></p>
+                
+                <h3>✅ Resultado da Verificação:</h3>
+            `;
+
+            if (conforme) {
+                explicacao += `
+                    <p style="color: #27ae60; font-weight: bold;">✅ BALANÇA APROVADA</p>
+                    <p><strong>Motivo da Aprovação:</strong></p>
+                    <ul>
+                        <li>O erro medido de <strong>${erro > 0 ? '+' : ''}${erro.toFixed(3)} g</strong> está dentro do limite permitido de <strong>±${emaGramas.toFixed(3)} g</strong></li>
+                        <li>A balança atende aos requisitos da Tabela 5 da Portaria INMETRO nº 157/2022</li>
+                        <li>O instrumento está adequado para uso legal nas aplicações para as quais foi projetado</li>
+                        <li>A precisão está em conformidade com a classe de exatidão ${classe}</li>
+                    </ul>
+                    
+                    <div class="info-box" style="background: #d5f4e6; border-color: #27ae60; color: #155724;">
+                        <h4>✅ Recomendações:</h4>
+                        <ul>
+                            <li>Mantenha a calibração em dia</li>
+                            <li>Realize verificações periódicas</li>
+                            <li>Proteja o instrumento de condições adversas</li>
+                            <li>Documente os resultados da verificação</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                const excessoErro = Math.abs(erro) - emaGramas;
+                explicacao += `
+                    <p style="color: #e74c3c; font-weight: bold;">❌ BALANÇA REPROVADA</p>
+                    <p><strong>Motivo da Reprovação:</strong></p>
+                    <ul>
+                        <li>O erro medido de <strong>${erro > 0 ? '+' : ''}${erro.toFixed(3)} g</strong> excede o limite permitido de <strong>±${emaGramas.toFixed(3)} g</strong></li>
+                        <li>Excesso de erro: <strong>${excessoErro.toFixed(3)} g</strong> acima do limite</li>
+                        <li>A balança NÃO atende aos requisitos da Tabela 5 da Portaria INMETRO nº 157/2022</li>
+                        <li>O instrumento NÃO está adequado para uso legal</li>
+                    </ul>
+                    
+                    <div class="info-box" style="background: #fadbd8; border-color: #e74c3c; color: #721c24;">
+                        <h4>⚠️ Ações Necessárias:</h4>
+                        <ul>
+                            <li><strong>Imediata:</strong> Suspender o uso da balança para fins legais</li>
+                            <li><strong>Calibração:</strong> Procurar um laboratório acreditado para ajuste</li>
+                            <li><strong>Manutenção:</strong> Verificar se há problemas mecânicos ou eletrônicos</li>
+                            <li><strong>Reavaliação:</strong> Realizar nova verificação após os ajustes</li>
+                            <li><strong>Documentação:</strong> Registrar a não conformidade</li>
+                        </ul>
+                    </div>
+                `;
+            }
+
+            explicacaoDetalhada.innerHTML = explicacao;
+
+            // Tabela de referência
+            const tabelaReferencia = document.getElementById('tabelaReferencia');
+            tabelaReferencia.innerHTML = gerarTabelaReferencia(classe);
+        }
+
+        function getClasseDescricao(classe) {
+            const descricoes = {
+                'I': 'Especial - Alta precisão',
+                'II': 'Fina - Precisão elevada',
+                'III': 'Média - Uso geral',
+                'IIII': 'Ordinária - Menor precisão'
+            };
+            return descricoes[classe] || '';
+        }
+
+        function gerarTabelaReferencia(classeAtual) {
+            const faixas = tabela5[classeAtual].faixas;
+            
+            let tabela = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Faixa de Carga (m)</th>
+                            <th>Aprovação de Modelo</th>
+                            <th>Verificação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            faixas.forEach(faixa => {
+                const faixaTexto = faixa.max === Infinity ? 
+                    `${faixa.min}e < m` : 
+                    `${faixa.min}e < m ≤ ${faixa.max}e`;
+                
+                tabela += `
+                    <tr>
+                        <td>${faixaTexto}</td>
+                        <td>±${faixa.aprovacao}e</td>
+                        <td>±${faixa.verificacao}e</td>
+                    </tr>
+                `;
+            });
+            
+            tabela += `
+                    </tbody>
+                </table>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                    <strong>Classe ${classeAtual}</strong> - Valores expressos em múltiplos da divisão de verificação (e)
+                </p>
+            `;
+            
+            return tabela;
+        }
+
+        // Adicionar eventos para limpar resultado quando campos mudarem
+        document.addEventListener('DOMContentLoaded', function() {
+            const campos = ['classExatidao', 'divisaoVerificacao', 'tipoAvaliacao', 'pesoPadrao', 'resultadoMedicao'];
+            
+            campos.forEach(campo => {
+                document.getElementById(campo).addEventListener('input', function() {
+                    document.getElementById('resultadoContainer').classList.add('hidden');
+                    document.getElementById('mensagemInicial').classList.remove('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
