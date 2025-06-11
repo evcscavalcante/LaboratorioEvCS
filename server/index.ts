@@ -413,7 +413,11 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Serve simple HTML without complex React dependencies
+// Setup Vite for development
+import { setupVite } from "./vite";
+setupVite(app, server);
+
+// Fallback for SPA routing
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
     res.send(`<!DOCTYPE html>
