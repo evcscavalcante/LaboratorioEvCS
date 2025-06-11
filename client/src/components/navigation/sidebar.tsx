@@ -119,6 +119,18 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       active: location === '/balanca-verificacao'
     },
     {
+      label: 'Relatórios',
+      icon: FileText,
+      href: '/relatorios',
+      active: location === '/relatorios'
+    },
+    {
+      label: 'Configurações',
+      icon: Settings,
+      href: '/configuracoes',
+      active: location === '/configuracoes'
+    },
+    {
       label: 'Asfalto',
       icon: Car,
       expandable: true,
