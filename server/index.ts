@@ -166,6 +166,159 @@ app.post("/api/max-min-density", mockAuth, async (req, res) => {
 });
 
 // Health check endpoint - must be before other routes
+// Payment system routes
+app.get('/api/subscription/plans', async (req, res) => {
+  const plans = [
+    {
+      id: '1',
+      name: 'Básico',
+      description: 'Ideal para laboratórios pequenos',
+      basePrice: '800.00',
+      maxUsers: 3,
+      maxEnsaios: 100,
+      features: ['Ensaios básicos', 'Relatórios padrão', 'Suporte por email'],
+      active: true
+    },
+    {
+      id: '2', 
+      name: 'Profissional',
+      description: 'Para laboratórios médios',
+      basePrice: '1500.00',
+      maxUsers: 10,
+      maxEnsaios: 500,
+      features: ['Todos os ensaios', 'Relatórios avançados', 'Analytics', 'Suporte prioritário'],
+      active: true
+    },
+    {
+      id: '3',
+      name: 'Enterprise', 
+      description: 'Para grandes laboratórios',
+      basePrice: '2500.00',
+      maxUsers: null,
+      maxEnsaios: null,
+      features: ['Funcionalidades completas', 'API access', 'Suporte 24/7', 'Customizações'],
+      active: true
+    }
+  ];
+  res.json(plans);
+});
+
+app.get('/api/subscription/cycles', async (req, res) => {
+  const cycles = [
+    { id: '1', name: 'Mensal', months: 1, discountPercent: '0', active: true },
+    { id: '2', name: 'Semestral', months: 6, discountPercent: '10', active: true },
+    { id: '3', name: 'Anual', months: 12, discountPercent: '20', active: true }
+  ];
+  res.json(cycles);
+});
+
+app.post('/api/subscription/calculate-price', async (req, res) => {
+  const { basePrice, cycleDiscountPercent, additionalUsers } = req.body;
+  const userCost = (additionalUsers || 0) * 200;
+  const subtotal = basePrice + userCost;
+  const discount = subtotal * ((cycleDiscountPercent || 0) / 100);
+  const finalPrice = subtotal - discount;
+  
+  res.json({ basePrice, userCost, subtotal, discount, finalPrice });
+});
+
+app.get('/api/subscription/current', async (req, res) => {
+  // Mock current subscription
+  const subscription = {
+    id: '1',
+    status: 'active',
+    planId: '2',
+    cycleId: '1',
+    currentPeriodStart: new Date(),
+    currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  };
+  res.json(subscription);
+});
+
+app.post('/api/subscription/create', async (req, res) => {
+  const { planId, cycleId, trialDays } = req.body;
+  const subscription = {
+    id: `sub_${Date.now()}`,
+    planId,
+    cycleId,
+    status: trialDays ? 'trialing' : 'active',
+    currentPeriodStart: new Date(),
+    currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    trialEnd: trialDays ? new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000) : null,
+    createdAt: new Date()
+  };
+  res.json(subscription);
+});
+
+app.post('/api/payment/invoices', async (req, res) => {
+  const { subscriptionId, amount, description } = req.body;
+  const invoice = {
+    id: `inv_${Date.now()}`,
+    subscriptionId,
+    amount: amount.toString(),
+    total: (amount * 1.05).toString(), // 5% tax
+    status: 'open',
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    invoiceNumber: `INV-${Date.now()}`,
+    description: description || 'Assinatura do sistema',
+    createdAt: new Date()
+  };
+  res.json(invoice);
+});
+
+app.post('/api/payment/pix', async (req, res) => {
+  const { invoiceId, customerData } = req.body;
+  const pixCode = `00020126580014br.gov.bcb.pix0136${customerData.email}520400005303986540${Math.random() * 1000}5802BR5925LABORATORIO EVCS LTDA6009SAO PAULO62070503***6304`;
+  
+  res.json({
+    success: true,
+    transactionId: `pix_${Date.now()}`,
+    pixQrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+    pixCopyPaste: pixCode,
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000)
+  });
+});
+
+app.post('/api/payment/boleto', async (req, res) => {
+  const { invoiceId, customerData } = req.body;
+  
+  res.json({
+    success: true,
+    transactionId: `boleto_${Date.now()}`,
+    boletoUrl: `https://pagseguro.uol.com.br/checkout/boleto/print.html?code=mock_${Date.now()}`,
+    boletoBarcode: `23791234567890123456789012345678901234567890`,
+    expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+  });
+});
+
+app.get('/api/payment/methods', async (req, res) => {
+  res.json([]);
+});
+
+app.get('/api/payment/invoices', async (req, res) => {
+  const invoices = [
+    {
+      id: '1',
+      invoiceNumber: 'INV-12345',
+      amount: '1500.00',
+      status: 'paid',
+      dueDate: new Date('2025-01-15'),
+      paidAt: new Date('2025-01-10'),
+      description: 'Janeiro 2025 - Plano Profissional'
+    },
+    {
+      id: '2', 
+      invoiceNumber: 'INV-12344',
+      amount: '1500.00',
+      status: 'paid',
+      dueDate: new Date('2024-12-15'),
+      paidAt: new Date('2024-12-10'),
+      description: 'Dezembro 2024 - Plano Profissional'
+    }
+  ];
+  res.json(invoices);
+});
+
 app.get("/health", (req, res) => {
   res.status(200).json({ 
     status: "ok", 
