@@ -363,9 +363,17 @@ export type InsertDensityInSituTest = z.infer<typeof insertDensityInSituTestSche
 export type InsertRealDensityTest = z.infer<typeof insertRealDensityTestSchema>;
 export type InsertMaxMinDensityTest = z.infer<typeof insertMaxMinDensityTestSchema>;
 
+export type InsertCapsula = z.infer<typeof insertCapsulaSchema>;
+export type InsertCilindro = z.infer<typeof insertCilindroSchema>;
+export type InsertConferenciaEquipamento = z.infer<typeof insertConferenciaEquipamentoSchema>;
+
 export type DensityInSituTest = typeof densityInSituTests.$inferSelect;
 export type RealDensityTest = typeof realDensityTests.$inferSelect;
 export type MaxMinDensityTest = typeof maxMinDensityTests.$inferSelect;
+
+export type Capsula = typeof capsulas.$inferSelect;
+export type Cilindro = typeof cilindros.$inferSelect;
+export type ConferenciaEquipamento = typeof conferenciaEquipamentos.$inferSelect;
 
 // User role definitions
 export const USER_ROLES = {

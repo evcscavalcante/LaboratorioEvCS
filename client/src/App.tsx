@@ -18,6 +18,7 @@ import BalancaVerificacao from "@/pages/balanca-verificacao";
 import Configuracoes from "@/pages/configuracoes";
 import Relatorios from "@/pages/relatorios";
 import Dashboard from "@/pages/dashboard";
+import EquipamentosGestao from "@/pages/equipamentos-gestao";
 import AdminDashboard from "@/pages/admin/dashboard";
 import UserManagement from "@/pages/admin/user-management";
 import UserRoles from "@/pages/admin/user-roles";
