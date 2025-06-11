@@ -67,13 +67,19 @@ app.get('/api/density-in-situ', mockAuth, (req, res) => {
 });
 
 app.post('/api/density-in-situ', mockAuth, (req, res) => {
+  console.log('Salvando ensaio de densidade in situ:', req.body);
   const ensaio = {
     id: Date.now(),
     ...req.body,
+    userId: req.user.claims.sub,
     createdAt: new Date(),
     updatedAt: new Date()
   };
-  res.status(201).json(ensaio);
+  res.status(201).json({ 
+    success: true, 
+    message: 'Ensaio de densidade in situ salvo com sucesso',
+    data: ensaio 
+  });
 });
 
 app.get('/api/real-density', mockAuth, (req, res) => {
@@ -81,13 +87,19 @@ app.get('/api/real-density', mockAuth, (req, res) => {
 });
 
 app.post('/api/real-density', mockAuth, (req, res) => {
+  console.log('Salvando ensaio de densidade real:', req.body);
   const ensaio = {
     id: Date.now(),
     ...req.body,
+    userId: req.user.claims.sub,
     createdAt: new Date(),
     updatedAt: new Date()
   };
-  res.status(201).json(ensaio);
+  res.status(201).json({ 
+    success: true, 
+    message: 'Ensaio de densidade real salvo com sucesso',
+    data: ensaio 
+  });
 });
 
 app.get('/api/max-min-density', mockAuth, (req, res) => {
@@ -95,13 +107,19 @@ app.get('/api/max-min-density', mockAuth, (req, res) => {
 });
 
 app.post('/api/max-min-density', mockAuth, (req, res) => {
+  console.log('Salvando ensaio de densidade máx/mín:', req.body);
   const ensaio = {
     id: Date.now(),
     ...req.body,
+    userId: req.user.claims.sub,
     createdAt: new Date(),
     updatedAt: new Date()
   };
-  res.status(201).json(ensaio);
+  res.status(201).json({ 
+    success: true, 
+    message: 'Ensaio de densidade máx/mín salvo com sucesso',
+    data: ensaio 
+  });
 });
 
 // Rotas de Equipamentos
