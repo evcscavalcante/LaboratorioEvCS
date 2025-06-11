@@ -59,10 +59,30 @@ export class MemStorage implements IStorage {
   async createDensityInSituTest(insertTest: InsertDensityInSituTest): Promise<DensityInSituTest> {
     const id = this.currentId++;
     const test: DensityInSituTest = { 
-      ...insertTest,
       id, 
       createdAt: new Date(),
-      time: insertTest.time || null
+      date: insertTest.date,
+      registrationNumber: insertTest.registrationNumber,
+      time: insertTest.time || null,
+      operator: insertTest.operator,
+      technicalResponsible: insertTest.technicalResponsible || null,
+      verifier: insertTest.verifier || null,
+      material: insertTest.material,
+      origin: insertTest.origin || null,
+      coordinates: insertTest.coordinates || null,
+      quadrant: insertTest.quadrant || null,
+      layer: insertTest.layer || null,
+      balanceId: insertTest.balanceId || null,
+      ovenId: insertTest.ovenId || null,
+      realDensityRef: insertTest.realDensityRef || null,
+      maxMinDensityRef: insertTest.maxMinDensityRef || null,
+      userId: insertTest.userId || null,
+      createdBy: insertTest.createdBy || null,
+      updatedBy: insertTest.updatedBy || null,
+      determinations: insertTest.determinations || null,
+      moistureTop: insertTest.moistureTop || null,
+      moistureBase: insertTest.moistureBase || null,
+      results: insertTest.results || null
     };
     this.densityInSituTests.set(id, test);
     return test;
@@ -80,7 +100,7 @@ export class MemStorage implements IStorage {
     const existing = this.densityInSituTests.get(id);
     if (!existing) return undefined;
     
-    const updated = { ...existing, ...updates };
+    const updated = { ...existing, ...updates } as DensityInSituTest;
     this.densityInSituTests.set(id, updated);
     return updated;
   }
@@ -93,9 +113,19 @@ export class MemStorage implements IStorage {
   async createRealDensityTest(insertTest: InsertRealDensityTest): Promise<RealDensityTest> {
     const id = this.currentId++;
     const test: RealDensityTest = { 
-      ...insertTest, 
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      date: insertTest.date,
+      registrationNumber: insertTest.registrationNumber,
+      operator: insertTest.operator,
+      material: insertTest.material,
+      origin: insertTest.origin || null,
+      userId: insertTest.userId || null,
+      createdBy: insertTest.createdBy || null,
+      updatedBy: insertTest.updatedBy || null,
+      results: insertTest.results || null,
+      moisture: insertTest.moisture || null,
+      picnometer: insertTest.picnometer || null
     };
     this.realDensityTests.set(id, test);
     return test;
@@ -113,7 +143,7 @@ export class MemStorage implements IStorage {
     const existing = this.realDensityTests.get(id);
     if (!existing) return undefined;
     
-    const updated = { ...existing, ...updates };
+    const updated = { ...existing, ...updates } as RealDensityTest;
     this.realDensityTests.set(id, updated);
     return updated;
   }
@@ -126,9 +156,19 @@ export class MemStorage implements IStorage {
   async createMaxMinDensityTest(insertTest: InsertMaxMinDensityTest): Promise<MaxMinDensityTest> {
     const id = this.currentId++;
     const test: MaxMinDensityTest = { 
-      ...insertTest, 
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      date: insertTest.date,
+      registrationNumber: insertTest.registrationNumber,
+      operator: insertTest.operator,
+      material: insertTest.material,
+      origin: insertTest.origin || null,
+      userId: insertTest.userId || null,
+      createdBy: insertTest.createdBy || null,
+      updatedBy: insertTest.updatedBy || null,
+      results: insertTest.results || null,
+      maxDensity: insertTest.maxDensity || null,
+      minDensity: insertTest.minDensity || null
     };
     this.maxMinDensityTests.set(id, test);
     return test;
@@ -146,7 +186,7 @@ export class MemStorage implements IStorage {
     const existing = this.maxMinDensityTests.get(id);
     if (!existing) return undefined;
     
-    const updated = { ...existing, ...updates };
+    const updated = { ...existing, ...updates } as MaxMinDensityTest;
     this.maxMinDensityTests.set(id, updated);
     return updated;
   }
@@ -165,8 +205,9 @@ export class MemStorage implements IStorage {
   }
 
   async upsertUser(userData: InsertUser): Promise<User> {
+    const userId = String(Date.now());
     const user: User = {
-      id: userData.id || String(Date.now()),
+      id: userId,
       email: userData.email || null,
       firstName: userData.firstName || null,
       lastName: userData.lastName || null,
