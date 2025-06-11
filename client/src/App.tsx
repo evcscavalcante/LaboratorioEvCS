@@ -57,6 +57,7 @@ function Router() {
         <Route path="/balanca-verificacao" component={BalancaVerificacao} />
         <Route path="/configuracoes" component={Configuracoes} />
         <Route path="/relatorios" component={Relatorios} />
+        <Route path="/equipamentos" component={EquipamentosGestao} />
         <Route path="/admin" component={AdminDashboard} />
         <Route path="/admin/users" component={UserManagement} />
         <Route path="/admin/user-roles" component={UserRoles} />

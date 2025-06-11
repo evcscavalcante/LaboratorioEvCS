@@ -19,6 +19,7 @@ import {
   LucideIcon,
   HelpCircle,
   FileText,
+  Package,
   Book,
   UserCog,
   LogOut,
@@ -124,6 +125,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       icon: FileText,
       href: '/relatorios',
       active: location === '/relatorios'
+    },
+    {
+      label: 'Gestão de Equipamentos',
+      icon: Package,
+      href: '/equipamentos',
+      active: location === '/equipamentos'
     },
     {
       label: 'Configurações',

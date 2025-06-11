@@ -12,6 +12,7 @@ import { generateDensityInSituPDF } from "@/lib/pdf-generator";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { localDataManager } from "@/lib/local-storage";
 
 interface DensityInSituData {
   // General Info
@@ -58,6 +59,11 @@ interface DensityInSituData {
 
 export default function DensityInSitu() {
   const { toast } = useToast();
+  const [equipamentos, setEquipamentos] = useState<{capsulas: any[], cilindros: any[]}>({
+    capsulas: [],
+    cilindros: []
+  });
+  
   const [data, setData] = useState<DensityInSituData>({
     registrationNumber: "",
     date: new Date().toISOString().split('T')[0],
@@ -83,6 +89,78 @@ export default function DensityInSitu() {
     moistureBase2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
     moistureBase3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
   });
+
+  // Carregar equipamentos ao montar o componente
+  useEffect(() => {
+    const loadEquipamentos = async () => {
+      try {
+        const [capsulas, cilindros] = await Promise.all([
+          localDataManager.getCapsulas(),
+          localDataManager.getCilindros()
+        ]);
+        setEquipamentos({ capsulas, cilindros });
+      } catch (error) {
+        console.error('Erro ao carregar equipamentos:', error);
+      }
+    };
+
+    loadEquipamentos();
+  }, []);
+
+  // Função para buscar dados do cilindro pelo número
+  const buscarDadosCilindro = (numero: string) => {
+    const cilindro = equipamentos.cilindros.find(c => c.codigo === numero);
+    return cilindro ? { peso: cilindro.peso, volume: cilindro.volume } : null;
+  };
+
+  // Função para buscar peso da cápsula pelo número
+  const buscarPesoCapsula = (numero: string) => {
+    const capsula = equipamentos.capsulas.find(c => c.codigo === numero);
+    return capsula ? capsula.peso : null;
+  };
+
+  // Handler para mudança no número do cilindro
+  const handleCylinderNumberChange = (determination: 'det1' | 'det2', value: string) => {
+    const dadosCilindro = buscarDadosCilindro(value);
+    
+    setData(prev => ({
+      ...prev,
+      [determination]: {
+        ...prev[determination],
+        cylinderNumber: value,
+        molde: dadosCilindro ? dadosCilindro.peso : prev[determination].molde,
+        volume: dadosCilindro ? dadosCilindro.volume : prev[determination].volume
+      }
+    }));
+
+    if (dadosCilindro) {
+      toast({
+        title: "Dados preenchidos automaticamente",
+        description: `Peso: ${dadosCilindro.peso}g, Volume: ${dadosCilindro.volume}cm³`,
+      });
+    }
+  };
+
+  // Handler para mudança no número da cápsula
+  const handleCapsuleNumberChange = (field: string, value: string) => {
+    const pesoCapsula = buscarPesoCapsula(value);
+    
+    setData(prev => ({
+      ...prev,
+      [field]: {
+        ...prev[field as keyof DensityInSituData],
+        capsule: value,
+        tare: pesoCapsula || (prev[field as keyof DensityInSituData] as any).tare
+      }
+    }));
+
+    if (pesoCapsula) {
+      toast({
+        title: "Peso preenchido automaticamente",
+        description: `Peso da cápsula: ${pesoCapsula}g`,
+      });
+    }
+  };
 
   const [calculations, setCalculations] = useState({
     det1: { soil: 0, gammaNatWet: 0, gammaNatDry: 0 },

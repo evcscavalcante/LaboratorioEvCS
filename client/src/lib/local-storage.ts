@@ -406,6 +406,93 @@ class LocalDataManager {
     }
     return 0;
   }
+
+  // Métodos para gestão de cápsulas
+  async getCapsulas(): Promise<any[]> {
+    try {
+      const data = localStorage.getItem('capsulas');
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('Erro ao carregar cápsulas:', error);
+      return [];
+    }
+  }
+
+  async createCapsula(capsula: any): Promise<any> {
+    try {
+      const capsulas = await this.getCapsulas();
+      const newCapsula = {
+        ...capsula,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      capsulas.push(newCapsula);
+      localStorage.setItem('capsulas', JSON.stringify(capsulas));
+      return newCapsula;
+    } catch (error) {
+      console.error('Erro ao criar cápsula:', error);
+      throw error;
+    }
+  }
+
+  // Métodos para gestão de cilindros
+  async getCilindros(): Promise<any[]> {
+    try {
+      const data = localStorage.getItem('cilindros');
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('Erro ao carregar cilindros:', error);
+      return [];
+    }
+  }
+
+  async createCilindro(cilindro: any): Promise<any> {
+    try {
+      const cilindros = await this.getCilindros();
+      const newCilindro = {
+        ...cilindro,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      cilindros.push(newCilindro);
+      localStorage.setItem('cilindros', JSON.stringify(cilindros));
+      return newCilindro;
+    } catch (error) {
+      console.error('Erro ao criar cilindro:', error);
+      throw error;
+    }
+  }
+
+  // Métodos para conferências de equipamentos
+  async getConferenciasEquipamentos(): Promise<any[]> {
+    try {
+      const data = localStorage.getItem('conferenciasEquipamentos');
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('Erro ao carregar conferências:', error);
+      return [];
+    }
+  }
+
+  async createConferenciaEquipamento(conferencia: any): Promise<any> {
+    try {
+      const conferencias = await this.getConferenciasEquipamentos();
+      const newConferencia = {
+        ...conferencia,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      conferencias.push(newConferencia);
+      localStorage.setItem('conferenciasEquipamentos', JSON.stringify(conferencias));
+      return newConferencia;
+    } catch (error) {
+      console.error('Erro ao criar conferência:', error);
+      throw error;
+    }
+  }
 }
 
 // Singleton instance
