@@ -1,6 +1,16 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
-import { setupVite, log } from "./vite";
+import path from "path";
+
+function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
 
 const app = express();
 const server = createServer(app);
@@ -421,20 +431,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Setup Vite for development
-if (process.env.NODE_ENV === "development") {
-  setupVite(app, server).catch(console.error);
-} else {
-  // Production static file serving
-  const path = await import('path');
-  app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-      res.sendFile(path.join(process.cwd(), 'client', 'dist', 'index.html'));
-    }
-  });
-}
-
 // Error handling middleware
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = err.status || err.statusCode || 500;
@@ -444,6 +440,43 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 const port = 5000;
+
+// Serve static files in production or fallback
+if (process.env.NODE_ENV !== "development") {
+  const clientPath = path.join(process.cwd(), 'client', 'dist');
+  app.use(express.static(clientPath));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
+      res.sendFile(path.join(clientPath, 'index.html'));
+    }
+  });
+} else {
+  // Simple fallback for development
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
+      res.send(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Laboratório Ev.C.S - Sistema Geotécnico</title>
+        </head>
+        <body>
+          <div id="root">
+            <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+              <h1>🧪 Laboratório Ev.C.S</h1>
+              <p>Sistema Geotécnico - Servidor funcionando!</p>
+              <p>API disponível em: <a href="/api/auth/user">/api/auth/user</a></p>
+              <p>Health check: <a href="/health">/health</a></p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+    }
+  });
+}
 
 server.listen(port, "0.0.0.0", () => {
   console.log(`✅ Servidor rodando na porta ${port}`);
