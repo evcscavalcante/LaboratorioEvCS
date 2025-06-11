@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
+import { createViteServer } from 'vite';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -178,6 +178,7 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -211,17 +212,6 @@ app.use((req, res, next) => {
 (async () => {
   const server = createServer(app);
 
-  // Error handling middleware
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  const port = 5000;
-
   // Setup Vite in development mode for proper frontend serving
   if (process.env.NODE_ENV === "development") {
     try {
@@ -229,23 +219,34 @@ app.use((req, res, next) => {
         server: { middlewareMode: true },
         appType: 'custom',
         root: path.join(__dirname, '../'),
-        configFile: path.join(__dirname, '../vite.config.ts'),
       });
 
       app.use(vite.middlewares);
 
-      // Handle SPA routing - serve index.html for non-API routes
+      // Handle SPA routing
       app.use('*', async (req, res, next) => {
-        if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/health')) {
+        if (req.originalUrl.startsWith('/api')) {
           return next();
         }
 
         try {
           const url = req.originalUrl;
-          const indexPath = path.join(__dirname, '../client/index.html');
-          let template = await import('fs').then(fs => fs.promises.readFile(indexPath, 'utf-8'));
-          const html = await vite.transformIndexHtml(url, template);
-          res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+          const template = await vite.transformIndexHtml(url, `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratório Ev.C.S - Sistema Geotécnico</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/client/src/main.tsx"></script>
+</body>
+</html>
+          `);
+          res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
         } catch (e) {
           vite.ssrFixStacktrace(e as Error);
           next(e);
@@ -253,25 +254,19 @@ app.use((req, res, next) => {
       });
     } catch (error) {
       console.error('Failed to setup Vite:', error);
-      // Fallback to simple static serving if Vite fails
-      const clientPath = path.join(__dirname, '../client');
-      app.use(express.static(clientPath));
-      app.get('*', (req, res) => {
-        if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-          res.sendFile(path.join(clientPath, 'index.html'));
-        }
-      });
+      process.exit(1);
     }
-  } else {
-    // Production mode - serve built files
-    const distPath = path.join(__dirname, '../dist/public');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-        res.sendFile(path.join(distPath, 'index.html'));
-      }
-    });
   }
+
+  // Error handling middleware
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    console.error('Server error:', err);
+    res.status(status).json({ message });
+  });
+
+  const port = 5000;
 
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
