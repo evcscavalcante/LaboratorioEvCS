@@ -194,6 +194,8 @@ const server = app.listen(port, '0.0.0.0', () => {
   console.log(`Server listening on port ${port}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`Process ID: ${process.pid}`);
+  console.log(`Server ready to accept connections`);
 });
 
 // Handle server errors
@@ -205,11 +207,42 @@ server.on('error', (err: any) => {
   }
 });
 
-// Error handling without immediate exit
+// Keep process alive with periodic health check
+const keepAlive = setInterval(() => {
+  // Heartbeat to prevent process termination in cloud environments
+  if (server.listening) {
+    console.log(`Server still active - PID: ${process.pid} - Port: ${port}`);
+  }
+}, 60000);
+
+// Ensure server stays responsive
+server.on('connection', (socket) => {
+  socket.setTimeout(120000); // 2 minute timeout
+});
+
+// Error handling
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
+  console.error('Stack:', err.stack);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Graceful shutdown handlers
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });

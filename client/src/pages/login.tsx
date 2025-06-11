@@ -24,24 +24,23 @@ export default function Login() {
         if (customUser && customUser.password === credentials.password) {
           userRole = customUser.role;
         }
-        // Default admin credentials
-        else if ((credentials.username.toLowerCase() === "admin" || 
-            credentials.username.toLowerCase() === "administrador") &&
-            credentials.password === "admin123") {
+        // Strict admin credentials - exact match required
+        else if (credentials.username === "admin" && credentials.password === "admin123@Lab2025!") {
           userRole = "ADMIN";
-        } else if ((credentials.username.toLowerCase() === "manager" || 
-                   credentials.username.toLowerCase() === "gerente") &&
-                  credentials.password === "manager123") {
+        } else if (credentials.username === "administrador" && credentials.password === "admin123@Lab2025!") {
+          userRole = "ADMIN";
+        } else if (credentials.username === "manager" && credentials.password === "manager123@Lab2025!") {
           userRole = "MANAGER";
-        } else if (credentials.username.toLowerCase() === "supervisor" &&
-                  credentials.password === "super123") {
+        } else if (credentials.username === "gerente" && credentials.password === "manager123@Lab2025!") {
+          userRole = "MANAGER";
+        } else if (credentials.username === "supervisor" && credentials.password === "super123@Lab2025!") {
           userRole = "SUPERVISOR";
-        } else if ((credentials.username.toLowerCase() === "viewer" || 
-                   credentials.username.toLowerCase() === "visualizador") &&
-                  credentials.password === "view123") {
+        } else if (credentials.username === "viewer" && credentials.password === "view123@Lab2025!") {
+          userRole = "VIEWER";
+        } else if (credentials.username === "visualizador" && credentials.password === "view123@Lab2025!") {
           userRole = "VIEWER";
         } else if (credentials.password === "demo123") {
-          // Any other user with demo123 gets technician access
+          // Technician access only for demo password
           userRole = "TECHNICIAN";
         } else {
           // Invalid credentials
