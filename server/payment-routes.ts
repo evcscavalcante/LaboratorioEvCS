@@ -1,6 +1,6 @@
 import { Express, Request, Response } from 'express';
-import { PaymentService, DEFAULT_PLANS, DEFAULT_CYCLES } from './services/payment-service.js';
-import { PAYMENT_TYPES, PAYMENT_PROVIDERS } from '../shared/payment-schema.js';
+import { PaymentService, DEFAULT_PLANS, DEFAULT_CYCLES } from './services/payment-service';
+import { PAYMENT_TYPES, PAYMENT_PROVIDERS } from '../shared/payment-schema';
 
 export async function registerPaymentRoutes(app: Express): Promise<void> {
   // Initialize payment service with configuration

@@ -1,13 +1,12 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
 import { storage } from "./storage-simple";
 import { 
   insertDensityInSituTestSchema,
   insertRealDensityTestSchema,
   insertMaxMinDensityTestSchema
-} from "@shared/schema";
+} from "../shared/schema";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express): Promise<void> {
   
   // Density In Situ Routes
   app.get("/api/density-in-situ", async (req, res) => {
@@ -341,6 +340,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-  return httpServer;
 }

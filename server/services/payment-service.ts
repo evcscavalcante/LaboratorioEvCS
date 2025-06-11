@@ -1,4 +1,4 @@
-import { db } from '../db.js';
+import { db } from '../db';
 import { 
   subscriptionPlans, 
   billingCycles, 
@@ -11,7 +11,7 @@ import {
   PAYMENT_STATUS,
   PAYMENT_TYPES,
   PAYMENT_PROVIDERS
-} from '../../shared/payment-schema.js';
+} from '../../shared/payment-schema';
 import { eq, and, desc } from 'drizzle-orm';
 
 // Payment Providers Configuration

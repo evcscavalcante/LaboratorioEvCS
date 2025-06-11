@@ -1,81 +1,171 @@
-import express from "express";
-import path from "path";
+import express, { type Request, Response, NextFunction } from "express";
+import { createServer } from "http";
+import { setupVite, log } from "./vite";
 
 const app = express();
+const server = createServer(app);
 
-// Middleware básico
+// Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  next();
-});
-
-// Auth mock
+// Mock authentication middleware
 const mockAuth = (req: any, res: any, next: any) => {
   req.user = { claims: { sub: "admin" } };
+  req.isAuthenticated = () => true;
   next();
 };
 
-// Usuários mock
-const users = new Map([
+// Mock user data
+const mockUsers = new Map([
   ["admin", {
     id: "admin",
-    email: "admin@laboratorio-evcs.com",
+    email: "admin@laboratorio-evcs.com", 
     firstName: "Administrador",
     lastName: "Sistema",
     role: "ADMIN",
-    active: true
+    active: true,
+    organizationId: 1,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }]
 ]);
 
-// Rotas de autenticação
-app.get('/api/auth/user', mockAuth, (req: any, res) => {
-  const user = users.get(req.user.claims.sub);
-  res.json(user || null);
+// Auth routes
+app.get('/api/auth/user', mockAuth, async (req: any, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const user = mockUsers.get(userId);
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Failed to fetch user" });
+  }
 });
 
 app.post('/api/logout', (req, res) => {
   res.json({ success: true });
 });
 
-// Rotas de ensaios
-app.get("/api/density-in-situ", mockAuth, (req, res) => {
+// Users routes
+app.get("/api/users", mockAuth, async (req, res) => {
+  try {
+    const users = Array.from(mockUsers.values());
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+});
+
+app.post("/api/users", mockAuth, async (req, res) => {
+  try {
+    const userData = req.body;
+    const userId = String(Date.now());
+    const user = {
+      id: userId,
+      ...userData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    mockUsers.set(userId, user);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create user" });
+  }
+});
+
+app.patch("/api/users/:id", mockAuth, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const updates = req.body;
+    const user = mockUsers.get(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const updatedUser = { ...user, ...updates, updatedAt: new Date() };
+    mockUsers.set(userId, updatedUser);
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update user" });
+  }
+});
+
+app.delete("/api/users/:id", mockAuth, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (mockUsers.delete(userId)) {
+      res.json({ message: "User deleted successfully" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete user" });
+  }
+});
+
+// Organizations routes
+app.get("/api/organizations", async (req, res) => {
+  try {
+    const mockOrgs = [
+      { id: 1, name: "Laboratório Principal", active: true, createdAt: new Date() },
+      { id: 2, name: "Filial Norte", active: true, createdAt: new Date() }
+    ];
+    res.json(mockOrgs);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch organizations" });
+  }
+});
+
+app.get("/api/organizations/user-counts", async (req, res) => {
+  try {
+    const countsMap = { 1: 15, 2: 8 };
+    res.json(countsMap);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch user counts" });
+  }
+});
+
+// Laboratory test routes
+app.get("/api/density-in-situ", mockAuth, async (req, res) => {
   res.json([]);
 });
 
-app.post("/api/density-in-situ", mockAuth, (req, res) => {
-  const test = { id: Date.now(), ...req.body, createdAt: new Date() };
-  res.status(201).json(test);
+app.post("/api/density-in-situ", mockAuth, async (req, res) => {
+  try {
+    const testData = { id: Date.now(), ...req.body, createdAt: new Date() };
+    res.status(201).json(testData);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create test" });
+  }
 });
 
-app.get("/api/real-density", mockAuth, (req, res) => {
+app.get("/api/real-density", mockAuth, async (req, res) => {
   res.json([]);
 });
 
-app.post("/api/real-density", mockAuth, (req, res) => {
-  const test = { id: Date.now(), ...req.body, createdAt: new Date() };
-  res.status(201).json(test);
+app.post("/api/real-density", mockAuth, async (req, res) => {
+  try {
+    const testData = { id: Date.now(), ...req.body, createdAt: new Date() };
+    res.status(201).json(testData);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create test" });
+  }
 });
 
-app.get("/api/max-min-density", mockAuth, (req, res) => {
+app.get("/api/max-min-density", mockAuth, async (req, res) => {
   res.json([]);
 });
 
-app.post("/api/max-min-density", mockAuth, (req, res) => {
-  const test = { id: Date.now(), ...req.body, createdAt: new Date() };
-  res.status(201).json(test);
+app.post("/api/max-min-density", mockAuth, async (req, res) => {
+  try {
+    const testData = { id: Date.now(), ...req.body, createdAt: new Date() };
+    res.status(201).json(testData);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create test" });
+  }
 });
 
-// Sistema de assinaturas - Planos
+// Subscription system routes
 app.get('/api/subscription/plans', (req, res) => {
   const plans = [
     {
@@ -131,7 +221,6 @@ app.get('/api/subscription/plans', (req, res) => {
   res.json(plans);
 });
 
-// Ciclos de cobrança
 app.get('/api/subscription/cycles', (req, res) => {
   const cycles = [
     {
@@ -159,7 +248,6 @@ app.get('/api/subscription/cycles', (req, res) => {
   res.json(cycles);
 });
 
-// Calcular preço da assinatura
 app.post('/api/subscription/calculate-price', (req, res) => {
   const { basePrice, cycleDiscountPercent, additionalUsers } = req.body;
   
@@ -180,7 +268,6 @@ app.post('/api/subscription/calculate-price', (req, res) => {
   });
 });
 
-// Assinatura atual
 app.get('/api/subscription/current', (req, res) => {
   const subscription = {
     id: '1',
@@ -194,7 +281,6 @@ app.get('/api/subscription/current', (req, res) => {
   res.json(subscription);
 });
 
-// Criar assinatura
 app.post('/api/subscription/create', (req, res) => {
   const { planId, cycleId, trialDays } = req.body;
   
@@ -212,55 +298,7 @@ app.post('/api/subscription/create', (req, res) => {
   res.json(subscription);
 });
 
-// Criar fatura
-app.post('/api/payment/invoices', (req, res) => {
-  const { subscriptionId, amount, description } = req.body;
-  
-  const invoice = {
-    id: `inv_${Date.now()}`,
-    subscriptionId,
-    amount: parseFloat(amount).toFixed(2),
-    total: (parseFloat(amount) * 1.05).toFixed(2), // 5% de impostos
-    status: 'open',
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    invoiceNumber: `INV-${Date.now()}`,
-    description: description || 'Assinatura Laboratório EV.C.S',
-    createdAt: new Date()
-  };
-  
-  res.json(invoice);
-});
-
-// Pagamento PIX
-app.post('/api/payment/pix', (req, res) => {
-  const { invoiceId, customerData } = req.body;
-  
-  // Código PIX simulado (em produção seria gerado pela API do banco)
-  const pixCode = `00020126580014br.gov.bcb.pix0136${customerData?.email || 'cliente'}@laboratorio-evcs.com520400005303986540${Math.floor(Math.random() * 1000)}5802BR5925LABORATORIO EVCS LTDA6009SAO PAULO62070503***6304`;
-  
-  res.json({
-    success: true,
-    transactionId: `pix_${Date.now()}`,
-    pixQrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-    pixCopyPaste: pixCode,
-    expiresAt: new Date(Date.now() + 30 * 60 * 1000) // 30 minutos
-  });
-});
-
-// Pagamento Boleto
-app.post('/api/payment/boleto', (req, res) => {
-  const { invoiceId, customerData } = req.body;
-  
-  res.json({
-    success: true,
-    transactionId: `boleto_${Date.now()}`,
-    boletoUrl: `https://sistema.laboratorio-evcs.com/boleto/mock_${Date.now()}`,
-    boletoBarcode: `23791234567890123456789012345678901234567890`,
-    expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 dias
-  });
-});
-
-// Métodos de pagamento
+// Payment routes  
 app.get('/api/payment/methods', (req, res) => {
   res.json([
     {
@@ -274,7 +312,6 @@ app.get('/api/payment/methods', (req, res) => {
   ]);
 });
 
-// Histórico de faturas
 app.get('/api/payment/invoices', (req, res) => {
   const invoices = [
     {
@@ -299,32 +336,116 @@ app.get('/api/payment/invoices', (req, res) => {
   res.json(invoices);
 });
 
+app.post('/api/payment/invoices', (req, res) => {
+  const { subscriptionId, amount, description } = req.body;
+  
+  const invoice = {
+    id: `inv_${Date.now()}`,
+    subscriptionId,
+    amount: parseFloat(amount).toFixed(2),
+    total: (parseFloat(amount) * 1.05).toFixed(2),
+    status: 'open',
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    invoiceNumber: `INV-${Date.now()}`,
+    description: description || 'Assinatura Laboratório EV.C.S',
+    createdAt: new Date()
+  };
+  
+  res.json(invoice);
+});
+
+app.post('/api/payment/pix', (req, res) => {
+  const { invoiceId, customerData } = req.body;
+  
+  const pixCode = `00020126580014br.gov.bcb.pix0136${customerData?.email || 'cliente'}@laboratorio-evcs.com520400005303986540${Math.floor(Math.random() * 1000)}5802BR5925LABORATORIO EVCS LTDA6009SAO PAULO62070503***6304`;
+  
+  res.json({
+    success: true,
+    transactionId: `pix_${Date.now()}`,
+    pixQrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+    pixCopyPaste: pixCode,
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000)
+  });
+});
+
+app.post('/api/payment/boleto', (req, res) => {
+  const { invoiceId, customerData } = req.body;
+  
+  res.json({
+    success: true,
+    transactionId: `boleto_${Date.now()}`,
+    boletoUrl: `https://sistema.laboratorio-evcs.com/boleto/mock_${Date.now()}`,
+    boletoBarcode: `23791234567890123456789012345678901234567890`,
+    expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+  });
+});
+
 // Health check
 app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "ok",
+  res.json({ 
+    status: "ok", 
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    port: 5000,
     version: "1.0.0"
   });
 });
 
-// Servir arquivos estáticos
-const clientPath = path.join(process.cwd(), 'client', 'dist');
-app.use(express.static(clientPath));
+// Request logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
-// SPA routing
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-    res.sendFile(path.join(clientPath, 'index.html'));
-  } else {
-    res.status(404).json({ error: 'API endpoint not found' });
-  }
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "…";
+      }
+
+      log(logLine);
+    }
+  });
+
+  next();
+});
+
+// Setup Vite for development
+if (process.env.NODE_ENV === "development") {
+  setupVite(app, server).catch(console.error);
+} else {
+  // Production static file serving
+  const path = await import('path');
+  app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
+      res.sendFile(path.join(process.cwd(), 'client', 'dist', 'index.html'));
+    }
+  });
+}
+
+// Error handling middleware
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  console.error('Server error:', err);
+  res.status(status).json({ message });
 });
 
 const port = 5000;
-const server = app.listen(port, '0.0.0.0', () => {
+
+server.listen(port, "0.0.0.0", () => {
   console.log(`✅ Servidor rodando na porta ${port}`);
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`⏰ Iniciado em: ${new Date().toISOString()}`);
@@ -332,7 +453,7 @@ const server = app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Sistema pronto para conexões`);
 });
 
-// Tratamento de erros
+// Handle server errors
 server.on('error', (err: any) => {
   console.error('❌ Erro no servidor:', err);
   if (err.code === 'EADDRINUSE') {
