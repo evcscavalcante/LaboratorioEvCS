@@ -58,7 +58,7 @@ export class MemStorage implements IStorage {
   // Density In Situ Methods
   async createDensityInSituTest(insertTest: InsertDensityInSituTest): Promise<DensityInSituTest> {
     const id = this.currentId++;
-    const test: DensityInSituTest = { 
+    const test = { 
       id, 
       createdAt: new Date(),
       date: insertTest.date,
@@ -83,7 +83,7 @@ export class MemStorage implements IStorage {
       moistureTop: insertTest.moistureTop || null,
       moistureBase: insertTest.moistureBase || null,
       results: insertTest.results || null
-    };
+    } as DensityInSituTest;
     this.densityInSituTests.set(id, test);
     return test;
   }
@@ -112,7 +112,7 @@ export class MemStorage implements IStorage {
   // Real Density Methods
   async createRealDensityTest(insertTest: InsertRealDensityTest): Promise<RealDensityTest> {
     const id = this.currentId++;
-    const test: RealDensityTest = { 
+    const test = { 
       id, 
       createdAt: new Date(),
       date: insertTest.date,
@@ -126,7 +126,7 @@ export class MemStorage implements IStorage {
       results: insertTest.results || null,
       moisture: insertTest.moisture || null,
       picnometer: insertTest.picnometer || null
-    };
+    } as RealDensityTest;
     this.realDensityTests.set(id, test);
     return test;
   }
@@ -155,7 +155,7 @@ export class MemStorage implements IStorage {
   // Max Min Density Methods
   async createMaxMinDensityTest(insertTest: InsertMaxMinDensityTest): Promise<MaxMinDensityTest> {
     const id = this.currentId++;
-    const test: MaxMinDensityTest = { 
+    const test = { 
       id, 
       createdAt: new Date(),
       date: insertTest.date,
@@ -169,7 +169,7 @@ export class MemStorage implements IStorage {
       results: insertTest.results || null,
       maxDensity: insertTest.maxDensity || null,
       minDensity: insertTest.minDensity || null
-    };
+    } as MaxMinDensityTest;
     this.maxMinDensityTests.set(id, test);
     return test;
   }
