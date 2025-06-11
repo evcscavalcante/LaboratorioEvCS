@@ -145,36 +145,60 @@ export default function DensityInSitu() {
   const handleCapsuleNumberChange = (field: string, value: string) => {
     const pesoCapsula = buscarPesoCapsula(value);
     
-    const updateCapsule = (fieldName: keyof DensityInSituData) => {
+    if (field === 'moistureTop1') {
       setData(prev => ({
         ...prev,
-        [fieldName]: {
-          ...prev[fieldName],
+        moistureTop1: {
+          ...prev.moistureTop1,
           capsule: value,
-          tare: pesoCapsula || (prev[fieldName] as any).tare
+          tare: pesoCapsula || prev.moistureTop1.tare
         }
       }));
-    };
-
-    switch (field) {
-      case 'moistureTop1':
-        updateCapsule('moistureTop1');
-        break;
-      case 'moistureTop2':
-        updateCapsule('moistureTop2');
-        break;
-      case 'moistureTop3':
-        updateCapsule('moistureTop3');
-        break;
-      case 'moistureBase1':
-        updateCapsule('moistureBase1');
-        break;
-      case 'moistureBase2':
-        updateCapsule('moistureBase2');
-        break;
-      case 'moistureBase3':
-        updateCapsule('moistureBase3');
-        break;
+    } else if (field === 'moistureTop2') {
+      setData(prev => ({
+        ...prev,
+        moistureTop2: {
+          ...prev.moistureTop2,
+          capsule: value,
+          tare: pesoCapsula || prev.moistureTop2.tare
+        }
+      }));
+    } else if (field === 'moistureTop3') {
+      setData(prev => ({
+        ...prev,
+        moistureTop3: {
+          ...prev.moistureTop3,
+          capsule: value,
+          tare: pesoCapsula || prev.moistureTop3.tare
+        }
+      }));
+    } else if (field === 'moistureBase1') {
+      setData(prev => ({
+        ...prev,
+        moistureBase1: {
+          ...prev.moistureBase1,
+          capsule: value,
+          tare: pesoCapsula || prev.moistureBase1.tare
+        }
+      }));
+    } else if (field === 'moistureBase2') {
+      setData(prev => ({
+        ...prev,
+        moistureBase2: {
+          ...prev.moistureBase2,
+          capsule: value,
+          tare: pesoCapsula || prev.moistureBase2.tare
+        }
+      }));
+    } else if (field === 'moistureBase3') {
+      setData(prev => ({
+        ...prev,
+        moistureBase3: {
+          ...prev.moistureBase3,
+          capsule: value,
+          tare: pesoCapsula || prev.moistureBase3.tare
+        }
+      }));
     }
 
     if (pesoCapsula) {

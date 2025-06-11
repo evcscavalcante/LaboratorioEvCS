@@ -96,37 +96,66 @@ export default function DensityMaxMin() {
   const handleCylinderNumberChange = (field: string, value: string) => {
     const dadosCilindro = buscarDadosCilindro(value);
     
-    const updateField = (fieldName: keyof MaxMinDensityData) => {
+    if (field === 'maxDensity1') {
       setData(prev => ({
         ...prev,
-        [fieldName]: {
-          ...prev[fieldName],
+        maxDensity1: {
+          ...prev.maxDensity1,
           cylinderNumber: value,
-          molde: dadosCilindro ? dadosCilindro.peso : (prev[fieldName] as any).molde,
-          volume: dadosCilindro ? dadosCilindro.volume : (prev[fieldName] as any).volume
+          molde: dadosCilindro ? dadosCilindro.peso : prev.maxDensity1.molde,
+          volume: dadosCilindro ? dadosCilindro.volume : prev.maxDensity1.volume
         }
       }));
-    };
-
-    switch (field) {
-      case 'maxDensity1':
-        updateField('maxDensity1');
-        break;
-      case 'maxDensity2':
-        updateField('maxDensity2');
-        break;
-      case 'maxDensity3':
-        updateField('maxDensity3');
-        break;
-      case 'minDensity1':
-        updateField('minDensity1');
-        break;
-      case 'minDensity2':
-        updateField('minDensity2');
-        break;
-      case 'minDensity3':
-        updateField('minDensity3');
-        break;
+    } else if (field === 'maxDensity2') {
+      setData(prev => ({
+        ...prev,
+        maxDensity2: {
+          ...prev.maxDensity2,
+          cylinderNumber: value,
+          molde: dadosCilindro ? dadosCilindro.peso : prev.maxDensity2.molde,
+          volume: dadosCilindro ? dadosCilindro.volume : prev.maxDensity2.volume
+        }
+      }));
+    } else if (field === 'maxDensity3') {
+      setData(prev => ({
+        ...prev,
+        maxDensity3: {
+          ...prev.maxDensity3,
+          cylinderNumber: value,
+          molde: dadosCilindro ? dadosCilindro.peso : prev.maxDensity3.molde,
+          volume: dadosCilindro ? dadosCilindro.volume : prev.maxDensity3.volume
+        }
+      }));
+    } else if (field === 'minDensity1') {
+      setData(prev => ({
+        ...prev,
+        minDensity1: {
+          ...prev.minDensity1,
+          cylinderNumber: value,
+          molde: dadosCilindro ? dadosCilindro.peso : prev.minDensity1.molde,
+          volume: dadosCilindro ? dadosCilindro.volume : prev.minDensity1.volume
+        }
+      }));
+    } else if (field === 'minDensity2') {
+      setData(prev => ({
+        ...prev,
+        minDensity2: {
+          ...prev.minDensity2,
+          cylinderNumber: value,
+          molde: dadosCilindro ? dadosCilindro.peso : prev.minDensity2.molde,
+          volume: dadosCilindro ? dadosCilindro.volume : prev.minDensity2.volume
+        }
+      }));
+    } else if (field === 'minDensity3') {
+      setData(prev => ({
+        ...prev,
+        minDensity3: {
+          ...prev.minDensity3,
+          cylinderNumber: value,
+          molde: dadosCilindro ? dadosCilindro.peso : prev.minDensity3.molde,
+          volume: dadosCilindro ? dadosCilindro.volume : prev.minDensity3.volume
+        }
+      }));
     }
 
     if (dadosCilindro) {
@@ -217,10 +246,79 @@ export default function DensityMaxMin() {
   };
 
   const updateNestedData = (parent: string, field: string, value: any) => {
-    setData(prev => ({
-      ...prev,
-      [parent]: { ...prev[parent as keyof MaxMinDensityData], [field]: value }
-    }));
+    if (parent === 'maxDensity1') {
+      setData(prev => ({
+        ...prev,
+        maxDensity1: { 
+          cylinderNumber: prev.maxDensity1.cylinderNumber,
+          moldeSolo: prev.maxDensity1.moldeSolo,
+          molde: prev.maxDensity1.molde,
+          volume: prev.maxDensity1.volume,
+          moisture: prev.maxDensity1.moisture,
+          [field]: value 
+        }
+      }));
+    } else if (parent === 'maxDensity2') {
+      setData(prev => ({
+        ...prev,
+        maxDensity2: { 
+          cylinderNumber: prev.maxDensity2.cylinderNumber,
+          moldeSolo: prev.maxDensity2.moldeSolo,
+          molde: prev.maxDensity2.molde,
+          volume: prev.maxDensity2.volume,
+          moisture: prev.maxDensity2.moisture,
+          [field]: value 
+        }
+      }));
+    } else if (parent === 'maxDensity3') {
+      setData(prev => ({
+        ...prev,
+        maxDensity3: { 
+          cylinderNumber: prev.maxDensity3.cylinderNumber,
+          moldeSolo: prev.maxDensity3.moldeSolo,
+          molde: prev.maxDensity3.molde,
+          volume: prev.maxDensity3.volume,
+          moisture: prev.maxDensity3.moisture,
+          [field]: value 
+        }
+      }));
+    } else if (parent === 'minDensity1') {
+      setData(prev => ({
+        ...prev,
+        minDensity1: { 
+          cylinderNumber: prev.minDensity1.cylinderNumber,
+          moldeSolo: prev.minDensity1.moldeSolo,
+          molde: prev.minDensity1.molde,
+          volume: prev.minDensity1.volume,
+          moisture: prev.minDensity1.moisture,
+          [field]: value 
+        }
+      }));
+    } else if (parent === 'minDensity2') {
+      setData(prev => ({
+        ...prev,
+        minDensity2: { 
+          cylinderNumber: prev.minDensity2.cylinderNumber,
+          moldeSolo: prev.minDensity2.moldeSolo,
+          molde: prev.minDensity2.molde,
+          volume: prev.minDensity2.volume,
+          moisture: prev.minDensity2.moisture,
+          [field]: value 
+        }
+      }));
+    } else if (parent === 'minDensity3') {
+      setData(prev => ({
+        ...prev,
+        minDensity3: { 
+          cylinderNumber: prev.minDensity3.cylinderNumber,
+          moldeSolo: prev.minDensity3.moldeSolo,
+          molde: prev.minDensity3.molde,
+          volume: prev.minDensity3.volume,
+          moisture: prev.minDensity3.moisture,
+          [field]: value 
+        }
+      }));
+    }
   };
 
   const handleSave = () => {

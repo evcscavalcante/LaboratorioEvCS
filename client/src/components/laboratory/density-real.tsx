@@ -220,10 +220,32 @@ export default function DensityReal() {
   };
 
   const updateNestedData = (parent: string, field: string, value: any) => {
-    setData(prev => ({
-      ...prev,
-      [parent]: { ...prev[parent as keyof RealDensityData], [field]: value }
-    }));
+    if (parent === 'moisture1') {
+      setData(prev => ({
+        ...prev,
+        moisture1: { ...prev.moisture1, [field]: value }
+      }));
+    } else if (parent === 'moisture2') {
+      setData(prev => ({
+        ...prev,
+        moisture2: { ...prev.moisture2, [field]: value }
+      }));
+    } else if (parent === 'moisture3') {
+      setData(prev => ({
+        ...prev,
+        moisture3: { ...prev.moisture3, [field]: value }
+      }));
+    } else if (parent === 'picnometer1') {
+      setData(prev => ({
+        ...prev,
+        picnometer1: { ...prev.picnometer1, [field]: value }
+      }));
+    } else if (parent === 'picnometer2') {
+      setData(prev => ({
+        ...prev,
+        picnometer2: { ...prev.picnometer2, [field]: value }
+      }));
+    }
   };
 
   const handleSave = () => {
