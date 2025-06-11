@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Mock authentication middleware
+// Mock auth middleware
 const mockAuth = (req: any, res: any, next: any) => {
   req.user = { claims: { sub: "admin" } };
   req.isAuthenticated = () => true;
@@ -31,7 +31,7 @@ const mockUsers = new Map([
   }]
 ]);
 
-// Auth routes
+// API Routes
 app.get('/api/auth/user', mockAuth, async (req: any, res) => {
   try {
     const userId = req.user.claims.sub;
@@ -43,7 +43,6 @@ app.get('/api/auth/user', mockAuth, async (req: any, res) => {
   }
 });
 
-// Users routes
 app.get("/api/users", mockAuth, async (req, res) => {
   try {
     const users = Array.from(mockUsers.values());
@@ -99,7 +98,6 @@ app.delete("/api/users/:id", mockAuth, async (req, res) => {
   }
 });
 
-// Organizations routes
 app.get("/api/organizations", async (req, res) => {
   try {
     const mockOrgs = [
@@ -121,7 +119,6 @@ app.get("/api/organizations/user-counts", async (req, res) => {
   }
 });
 
-// Laboratory test routes
 app.get("/api/density-in-situ", mockAuth, async (req, res) => {
   res.json([]);
 });
@@ -166,49 +163,44 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
-
-  next();
-});
-
 // Serve static files
 const clientPath = path.join(__dirname, '../client');
 app.use(express.static(clientPath));
 
-// SPA routing
+// SPA routing - must be last
 app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
+  if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
     res.sendFile(path.join(clientPath, 'index.html'));
   }
 });
 
-const port = 5000;
-app.listen(port, '0.0.0.0', () => {
+const port = parseInt(process.env.PORT || '5000', 10);
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
   console.log(`Health check: http://localhost:${port}/health`);
+  console.log(`Process ID: ${process.pid}`);
+});
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
+
+// Keep the process alive
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
