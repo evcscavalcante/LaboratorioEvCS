@@ -193,7 +193,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed left-0 top-0 z-40 h-screen w-64 bg-white border-r border-gray-200 shadow-lg">
+    <div className="fixed left-0 top-0 z-40 h-screen w-64 bg-white border-r border-gray-200 shadow-lg flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
@@ -211,7 +211,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="p-4 space-y-2">
+      <nav className="p-4 space-y-2 overflow-y-auto flex-1">
         {menuItems.map((item) => (
           <div key={item.label}>
             {item.expandable ? (
@@ -285,12 +285,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       </nav>
 
       {/* User Info */}
-      <div className="absolute bottom-16 left-0 right-0 p-4 border-t border-gray-200">
+      <div className="mt-auto p-4 border-t border-gray-200 bg-gray-50">
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm">
             <User className="h-4 w-4 text-gray-600" />
-            <div>
-              <div className="font-medium text-gray-700">{user?.name || 'Usuário'}</div>
+            <div className="min-w-0 flex-1">
+              <div className="font-medium text-gray-700 truncate">{user?.name || 'Usuário'}</div>
               <div className="text-xs text-gray-500">
                 {userRole === 'ADMIN' && 'Administrador'}
                 {userRole === 'MANAGER' && 'Gerente'}
@@ -313,7 +313,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       </div>
 
       {/* Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+      <div className="p-3 border-t border-gray-200 bg-gray-50">
         <div className="text-xs text-gray-500 text-center">
           <div>Versão 1.0.0</div>
           <div>ABNT NBR 6457/9813</div>
