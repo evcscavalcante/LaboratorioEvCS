@@ -451,13 +451,13 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 const port = parseInt(process.env.PORT || '5000', 10);
 
-server.listen(port, () => {
+server.listen(port, '0.0.0.0', () => {
   console.log(`✅ Servidor rodando na porta ${port}`);
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`⏰ Iniciado em: ${new Date().toISOString()}`);
   console.log(`🆔 Process ID: ${process.pid}`);
   console.log(`🚀 Sistema pronto para conexões`);
-  console.log(`📍 Acesse: http://localhost:${port}`);
+  console.log(`📍 Acesse: http://0.0.0.0:${port}`);
   
   // Test server accessibility
   setTimeout(() => {
