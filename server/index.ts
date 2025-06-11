@@ -205,10 +205,9 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Serve static files directly for now
-  app.use(express.static("dist"));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(process.cwd(), "dist", "index.html"));
+  // Simple health check endpoint
+  app.get("/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
   const port = 5000;
