@@ -174,33 +174,25 @@ app.get('*', (req, res) => {
   }
 });
 
-const port = parseInt(process.env.PORT || '5000', 10);
-const server = app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port}`);
-  console.log(`Health check: http://localhost:${port}/health`);
-  console.log(`Process ID: ${process.pid}`);
-});
-
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
-  });
-});
-
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
-  });
+const port = 5000;
+app.listen(port, '0.0.0.0', () => {
+  console.log(`✓ Server started successfully`);
+  console.log(`✓ Listening on port ${port}`);
+  console.log(`✓ Health endpoint: /health`);
 });
 
 // Keep the process alive
+setInterval(() => {
+  // Heartbeat to keep process alive
+}, 30000);
+
+// Error handling
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
