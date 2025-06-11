@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Building, Settings, BarChart3, Shield, Activity, Plus, ArrowRight } from 'lucide-react';
+import { Users, Building, Settings, BarChart3, Shield, Activity, Plus, ArrowRight, AlertTriangle } from 'lucide-react';
+import { usePermissions } from '@/hooks/usePermissions';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { User, Organization } from '@shared/schema';
 
 const QUICK_STATS = [

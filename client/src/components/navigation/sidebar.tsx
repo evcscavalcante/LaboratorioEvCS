@@ -62,9 +62,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const [adminOpen, setAdminOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const { user, logout } = useAuth();
-  const { userRole } = usePermissions();
+  const permissions = usePermissions();
 
-  const menuItems: MenuItem[] = [
+  // Build menu items with proper permission checks
+  const buildMenuItems = (): MenuItem[] => [
     {
       label: 'Dashboard',
       icon: Home,
@@ -134,7 +135,8 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         }
       ]
     },
-    {
+    // Admin section - only for authorized users
+    ...(permissions.canManageUsers ? [{
       label: 'Administração',
       icon: Shield,
       expandable: true,
@@ -166,7 +168,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           active: location === '/admin/organizations'
         }
       ]
-    },
+    }] : []),
     {
       label: 'Ajuda',
       icon: HelpCircle,
@@ -190,6 +192,8 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     }
   ];
 
+  const menuItems = buildMenuItems();
+
   if (!isOpen) return null;
 
   return (
@@ -212,7 +216,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="p-4 space-y-2 overflow-y-auto flex-1">
-        {menuItems.map((item) => (
+        {menuItems.map((item: MenuItem) => (
           <div key={item.label}>
             {item.expandable ? (
               <Collapsible open={item.expanded} onOpenChange={item.onToggle}>
@@ -236,7 +240,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-1 mt-1">
-                  {item.children?.map((child) => {
+                  {item.children?.map((child: MenuChild) => {
                     const content = (
                       <Button
                         variant="ghost"
@@ -292,11 +296,11 @@ export default function Sidebar({ isOpen }: SidebarProps) {
             <div className="min-w-0 flex-1">
               <div className="font-medium text-gray-700 truncate">{user?.name || 'Usuário'}</div>
               <div className="text-xs text-gray-500">
-                {userRole === 'ADMIN' && 'Administrador'}
-                {userRole === 'MANAGER' && 'Gerente'}
-                {userRole === 'SUPERVISOR' && 'Supervisor'}
-                {userRole === 'TECHNICIAN' && 'Técnico'}
-                {userRole === 'VIEWER' && 'Visualizador'}
+                {permissions.userRole === 'ADMIN' && 'Administrador'}
+                {permissions.userRole === 'MANAGER' && 'Gerente'}
+                {permissions.userRole === 'SUPERVISOR' && 'Supervisor'}
+                {permissions.userRole === 'TECHNICIAN' && 'Técnico'}
+                {permissions.userRole === 'VIEWER' && 'Visualizador'}
               </div>
             </div>
           </div>
