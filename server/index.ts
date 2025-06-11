@@ -61,16 +61,124 @@ app.get('/api/organizations', mockAuth, (req, res) => {
   res.json(organizations);
 });
 
+// Rotas de Ensaios
 app.get('/api/density-in-situ', mockAuth, (req, res) => {
   res.json([]);
+});
+
+app.post('/api/density-in-situ', mockAuth, (req, res) => {
+  const ensaio = {
+    id: Date.now(),
+    ...req.body,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  res.status(201).json(ensaio);
 });
 
 app.get('/api/real-density', mockAuth, (req, res) => {
   res.json([]);
 });
 
+app.post('/api/real-density', mockAuth, (req, res) => {
+  const ensaio = {
+    id: Date.now(),
+    ...req.body,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  res.status(201).json(ensaio);
+});
+
 app.get('/api/max-min-density', mockAuth, (req, res) => {
   res.json([]);
+});
+
+app.post('/api/max-min-density', mockAuth, (req, res) => {
+  const ensaio = {
+    id: Date.now(),
+    ...req.body,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  res.status(201).json(ensaio);
+});
+
+// Rotas de Equipamentos
+app.get('/api/equipamentos/capsulas', mockAuth, (req, res) => {
+  const capsulas = [
+    { id: 1, codigo: 'CAP-001', peso: 15.25, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 2, codigo: 'CAP-002', peso: 15.30, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 3, codigo: 'CAP-003', peso: 15.28, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 4, codigo: 'CAP-004', peso: 15.32, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 5, codigo: 'CAP-005', peso: 15.27, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 6, codigo: 'CAP-101', peso: 16.45, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 7, codigo: 'CAP-102', peso: 16.50, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 8, codigo: 'CAP-103', peso: 16.48, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 9, codigo: 'CAP-201', peso: 14.85, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 10, codigo: 'CAP-202', peso: 14.90, status: 'ATIVO', ultimaConferencia: '2025-01-15' }
+  ];
+  res.json(capsulas);
+});
+
+app.get('/api/equipamentos/cilindros', mockAuth, (req, res) => {
+  const cilindros = [
+    { id: 1, codigo: 'CIL-001', tipo: 'BISELADO', peso: 2850.5, volume: 999.8, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 2, codigo: 'CIL-002', tipo: 'BISELADO', peso: 2845.2, volume: 1000.2, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 3, codigo: 'CIL-003', tipo: 'PROCTOR', peso: 3250.8, volume: 944.5, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 4, codigo: 'CIL-004', tipo: 'PROCTOR', peso: 3248.9, volume: 943.8, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 5, codigo: 'CIL-005', tipo: 'CBR', peso: 4850.3, volume: 2124.5, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 6, codigo: 'CIL-006', tipo: 'CBR', peso: 4855.1, volume: 2125.8, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 7, codigo: 'CIL-101', tipo: 'VAZIOS_MINIMOS', peso: 1850.5, volume: 1000.0, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 8, codigo: 'CIL-102', tipo: 'VAZIOS_MINIMOS', peso: 1848.8, volume: 999.5, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 9, codigo: 'CIL-201', tipo: 'BISELADO', peso: 2852.3, volume: 1001.1, status: 'ATIVO', ultimaConferencia: '2025-01-15' },
+    { id: 10, codigo: 'CIL-202', tipo: 'BISELADO', peso: 2847.6, volume: 998.9, status: 'ATIVO', ultimaConferencia: '2025-01-15' }
+  ];
+  res.json(cilindros);
+});
+
+app.post('/api/equipamentos/capsulas', mockAuth, (req, res) => {
+  const novaCapsula = {
+    id: Date.now(),
+    ...req.body,
+    status: 'ATIVO',
+    ultimaConferencia: new Date().toISOString().split('T')[0]
+  };
+  res.status(201).json(novaCapsula);
+});
+
+app.post('/api/equipamentos/cilindros', mockAuth, (req, res) => {
+  const novoCilindro = {
+    id: Date.now(),
+    ...req.body,
+    status: 'ATIVO',
+    ultimaConferencia: new Date().toISOString().split('T')[0]
+  };
+  res.status(201).json(novoCilindro);
+});
+
+app.put('/api/equipamentos/capsulas/:id', mockAuth, (req, res) => {
+  const capsulaAtualizada = {
+    id: parseInt(req.params.id),
+    ...req.body
+  };
+  res.json(capsulaAtualizada);
+});
+
+app.put('/api/equipamentos/cilindros/:id', mockAuth, (req, res) => {
+  const cilindroAtualizado = {
+    id: parseInt(req.params.id),
+    ...req.body
+  };
+  res.json(cilindroAtualizado);
+});
+
+app.delete('/api/equipamentos/capsulas/:id', mockAuth, (req, res) => {
+  res.json({ success: true });
+});
+
+app.delete('/api/equipamentos/cilindros/:id', mockAuth, (req, res) => {
+  res.json({ success: true });
 });
 
 // Payment and Subscription Routes
