@@ -145,17 +145,37 @@ export default function DensityInSitu() {
   const handleCapsuleNumberChange = (field: string, value: string) => {
     const pesoCapsula = buscarPesoCapsula(value);
     
-    setData(prev => {
-      const currentField = prev[field as keyof DensityInSituData] as any;
-      return {
+    const updateCapsule = (fieldName: keyof DensityInSituData) => {
+      setData(prev => ({
         ...prev,
-        [field]: {
-          ...currentField,
+        [fieldName]: {
+          ...prev[fieldName],
           capsule: value,
-          tare: pesoCapsula || currentField.tare
+          tare: pesoCapsula || (prev[fieldName] as any).tare
         }
-      };
-    });
+      }));
+    };
+
+    switch (field) {
+      case 'moistureTop1':
+        updateCapsule('moistureTop1');
+        break;
+      case 'moistureTop2':
+        updateCapsule('moistureTop2');
+        break;
+      case 'moistureTop3':
+        updateCapsule('moistureTop3');
+        break;
+      case 'moistureBase1':
+        updateCapsule('moistureBase1');
+        break;
+      case 'moistureBase2':
+        updateCapsule('moistureBase2');
+        break;
+      case 'moistureBase3':
+        updateCapsule('moistureBase3');
+        break;
+    }
 
     if (pesoCapsula) {
       toast({

@@ -79,7 +79,7 @@ export default function DensityReal() {
       det1: { waterDensity: 0.99823, dryWeight: 0, realDensity: 0 },
       det2: { waterDensity: 0.99823, dryWeight: 0, realDensity: 0 }
     },
-    results: { difference: 0, average: 0, status: "AGUARDANDO" as const }
+    results: { difference: 0, average: 0, status: "AGUARDANDO" as "AGUARDANDO" | "APROVADO" | "REPROVADO" }
   });
 
   // Carregar equipamentos ao montar o componente
@@ -106,17 +106,34 @@ export default function DensityReal() {
   const handleCapsuleNumberChange = (field: string, value: string) => {
     const pesoCapsula = buscarPesoCapsula(value);
     
-    setData(prev => {
-      const currentField = prev[field as keyof RealDensityData] as any;
-      return {
+    if (field === 'moisture1') {
+      setData(prev => ({
         ...prev,
-        [field]: {
-          ...currentField,
+        moisture1: {
+          ...prev.moisture1,
           capsule: value,
-          tare: pesoCapsula || currentField.tare
+          tare: pesoCapsula || prev.moisture1.tare
         }
-      };
-    });
+      }));
+    } else if (field === 'moisture2') {
+      setData(prev => ({
+        ...prev,
+        moisture2: {
+          ...prev.moisture2,
+          capsule: value,
+          tare: pesoCapsula || prev.moisture2.tare
+        }
+      }));
+    } else if (field === 'moisture3') {
+      setData(prev => ({
+        ...prev,
+        moisture3: {
+          ...prev.moisture3,
+          capsule: value,
+          tare: pesoCapsula || prev.moisture3.tare
+        }
+      }));
+    }
 
     if (pesoCapsula) {
       toast({

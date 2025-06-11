@@ -10,6 +10,7 @@ import { generateMaxMinDensityPDF } from "@/lib/pdf-generator";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { localDataManager } from "@/lib/local-storage";
 
 interface MaxMinDensityData {
   registrationNumber: string;
@@ -19,18 +20,22 @@ interface MaxMinDensityData {
   origin: string;
   
   // Maximum density determinations
-  maxDensity1: { moldeSolo: number; molde: number; volume: number; moisture?: number; };
-  maxDensity2: { moldeSolo: number; molde: number; volume: number; moisture?: number; };
-  maxDensity3: { moldeSolo: number; molde: number; volume: number; moisture?: number; };
+  maxDensity1: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
+  maxDensity2: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
+  maxDensity3: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
   
   // Minimum density determinations
-  minDensity1: { moldeSolo: number; molde: number; volume: number; moisture?: number; };
-  minDensity2: { moldeSolo: number; molde: number; volume: number; moisture?: number; };
-  minDensity3: { moldeSolo: number; molde: number; volume: number; moisture?: number; };
+  minDensity1: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
+  minDensity2: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
+  minDensity3: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
 }
 
 export default function DensityMaxMin() {
   const { toast } = useToast();
+  const [equipamentos, setEquipamentos] = useState<{cilindros: any[]}>({
+    cilindros: []
+  });
+  
   const [data, setData] = useState<MaxMinDensityData>({
     registrationNumber: "",
     date: new Date().toISOString().split('T')[0],
@@ -63,9 +68,74 @@ export default function DensityMaxMin() {
       gammaDMin: 0,
       emax: 0,
       emin: 0,
-      status: "AGUARDANDO" as const
+      status: "AGUARDANDO" as "AGUARDANDO" | "APROVADO" | "REPROVADO"
     }
   });
+
+  // Carregar equipamentos ao montar o componente
+  useEffect(() => {
+    const loadEquipamentos = async () => {
+      try {
+        const cilindros = await localDataManager.getCilindros();
+        setEquipamentos({ cilindros });
+      } catch (error) {
+        console.error('Erro ao carregar equipamentos:', error);
+      }
+    };
+
+    loadEquipamentos();
+  }, []);
+
+  // Função para buscar dados do cilindro pelo número
+  const buscarDadosCilindro = (numero: string) => {
+    const cilindro = equipamentos.cilindros.find(c => c.codigo === numero);
+    return cilindro ? { peso: cilindro.peso, volume: cilindro.volume } : null;
+  };
+
+  // Handler para mudança no número do cilindro
+  const handleCylinderNumberChange = (field: string, value: string) => {
+    const dadosCilindro = buscarDadosCilindro(value);
+    
+    const updateField = (fieldName: keyof MaxMinDensityData) => {
+      setData(prev => ({
+        ...prev,
+        [fieldName]: {
+          ...prev[fieldName],
+          cylinderNumber: value,
+          molde: dadosCilindro ? dadosCilindro.peso : (prev[fieldName] as any).molde,
+          volume: dadosCilindro ? dadosCilindro.volume : (prev[fieldName] as any).volume
+        }
+      }));
+    };
+
+    switch (field) {
+      case 'maxDensity1':
+        updateField('maxDensity1');
+        break;
+      case 'maxDensity2':
+        updateField('maxDensity2');
+        break;
+      case 'maxDensity3':
+        updateField('maxDensity3');
+        break;
+      case 'minDensity1':
+        updateField('minDensity1');
+        break;
+      case 'minDensity2':
+        updateField('minDensity2');
+        break;
+      case 'minDensity3':
+        updateField('minDensity3');
+        break;
+    }
+
+    if (dadosCilindro) {
+      toast({
+        title: "Dados preenchidos automaticamente",
+        description: `Peso: ${dadosCilindro.peso}g, Volume: ${dadosCilindro.volume}cm³`,
+      });
+    }
+  };
 
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
