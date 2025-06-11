@@ -62,21 +62,31 @@ const MANAGEMENT_MODULES = [
 
 export default function AdminDashboard() {
   // Fetch users for statistics
-  const { data: users = [] } = useQuery({
+  const { data: users = [], isError: usersError } = useQuery({
     queryKey: ['/api/users'],
     queryFn: async () => {
       const response = await fetch('/api/users');
-      return response.json();
-    }
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    },
+    retry: false
   });
 
   // Fetch organizations for statistics
-  const { data: organizations = [] } = useQuery({
+  const { data: organizations = [], isError: orgsError } = useQuery({
     queryKey: ['/api/organizations'],
     queryFn: async () => {
       const response = await fetch('/api/organizations');
-      return response.json();
-    }
+      if (!response.ok) {
+        throw new Error('Failed to fetch organizations');
+      }
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    },
+    retry: false
   });
 
   const getStatValue = (endpoint: string, filter: (data: any[]) => number) => {
