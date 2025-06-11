@@ -6,8 +6,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// CORS headers
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 
 // Mock auth middleware
 const mockAuth = (req: any, res: any, next: any) => {
@@ -158,9 +168,14 @@ app.post("/api/max-min-density", mockAuth, async (req, res) => {
   }
 });
 
-// Health check
+// Health check endpoint - must be before other routes
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  res.status(200).json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    port: 5000
+  });
 });
 
 // Serve static files
@@ -175,24 +190,26 @@ app.get('*', (req, res) => {
 });
 
 const port = 5000;
-app.listen(port, '0.0.0.0', () => {
-  console.log(`✓ Server started successfully`);
-  console.log(`✓ Listening on port ${port}`);
-  console.log(`✓ Health endpoint: /health`);
+const server = app.listen(port, '0.0.0.0', () => {
+  console.log(`Server listening on port ${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Time: ${new Date().toISOString()}`);
 });
 
-// Keep the process alive
-setInterval(() => {
-  // Heartbeat to keep process alive
-}, 30000);
+// Handle server errors
+server.on('error', (err: any) => {
+  console.error('Server error:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${port} is already in use`);
+    process.exit(1);
+  }
+});
 
-// Error handling
+// Error handling without immediate exit
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
-  process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  process.exit(1);
 });
