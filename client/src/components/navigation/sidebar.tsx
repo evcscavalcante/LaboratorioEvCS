@@ -18,6 +18,7 @@ import {
   Building,
   LucideIcon,
   HelpCircle,
+  FileText,
   Book,
   UserCog,
   LogOut,

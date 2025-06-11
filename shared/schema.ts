@@ -223,6 +223,98 @@ export const maxMinDensityTestsRelations = relations(maxMinDensityTests, ({ one 
   })
 }));
 
+// Equipment Management Tables
+export const capsulas = pgTable("capsulas", {
+  id: serial("id").primaryKey(),
+  codigo: varchar("codigo", { length: 50 }).notNull().unique(),
+  descricao: text("descricao"),
+  peso: real("peso").notNull(),
+  material: varchar("material", { length: 100 }),
+  fabricante: varchar("fabricante", { length: 255 }),
+  dataAquisicao: timestamp("data_aquisicao"),
+  status: varchar("status", { length: 50 }).notNull().default("ATIVO"),
+  localizacao: varchar("localizacao", { length: 255 }),
+  observacoes: text("observacoes"),
+  proximaConferencia: timestamp("proxima_conferencia"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const cilindros = pgTable("cilindros", {
+  id: serial("id").primaryKey(),
+  codigo: varchar("codigo", { length: 50 }).notNull().unique(),
+  tipo: varchar("tipo", { length: 50 }).notNull(), // 'biselado', 'proctor', 'cbr', 'vazios_minimos'
+  descricao: text("descricao"),
+  peso: real("peso").notNull(),
+  volume: real("volume").notNull(),
+  altura: real("altura"),
+  diametro: real("diametro"),
+  material: varchar("material", { length: 100 }),
+  fabricante: varchar("fabricante", { length: 255 }),
+  dataAquisicao: timestamp("data_aquisicao"),
+  status: varchar("status", { length: 50 }).notNull().default("ATIVO"),
+  localizacao: varchar("localizacao", { length: 255 }),
+  observacoes: text("observacoes"),
+  proximaConferencia: timestamp("proxima_conferencia"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const conferenciaEquipamentos = pgTable("conferencia_equipamentos", {
+  id: serial("id").primaryKey(),
+  equipamentoTipo: varchar("equipamento_tipo", { length: 50 }).notNull(), // 'capsula' ou 'cilindro'
+  equipamentoId: integer("equipamento_id").notNull(),
+  dataConferencia: timestamp("data_conferencia").notNull(),
+  responsavel: varchar("responsavel", { length: 255 }).notNull(),
+  status: varchar("status", { length: 50 }).notNull(), // 'APROVADO', 'REPROVADO', 'PENDENTE'
+  observacoes: text("observacoes"),
+  
+  // Dados específicos para cápsulas
+  pesoAferido: real("peso_aferido"),
+  desvioToleranciaPeso: real("desvio_tolerancia_peso"),
+  
+  // Dados específicos para cilindros
+  volumeAferido: real("volume_aferido"),
+  alturaAferida: real("altura_aferida"),
+  diametroAferido: real("diametro_aferido"),
+  desvioToleranciaVolume: real("desvio_tolerancia_volume"),
+  desvioToleranciaAltura: real("desvio_tolerancia_altura"),
+  desvioToleranciaDiametro: real("desvio_tolerancia_diametro"),
+  
+  aprovado: boolean("aprovado").notNull(),
+  proximaConferencia: timestamp("proxima_conferencia"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Equipment relations
+export const capsulasRelations = relations(capsulas, ({ many }) => ({
+  conferencias: many(conferenciaEquipamentos)
+}));
+
+export const cilindrosRelations = relations(cilindros, ({ many }) => ({
+  conferencias: many(conferenciaEquipamentos)
+}));
+
+// Equipment Schemas
+export const insertCapsulaSchema = createInsertSchema(capsulas).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCilindroSchema = createInsertSchema(cilindros).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertConferenciaEquipamentoSchema = createInsertSchema(conferenciaEquipamentos).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Schemas
 export const insertOrganizationSchema = createInsertSchema(organizations).omit({
   id: true,
