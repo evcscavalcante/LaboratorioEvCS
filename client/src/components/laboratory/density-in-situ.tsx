@@ -145,14 +145,17 @@ export default function DensityInSitu() {
   const handleCapsuleNumberChange = (field: string, value: string) => {
     const pesoCapsula = buscarPesoCapsula(value);
     
-    setData(prev => ({
-      ...prev,
-      [field]: {
-        ...prev[field as keyof DensityInSituData],
-        capsule: value,
-        tare: pesoCapsula || (prev[field as keyof DensityInSituData] as any).tare
-      }
-    }));
+    setData(prev => {
+      const currentField = prev[field as keyof DensityInSituData] as any;
+      return {
+        ...prev,
+        [field]: {
+          ...currentField,
+          capsule: value,
+          tare: pesoCapsula || currentField.tare
+        }
+      };
+    });
 
     if (pesoCapsula) {
       toast({
@@ -585,7 +588,7 @@ export default function DensityInSitu() {
                   <Input
                     className="calculator-input"
                     value={data.det1.cylinderNumber}
-                    onChange={(e) => updateNestedData("det1", "cylinderNumber", e.target.value)}
+                    onChange={(e) => handleCylinderNumberChange("det1", e.target.value)}
                     placeholder="CIL-01"
                   />
                 </TableCell>
@@ -593,7 +596,7 @@ export default function DensityInSitu() {
                   <Input
                     className="calculator-input"
                     value={data.det2.cylinderNumber}
-                    onChange={(e) => updateNestedData("det2", "cylinderNumber", e.target.value)}
+                    onChange={(e) => handleCylinderNumberChange("det2", e.target.value)}
                     placeholder="CIL-02"
                   />
                 </TableCell>
@@ -765,9 +768,9 @@ export default function DensityInSitu() {
               <TableBody>
                 <TableRow>
                   <TableCell className="font-medium">Cápsula Nº</TableCell>
-                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop1.capsule} onChange={(e) => updateNestedData("moistureTop1", "capsule", e.target.value)} placeholder="C-01" className="text-xs" /></TableCell>
-                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop2.capsule} onChange={(e) => updateNestedData("moistureTop2", "capsule", e.target.value)} placeholder="C-02" className="text-xs" /></TableCell>
-                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop3.capsule} onChange={(e) => updateNestedData("moistureTop3", "capsule", e.target.value)} placeholder="C-03" className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop1.capsule} onChange={(e) => handleCapsuleNumberChange("moistureTop1", e.target.value)} placeholder="C-01" className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop2.capsule} onChange={(e) => handleCapsuleNumberChange("moistureTop2", e.target.value)} placeholder="C-02" className="text-xs" /></TableCell>
+                  <TableCell className="mobile-table-cell"><Input value={data.moistureTop3.capsule} onChange={(e) => handleCapsuleNumberChange("moistureTop3", e.target.value)} placeholder="C-03" className="text-xs" /></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Solo Úmido+Tara</TableCell>
@@ -837,9 +840,9 @@ export default function DensityInSitu() {
               <TableBody>
                 <TableRow>
                   <TableCell className="font-medium">Cápsula Nº</TableCell>
-                  <TableCell><Input value={data.moistureBase1.capsule} onChange={(e) => updateNestedData("moistureBase1", "capsule", e.target.value)} placeholder="C-04" className="text-xs" /></TableCell>
-                  <TableCell><Input value={data.moistureBase2.capsule} onChange={(e) => updateNestedData("moistureBase2", "capsule", e.target.value)} placeholder="C-05" className="text-xs" /></TableCell>
-                  <TableCell><Input value={data.moistureBase3.capsule} onChange={(e) => updateNestedData("moistureBase3", "capsule", e.target.value)} placeholder="C-06" className="text-xs" /></TableCell>
+                  <TableCell><Input value={data.moistureBase1.capsule} onChange={(e) => handleCapsuleNumberChange("moistureBase1", e.target.value)} placeholder="C-04" className="text-xs" /></TableCell>
+                  <TableCell><Input value={data.moistureBase2.capsule} onChange={(e) => handleCapsuleNumberChange("moistureBase2", e.target.value)} placeholder="C-05" className="text-xs" /></TableCell>
+                  <TableCell><Input value={data.moistureBase3.capsule} onChange={(e) => handleCapsuleNumberChange("moistureBase3", e.target.value)} placeholder="C-06" className="text-xs" /></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Solo Úmido+Tara</TableCell>

@@ -11,6 +11,7 @@ import { generateRealDensityPDF } from "@/lib/pdf-generator";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { localDataManager } from "@/lib/local-storage";
 
 interface RealDensityData {
   registrationNumber: string;
@@ -43,6 +44,10 @@ interface RealDensityData {
 
 export default function DensityReal() {
   const { toast } = useToast();
+  const [equipamentos, setEquipamentos] = useState<{capsulas: any[]}>({
+    capsulas: []
+  });
+  
   const [data, setData] = useState<RealDensityData>({
     registrationNumber: "",
     date: new Date().toISOString().split('T')[0],
@@ -76,6 +81,50 @@ export default function DensityReal() {
     },
     results: { difference: 0, average: 0, status: "AGUARDANDO" as const }
   });
+
+  // Carregar equipamentos ao montar o componente
+  useEffect(() => {
+    const loadEquipamentos = async () => {
+      try {
+        const capsulas = await localDataManager.getCapsulas();
+        setEquipamentos({ capsulas });
+      } catch (error) {
+        console.error('Erro ao carregar equipamentos:', error);
+      }
+    };
+
+    loadEquipamentos();
+  }, []);
+
+  // Função para buscar peso da cápsula pelo número
+  const buscarPesoCapsula = (numero: string) => {
+    const capsula = equipamentos.capsulas.find(c => c.codigo === numero);
+    return capsula ? capsula.peso : null;
+  };
+
+  // Handler para mudança no número da cápsula
+  const handleCapsuleNumberChange = (field: string, value: string) => {
+    const pesoCapsula = buscarPesoCapsula(value);
+    
+    setData(prev => {
+      const currentField = prev[field as keyof RealDensityData] as any;
+      return {
+        ...prev,
+        [field]: {
+          ...currentField,
+          capsule: value,
+          tare: pesoCapsula || currentField.tare
+        }
+      };
+    });
+
+    if (pesoCapsula) {
+      toast({
+        title: "Peso preenchido automaticamente",
+        description: `Peso da cápsula: ${pesoCapsula}g`,
+      });
+    }
+  };
 
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
@@ -307,7 +356,7 @@ export default function DensityReal() {
                 <TableCell>
                   <Input
                     value={data.moisture1.capsule}
-                    onChange={(e) => updateNestedData("moisture1", "capsule", e.target.value)}
+                    onChange={(e) => handleCapsuleNumberChange("moisture1", e.target.value)}
                     placeholder="C-01"
                     className="text-sm"
                   />
@@ -315,7 +364,7 @@ export default function DensityReal() {
                 <TableCell>
                   <Input
                     value={data.moisture2.capsule}
-                    onChange={(e) => updateNestedData("moisture2", "capsule", e.target.value)}
+                    onChange={(e) => handleCapsuleNumberChange("moisture2", e.target.value)}
                     placeholder="C-02"
                     className="text-sm"
                   />
@@ -323,7 +372,7 @@ export default function DensityReal() {
                 <TableCell>
                   <Input
                     value={data.moisture3.capsule}
-                    onChange={(e) => updateNestedData("moisture3", "capsule", e.target.value)}
+                    onChange={(e) => handleCapsuleNumberChange("moisture3", e.target.value)}
                     placeholder="C-03"
                     className="text-sm"
                   />
