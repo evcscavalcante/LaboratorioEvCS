@@ -1149,82 +1149,79 @@ app.get('*', (req, res) => {
         }
         
         function showPixPayment(payment) {
-            document.getElementById('payment-modal').innerHTML = \`
-                <div class="payment-modal-content">
-                    <h3>Pagamento via PIX</h3>
-                    <div style="text-align: center; padding: 20px;">
-                        \${payment.qrCodeBase64 ? \`
-                            <div style="margin: 20px 0;">
-                                <img src="data:image/png;base64,\${payment.qrCodeBase64}" 
-                                     alt="QR Code PIX" style="max-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px;">
-                            </div>
-                        \` : ''}
-                        
-                        \${payment.pixCode ? \`
-                            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                                <h4>Código PIX:</h4>
-                                <div style="font-family: monospace; font-size: 12px; word-break: break-all; background: white; padding: 10px; border-radius: 4px;">
-                                    \${payment.pixCode}
-                                </div>
-                                <button class="module-btn" onclick="navigator.clipboard.writeText('\${payment.pixCode}'); alert('Código PIX copiado!')">
-                                    Copiar Código PIX
-                                </button>
-                            </div>
-                        \` : ''}
-                        
-                        <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin: 20px 0;">
-                            <p><strong>Valor:</strong> R$ \${payment.amount.toFixed(2).replace('.', ',')}</p>
-                            <p><strong>ID do Pagamento:</strong> \${payment.mercadoPagoId || payment.id}</p>
-                            <p><strong>Status:</strong> <span style="color: #d97706;">Aguardando Pagamento</span></p>
-                            \${payment.expiresAt ? \`<p><strong>Expira em:</strong> \${new Date(payment.expiresAt).toLocaleString('pt-BR')}</p>\` : ''}
-                        </div>
-                        
-                        <div style="background: #fef3c7; padding: 12px; border-radius: 6px; font-size: 14px; color: #92400e;">
-                            💡 Após o pagamento, a confirmação pode levar alguns minutos para aparecer.
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 12px; margin-top: 20px;">
-                        <button class="cancel-btn" onclick="checkPaymentStatus('\${payment.mercadoPagoId || payment.id}')">
-                            Verificar Status
-                        </button>
-                        <button class="confirm-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>
-                    </div>
-                </div>
-            \`;
+            let qrCodeSection = '';
+            if (payment.qrCodeBase64) {
+                qrCodeSection = '<div style="margin: 20px 0;"><img src="data:image/png;base64,' + payment.qrCodeBase64 + '" alt="QR Code PIX" style="max-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px;"></div>';
+            }
+            
+            let pixCodeSection = '';
+            if (payment.pixCode) {
+                pixCodeSection = '<div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;"><h4>Código PIX:</h4><div style="font-family: monospace; font-size: 12px; word-break: break-all; background: white; padding: 10px; border-radius: 4px;">' + payment.pixCode + '</div><button class="module-btn" onclick="navigator.clipboard.writeText(\'' + payment.pixCode + '\'); alert(\'Código PIX copiado!\')">Copiar Código PIX</button></div>';
+            }
+            
+            let expiresSection = '';
+            if (payment.expiresAt) {
+                expiresSection = '<p><strong>Expira em:</strong> ' + new Date(payment.expiresAt).toLocaleString('pt-BR') + '</p>';
+            }
+            
+            document.getElementById('payment-modal').innerHTML = 
+                '<div class="payment-modal-content">' +
+                    '<h3>Pagamento via PIX</h3>' +
+                    '<div style="text-align: center; padding: 20px;">' +
+                        qrCodeSection +
+                        pixCodeSection +
+                        '<div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin: 20px 0;">' +
+                            '<p><strong>Valor:</strong> R$ ' + payment.amount.toFixed(2).replace('.', ',') + '</p>' +
+                            '<p><strong>ID do Pagamento:</strong> ' + (payment.mercadoPagoId || payment.id) + '</p>' +
+                            '<p><strong>Status:</strong> <span style="color: #d97706;">Aguardando Pagamento</span></p>' +
+                            expiresSection +
+                        '</div>' +
+                        '<div style="background: #fef3c7; padding: 12px; border-radius: 6px; font-size: 14px; color: #92400e;">' +
+                            '💡 Após o pagamento, a confirmação pode levar alguns minutos para aparecer.' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 12px; margin-top: 20px;">' +
+                        '<button class="cancel-btn" onclick="checkPaymentStatus(\'' + (payment.mercadoPagoId || payment.id) + '\')">Verificar Status</button>' +
+                        '<button class="confirm-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>' +
+                    '</div>' +
+                '</div>';
         }
         
         function showBoletoPayment(payment) {
-            document.getElementById('payment-modal').innerHTML = \`
-                <div class="payment-modal-content">
-                    <h3>Pagamento via Boleto</h3>
-                    <div style="text-align: center; padding: 20px;">
-                        <p>Valor: <strong>R$ \${payment.amount.toFixed(2).replace('.', ',')}</strong></p>
-                        <p>Vencimento: <strong>\${new Date(payment.dueDate).toLocaleDateString('pt-BR')}</strong></p>
-                        <p>Status: <span style="color: #d97706;">Aguardando Pagamento</span></p>
-                        <button class="module-btn" onclick="window.open('\${payment.boletoUrl}', '_blank')">
-                            📄 Visualizar Boleto
-                        </button>
-                    </div>
-                    <button class="module-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>
-                </div>
-            \`;
+            document.getElementById('payment-modal').innerHTML = 
+                '<div class="payment-modal-content">' +
+                    '<h3>Pagamento via Boleto</h3>' +
+                    '<div style="text-align: center; padding: 20px;">' +
+                        '<p>Valor: <strong>R$ ' + payment.amount.toFixed(2).replace('.', ',') + '</strong></p>' +
+                        '<p>Vencimento: <strong>' + new Date(payment.dueDate).toLocaleDateString('pt-BR') + '</strong></p>' +
+                        '<p>Status: <span style="color: #d97706;">Aguardando Pagamento</span></p>' +
+                        '<button class="module-btn" onclick="window.open(\'' + payment.boletoUrl + '\', \'_blank\')">' +
+                            '📄 Visualizar Boleto' +
+                        '</button>' +
+                    '</div>' +
+                    '<button class="module-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>' +
+                '</div>';
         }
         
         function showCardPayment(payment) {
-            const status = payment.status === 'APPROVED' ? 'Aprovado' : 'Recusado';
-            const statusColor = payment.status === 'APPROVED' ? '#059669' : '#dc2626';
+            const status = payment.status === 'approved' ? 'Aprovado' : 'Recusado';
+            const statusColor = payment.status === 'approved' ? '#059669' : '#dc2626';
             
-            document.getElementById('payment-modal').innerHTML = \`
-                <div class="payment-modal-content">
-                    <h3>Pagamento via Cartão</h3>
-                    <div style="text-align: center; padding: 20px;">
-                        <p>Valor: <strong>R$ \${payment.amount.toFixed(2).replace('.', ',')}</strong></p>
-                        <p>Status: <span style="color: \${statusColor};"><strong>\${status}</strong></span></p>
-                        \${payment.transactionId ? \`<p>ID da Transação: \${payment.transactionId}</p>\` : ''}
-                    </div>
-                    <button class="module-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>
-                </div>
-            \`;
+            let transactionSection = '';
+            if (payment.transactionId) {
+                transactionSection = '<p>ID da Transação: ' + payment.transactionId + '</p>';
+            }
+            
+            document.getElementById('payment-modal').innerHTML = 
+                '<div class="payment-modal-content">' +
+                    '<h3>Pagamento via Cartão</h3>' +
+                    '<div style="text-align: center; padding: 20px;">' +
+                        '<p>Valor: <strong>R$ ' + payment.amount.toFixed(2).replace('.', ',') + '</strong></p>' +
+                        '<p>Status: <span style="color: ' + statusColor + ';"><strong>' + status + '</strong></span></p>' +
+                        transactionSection +
+                    '</div>' +
+                    '<button class="module-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>' +
+                '</div>';
         }
         
         function closePaymentModal() {
