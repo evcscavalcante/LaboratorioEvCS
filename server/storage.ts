@@ -7,14 +7,16 @@ import {
   type MaxMinDensityTest,
   type InsertDensityInSituTest,
   type InsertRealDensityTest,
-  type InsertMaxMinDensityTest
+  type InsertMaxMinDensityTest,
+  type User,
+  type InsertUser
 } from "@shared/schema";
 
 export interface IStorage {
   // User operations for Replit Auth
   getUser(id: string): Promise<User | undefined>;
   getUsers(): Promise<User[]>;
-  upsertUser(user: UpsertUser): Promise<User>;
+  upsertUser(user: InsertUser): Promise<User>;
 
   // Density In Situ
   createDensityInSituTest(test: InsertDensityInSituTest): Promise<DensityInSituTest>;
@@ -49,6 +51,7 @@ export class MemStorage implements IStorage {
     this.densityInSituTests = new Map();
     this.realDensityTests = new Map();
     this.maxMinDensityTests = new Map();
+    this.users = new Map();
     this.currentId = 1;
   }
 
@@ -150,6 +153,35 @@ export class MemStorage implements IStorage {
 
   async deleteMaxMinDensityTest(id: number): Promise<boolean> {
     return this.maxMinDensityTests.delete(id);
+  }
+
+  // User Management Methods
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async upsertUser(userData: InsertUser): Promise<User> {
+    const user: User = {
+      id: userData.id || String(Date.now()),
+      email: userData.email || null,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      profileImageUrl: userData.profileImageUrl || null,
+      role: userData.role || 'VIEWER',
+      active: userData.active !== undefined ? userData.active : true,
+      organizationId: userData.organizationId || null,
+      permissions: userData.permissions || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastLogin: null
+    };
+    
+    this.users.set(user.id, user);
+    return user;
   }
 }
 
