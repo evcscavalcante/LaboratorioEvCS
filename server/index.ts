@@ -2,16 +2,6 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import path from "path";
 
-function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-  console.log(`${formattedTime} [${source}] ${message}`);
-}
-
 const app = express();
 const server = createServer(app);
 
@@ -42,7 +32,7 @@ const mockUsers = new Map([
 ]);
 
 // Auth routes
-app.get('/api/auth/user', mockAuth, async (req: any, res) => {
+app.get('/api/auth/user', mockAuth, (req: any, res) => {
   try {
     const userId = req.user.claims.sub;
     const user = mockUsers.get(userId);
@@ -58,7 +48,7 @@ app.post('/api/logout', (req, res) => {
 });
 
 // Users routes
-app.get("/api/users", mockAuth, async (req, res) => {
+app.get("/api/users", mockAuth, (req, res) => {
   try {
     const users = Array.from(mockUsers.values());
     res.json(users);
@@ -67,7 +57,7 @@ app.get("/api/users", mockAuth, async (req, res) => {
   }
 });
 
-app.post("/api/users", mockAuth, async (req, res) => {
+app.post("/api/users", mockAuth, (req, res) => {
   try {
     const userData = req.body;
     const userId = String(Date.now());
@@ -84,7 +74,7 @@ app.post("/api/users", mockAuth, async (req, res) => {
   }
 });
 
-app.patch("/api/users/:id", mockAuth, async (req, res) => {
+app.patch("/api/users/:id", mockAuth, (req, res) => {
   try {
     const userId = req.params.id;
     const updates = req.body;
@@ -100,7 +90,7 @@ app.patch("/api/users/:id", mockAuth, async (req, res) => {
   }
 });
 
-app.delete("/api/users/:id", mockAuth, async (req, res) => {
+app.delete("/api/users/:id", mockAuth, (req, res) => {
   try {
     const userId = req.params.id;
     if (mockUsers.delete(userId)) {
@@ -114,7 +104,7 @@ app.delete("/api/users/:id", mockAuth, async (req, res) => {
 });
 
 // Organizations routes
-app.get("/api/organizations", async (req, res) => {
+app.get("/api/organizations", (req, res) => {
   try {
     const mockOrgs = [
       { id: 1, name: "Laboratório Principal", active: true, createdAt: new Date() },
@@ -126,7 +116,7 @@ app.get("/api/organizations", async (req, res) => {
   }
 });
 
-app.get("/api/organizations/user-counts", async (req, res) => {
+app.get("/api/organizations/user-counts", (req, res) => {
   try {
     const countsMap = { 1: 15, 2: 8 };
     res.json(countsMap);
@@ -136,11 +126,11 @@ app.get("/api/organizations/user-counts", async (req, res) => {
 });
 
 // Laboratory test routes
-app.get("/api/density-in-situ", mockAuth, async (req, res) => {
+app.get("/api/density-in-situ", mockAuth, (req, res) => {
   res.json([]);
 });
 
-app.post("/api/density-in-situ", mockAuth, async (req, res) => {
+app.post("/api/density-in-situ", mockAuth, (req, res) => {
   try {
     const testData = { id: Date.now(), ...req.body, createdAt: new Date() };
     res.status(201).json(testData);
@@ -149,11 +139,11 @@ app.post("/api/density-in-situ", mockAuth, async (req, res) => {
   }
 });
 
-app.get("/api/real-density", mockAuth, async (req, res) => {
+app.get("/api/real-density", mockAuth, (req, res) => {
   res.json([]);
 });
 
-app.post("/api/real-density", mockAuth, async (req, res) => {
+app.post("/api/real-density", mockAuth, (req, res) => {
   try {
     const testData = { id: Date.now(), ...req.body, createdAt: new Date() };
     res.status(201).json(testData);
@@ -162,11 +152,11 @@ app.post("/api/real-density", mockAuth, async (req, res) => {
   }
 });
 
-app.get("/api/max-min-density", mockAuth, async (req, res) => {
+app.get("/api/max-min-density", mockAuth, (req, res) => {
   res.json([]);
 });
 
-app.post("/api/max-min-density", mockAuth, async (req, res) => {
+app.post("/api/max-min-density", mockAuth, (req, res) => {
   try {
     const testData = { id: Date.now(), ...req.body, createdAt: new Date() };
     res.status(201).json(testData);
@@ -400,35 +390,55 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Request logging middleware
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
-
-  next();
+// Simple fallback for development
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Laboratório Ev.C.S - Sistema Geotécnico</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+          .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+          h1 { color: #2563eb; margin-bottom: 20px; }
+          .status { background: #dcfce7; border: 1px solid #16a34a; color: #166534; padding: 12px; border-radius: 4px; margin: 20px 0; }
+          .api-list { background: #f8fafc; padding: 20px; border-radius: 4px; margin: 20px 0; }
+          .api-link { display: block; color: #2563eb; text-decoration: none; margin: 8px 0; padding: 8px; background: white; border-radius: 4px; border: 1px solid #e2e8f0; }
+          .api-link:hover { background: #f1f5f9; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>🧪 Laboratório Ev.C.S</h1>
+          <p>Sistema Geotécnico para Análise de Densidade do Solo</p>
+          
+          <div class="status">
+            ✅ Servidor funcionando corretamente na porta 5000
+          </div>
+          
+          <div class="api-list">
+            <h3>APIs Disponíveis:</h3>
+            <a href="/health" class="api-link">GET /health - Status do servidor</a>
+            <a href="/api/auth/user" class="api-link">GET /api/auth/user - Usuário autenticado</a>
+            <a href="/api/users" class="api-link">GET /api/users - Lista de usuários</a>
+            <a href="/api/organizations" class="api-link">GET /api/organizations - Organizações</a>
+            <a href="/api/subscription/plans" class="api-link">GET /api/subscription/plans - Planos de assinatura</a>
+            <a href="/api/subscription/cycles" class="api-link">GET /api/subscription/cycles - Ciclos de cobrança</a>
+            <a href="/api/density-in-situ" class="api-link">GET /api/density-in-situ - Ensaios densidade in situ</a>
+            <a href="/api/real-density" class="api-link">GET /api/real-density - Ensaios densidade real</a>
+            <a href="/api/max-min-density" class="api-link">GET /api/max-min-density - Ensaios densidade máx/mín</a>
+          </div>
+          
+          <p><strong>Ambiente:</strong> ${process.env.NODE_ENV || 'development'}</p>
+          <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+        </div>
+      </body>
+      </html>
+    `);
+  }
 });
 
 // Error handling middleware
@@ -439,51 +449,28 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(status).json({ message });
 });
 
-const port = 5000;
+const port = parseInt(process.env.PORT || '5000', 10);
 
-// Serve static files in production or fallback
-if (process.env.NODE_ENV !== "development") {
-  const clientPath = path.join(process.cwd(), 'client', 'dist');
-  app.use(express.static(clientPath));
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-      res.sendFile(path.join(clientPath, 'index.html'));
-    }
-  });
-} else {
-  // Simple fallback for development
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-      res.send(`
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Laboratório Ev.C.S - Sistema Geotécnico</title>
-        </head>
-        <body>
-          <div id="root">
-            <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
-              <h1>🧪 Laboratório Ev.C.S</h1>
-              <p>Sistema Geotécnico - Servidor funcionando!</p>
-              <p>API disponível em: <a href="/api/auth/user">/api/auth/user</a></p>
-              <p>Health check: <a href="/health">/health</a></p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `);
-    }
-  });
-}
-
-server.listen(port, "0.0.0.0", () => {
+server.listen(port, () => {
   console.log(`✅ Servidor rodando na porta ${port}`);
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`⏰ Iniciado em: ${new Date().toISOString()}`);
   console.log(`🆔 Process ID: ${process.pid}`);
   console.log(`🚀 Sistema pronto para conexões`);
+  console.log(`📍 Acesse: http://localhost:${port}`);
+  
+  // Test server accessibility
+  setTimeout(() => {
+    import('http').then(http => {
+      const req = http.request(`http://localhost:${port}/health`, { method: 'GET' }, (res) => {
+        console.log(`✓ Server health check passed: ${res.statusCode}`);
+      });
+      req.on('error', (err) => {
+        console.log(`⚠ Server health check failed: ${err.message}`);
+      });
+      req.end();
+    });
+  }, 1000);
 });
 
 // Handle server errors
