@@ -69,6 +69,7 @@ app.get('/api/max-min-density', mockAuth, (req, res) => {
   res.json([]);
 });
 
+// Payment and Subscription Routes
 app.get('/api/subscription/plans', (req, res) => {
   const plans = [
     {
@@ -76,11 +77,217 @@ app.get('/api/subscription/plans', (req, res) => {
       name: 'Básico',
       description: 'Plano ideal para pequenos laboratórios',
       basePrice: '299.00',
-      features: ['Ensaios básicos', 'Relatórios PDF'],
+      maxUsers: 5,
+      maxEnsaios: 100,
+      features: ['Ensaios básicos', 'Relatórios PDF', 'Suporte por email'],
+      active: true
+    },
+    {
+      id: '2',
+      name: 'Profissional',
+      description: 'Plano completo para laboratórios médios',
+      basePrice: '599.00',
+      maxUsers: 15,
+      maxEnsaios: 500,
+      features: ['Todos os ensaios', 'Relatórios avançados', 'Analytics', 'Suporte prioritário'],
+      active: true
+    },
+    {
+      id: '3',
+      name: 'Empresarial',
+      description: 'Solução completa para grandes laboratórios',
+      basePrice: '1199.00',
+      maxUsers: -1,
+      maxEnsaios: -1,
+      features: ['Recursos ilimitados', 'API personalizada', 'Integrações', 'Gerente dedicado'],
       active: true
     }
   ];
   res.json(plans);
+});
+
+app.get('/api/subscription/cycles', (req, res) => {
+  const cycles = [
+    {
+      id: '1',
+      name: 'Mensal',
+      months: 1,
+      discountPercent: '0',
+      active: true
+    },
+    {
+      id: '2',
+      name: 'Trimestral',
+      months: 3,
+      discountPercent: '5',
+      active: true
+    },
+    {
+      id: '3',
+      name: 'Semestral',
+      months: 6,
+      discountPercent: '10',
+      active: true
+    },
+    {
+      id: '4',
+      name: 'Anual',
+      months: 12,
+      discountPercent: '20',
+      active: true
+    }
+  ];
+  res.json(cycles);
+});
+
+app.post('/api/subscription/calculate-price', (req, res) => {
+  const { basePrice, cycleDiscountPercent, additionalUsers } = req.body;
+  
+  const userCost = (additionalUsers || 0) * 200; // R$ 200 per additional user
+  const subtotal = parseFloat(basePrice) + userCost;
+  const discount = subtotal * ((cycleDiscountPercent || 0) / 100);
+  const finalPrice = subtotal - discount;
+  
+  res.json({
+    basePrice: parseFloat(basePrice),
+    userCost,
+    subtotal,
+    discount,
+    finalPrice,
+    formattedPrice: `R$ ${finalPrice.toFixed(2).replace('.', ',')}`
+  });
+});
+
+app.post('/api/subscription/create', mockAuth, (req, res) => {
+  const { planId, cycleId, additionalUsers, paymentMethod } = req.body;
+  
+  // Mock subscription creation
+  const subscription = {
+    id: Date.now().toString(),
+    organizationId: 1,
+    planId,
+    cycleId,
+    additionalUsers: additionalUsers || 0,
+    status: 'PENDING',
+    startDate: new Date(),
+    nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    paymentMethod
+  };
+  
+  res.json(subscription);
+});
+
+app.get('/api/subscription/current', mockAuth, (req, res) => {
+  // Mock current subscription
+  const subscription = {
+    id: '1',
+    planId: '1',
+    planName: 'Básico',
+    status: 'ACTIVE',
+    startDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+    nextBillingDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+    price: 'R$ 299,00'
+  };
+  res.json(subscription);
+});
+
+// Payment Methods
+app.get('/api/payment/methods', mockAuth, (req, res) => {
+  const methods = [
+    {
+      id: 'pix',
+      name: 'PIX',
+      type: 'INSTANT',
+      enabled: true,
+      description: 'Pagamento instantâneo via PIX'
+    },
+    {
+      id: 'credit_card',
+      name: 'Cartão de Crédito',
+      type: 'CARD',
+      enabled: true,
+      description: 'Visa, Mastercard, Elo'
+    },
+    {
+      id: 'boleto',
+      name: 'Boleto Bancário',
+      type: 'SLIP',
+      enabled: true,
+      description: 'Vencimento em 3 dias úteis'
+    }
+  ];
+  res.json(methods);
+});
+
+app.post('/api/payment/process', mockAuth, (req, res) => {
+  const { amount, method, planId, cycleId } = req.body;
+  
+  const payment = {
+    id: Date.now().toString(),
+    amount: parseFloat(amount),
+    method,
+    status: 'PENDING',
+    createdAt: new Date(),
+    planId,
+    cycleId
+  };
+  
+  // Simulate different payment flows
+  if (method === 'pix') {
+    payment.pixCode = 'PIX123456789ABCDEF';
+    payment.qrCode = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQR42mNkYPhfz0AAAAAXMMS0GAQAAAAAvD_BwAAAABJRU5ErkJggg==';
+  } else if (method === 'boleto') {
+    payment.boletoUrl = '/api/payment/boleto/' + payment.id;
+    payment.dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+  }
+  
+  res.json(payment);
+});
+
+app.post('/api/payment/pix', mockAuth, (req, res) => {
+  const { amount } = req.body;
+  
+  const pixPayment = {
+    id: Date.now().toString(),
+    amount: parseFloat(amount),
+    pixCode: `00020126580014BR.GOV.BCB.PIX0136${Date.now()}520400005303986540${amount.toFixed(2)}5802BR5925LABORATORIO EVCS LTDA6009SAO PAULO62070503***6304${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
+    qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQR42mNkYPhfz0AAAAAXMMS0GAQAAAAAvD_BwAAAABJRU5ErkJggg==',
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
+    status: 'PENDING'
+  };
+  
+  res.json(pixPayment);
+});
+
+app.post('/api/payment/credit-card', mockAuth, (req, res) => {
+  const { amount, cardData } = req.body;
+  
+  // Mock credit card processing
+  const payment = {
+    id: Date.now().toString(),
+    amount: parseFloat(amount),
+    method: 'CREDIT_CARD',
+    status: Math.random() > 0.1 ? 'APPROVED' : 'DECLINED',
+    transactionId: 'TXN' + Date.now(),
+    installments: cardData.installments || 1
+  };
+  
+  res.json(payment);
+});
+
+app.post('/api/payment/boleto', mockAuth, (req, res) => {
+  const { amount } = req.body;
+  
+  const boleto = {
+    id: Date.now().toString(),
+    amount: parseFloat(amount),
+    barcode: '03399999999999999999999999999999999999999999',
+    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    boletoUrl: '/api/payment/boleto/' + Date.now(),
+    status: 'PENDING'
+  };
+  
+  res.json(boleto);
 });
 
 app.get("/health", (req, res) => {
@@ -186,6 +393,7 @@ app.get('*', (req, res) => {
                         <button class="nav-btn active" data-page="dashboard">🏠 Dashboard</button>
                         <button class="nav-btn" data-page="laboratory">🧪 Ensaios</button>
                         <button class="nav-btn" data-page="reports">📊 Relatórios</button>
+                        <button class="nav-btn" data-page="subscription">💳 Assinatura</button>
                         <button class="nav-btn" data-page="admin" id="admin-nav">⚙️ Admin</button>
                         <button class="nav-btn logout-btn" id="logout-btn">Sair</button>
                     </div>
@@ -347,6 +555,9 @@ app.get('*', (req, res) => {
                         </div>
                     \`;
                     break;
+                case 'subscription':
+                    loadSubscriptionPage();
+                    break;
                 case 'admin':
                     if (currentUser && currentUser.role === 'ADMIN') {
                         content.innerHTML = \`
@@ -406,6 +617,268 @@ app.get('*', (req, res) => {
                     alert('Erro na API: ' + error.message);
                 });
         }
+        
+        async function loadSubscriptionPage() {
+            const content = document.getElementById('page-content');
+            content.innerHTML = '<div style="text-align: center; padding: 40px;">Carregando planos...</div>';
+            
+            try {
+                const [plansResponse, cyclesResponse, currentResponse] = await Promise.all([
+                    fetch('/api/subscription/plans'),
+                    fetch('/api/subscription/cycles'),
+                    fetch('/api/subscription/current')
+                ]);
+                
+                const plans = await plansResponse.json();
+                const cycles = await cyclesResponse.json();
+                const current = currentResponse.ok ? await currentResponse.json() : null;
+                
+                let subscriptionHTML = \`
+                    <h1 class="page-title">Gerenciar Assinatura</h1>
+                    
+                    \${current ? \`
+                        <div class="module-card" style="margin-bottom: 30px; background: #f0fdf4; border-color: #bbf7d0;">
+                            <h3 style="color: #166534;">📋 Assinatura Atual</h3>
+                            <p><strong>Plano:</strong> \${current.planName}</p>
+                            <p><strong>Status:</strong> <span style="color: #059669;">\${current.status}</span></p>
+                            <p><strong>Próxima cobrança:</strong> \${new Date(current.nextBillingDate).toLocaleDateString('pt-BR')}</p>
+                            <p><strong>Valor:</strong> \${current.price}</p>
+                        </div>
+                    \` : ''}
+                    
+                    <h2 style="margin-bottom: 20px;">Escolha seu Plano</h2>
+                    <div class="subscription-grid">
+                \`;
+                
+                plans.forEach(plan => {
+                    subscriptionHTML += \`
+                        <div class="plan-card \${current && current.planId === plan.id ? 'current-plan' : ''}" data-plan-id="\${plan.id}">
+                            <h3>\${plan.name}</h3>
+                            <div class="plan-price">R$ \${plan.basePrice.replace('.', ',')}<span>/mês</span></div>
+                            <p class="plan-description">\${plan.description}</p>
+                            
+                            <ul class="plan-features">
+                                \${plan.features.map(feature => \`<li>✓ \${feature}</li>\`).join('')}
+                                \${plan.maxUsers > 0 ? \`<li>✓ Até \${plan.maxUsers} usuários</li>\` : '<li>✓ Usuários ilimitados</li>'}
+                                \${plan.maxEnsaios > 0 ? \`<li>✓ Até \${plan.maxEnsaios} ensaios/mês</li>\` : '<li>✓ Ensaios ilimitados</li>'}
+                            </ul>
+                            
+                            <button class="plan-btn" onclick="selectPlan('\${plan.id}', '\${plan.basePrice}', '\${plan.name}')" 
+                                    \${current && current.planId === plan.id ? 'disabled' : ''}>
+                                \${current && current.planId === plan.id ? 'Plano Atual' : 'Selecionar Plano'}
+                            </button>
+                        </div>
+                    \`;
+                });
+                
+                subscriptionHTML += \`
+                    </div>
+                    
+                    <div id="payment-modal" class="payment-modal" style="display: none;">
+                        <div class="payment-modal-content">
+                            <h3>Finalizar Assinatura</h3>
+                            <div id="payment-details"></div>
+                            
+                            <div class="billing-cycle-section">
+                                <h4>Ciclo de Cobrança</h4>
+                                <select id="billing-cycle">
+                                    \${cycles.map(cycle => \`
+                                        <option value="\${cycle.id}" data-discount="\${cycle.discountPercent}">
+                                            \${cycle.name} \${cycle.discountPercent > 0 ? \`(-\${cycle.discountPercent}% desconto)\` : ''}
+                                        </option>
+                                    \`).join('')}
+                                </select>
+                            </div>
+                            
+                            <div class="payment-method-section">
+                                <h4>Forma de Pagamento</h4>
+                                <div class="payment-methods">
+                                    <button class="payment-method-btn" onclick="selectPaymentMethod('pix')">
+                                        📱 PIX
+                                    </button>
+                                    <button class="payment-method-btn" onclick="selectPaymentMethod('credit_card')">
+                                        💳 Cartão de Crédito
+                                    </button>
+                                    <button class="payment-method-btn" onclick="selectPaymentMethod('boleto')">
+                                        📄 Boleto
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="price-summary">
+                                <div id="price-breakdown"></div>
+                            </div>
+                            
+                            <div class="modal-actions">
+                                <button class="cancel-btn" onclick="closePaymentModal()">Cancelar</button>
+                                <button class="confirm-btn" onclick="processPayment()" id="process-payment-btn" disabled>
+                                    Processar Pagamento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                \`;
+                
+                content.innerHTML = subscriptionHTML;
+                
+            } catch (error) {
+                content.innerHTML = \`
+                    <div style="text-align: center; padding: 40px; color: #dc2626;">
+                        <h3>Erro ao carregar planos</h3>
+                        <p>Tente novamente em alguns instantes.</p>
+                        <button class="module-btn" onclick="loadSubscriptionPage()">Tentar Novamente</button>
+                    </div>
+                \`;
+            }
+        }
+        
+        let selectedPlan = null;
+        let selectedPaymentMethod = null;
+        
+        function selectPlan(planId, basePrice, planName) {
+            selectedPlan = { id: planId, basePrice: parseFloat(basePrice.replace(',', '.')), name: planName };
+            
+            document.getElementById('payment-details').innerHTML = \`
+                <div class="selected-plan">
+                    <h4>Plano Selecionado: \${planName}</h4>
+                    <p>Valor base: R$ \${basePrice.replace('.', ',')}/mês</p>
+                </div>
+            \`;
+            
+            updatePriceBreakdown();
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+        
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            document.querySelectorAll('.payment-method-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            event.target.classList.add('selected');
+            document.getElementById('process-payment-btn').disabled = false;
+        }
+        
+        function updatePriceBreakdown() {
+            const cycleSelect = document.getElementById('billing-cycle');
+            const selectedCycle = cycleSelect.options[cycleSelect.selectedIndex];
+            const discount = parseFloat(selectedCycle.dataset.discount) || 0;
+            
+            const basePrice = selectedPlan.basePrice;
+            const subtotal = basePrice;
+            const discountAmount = subtotal * (discount / 100);
+            const finalPrice = subtotal - discountAmount;
+            
+            document.getElementById('price-breakdown').innerHTML = \`
+                <div class="price-line">Valor base: <span>R$ \${basePrice.toFixed(2).replace('.', ',')}</span></div>
+                \${discount > 0 ? \`<div class="price-line discount">Desconto (\${discount}%): <span>-R$ \${discountAmount.toFixed(2).replace('.', ',')}</span></div>\` : ''}
+                <div class="price-line total">Total: <span>R$ \${finalPrice.toFixed(2).replace('.', ',')}</span></div>
+            \`;
+        }
+        
+        async function processPayment() {
+            const cycleSelect = document.getElementById('billing-cycle');
+            const selectedCycle = cycleSelect.options[cycleSelect.selectedIndex];
+            const discount = parseFloat(selectedCycle.dataset.discount) || 0;
+            
+            const finalPrice = selectedPlan.basePrice * (1 - discount / 100);
+            
+            try {
+                const response = await fetch('/api/payment/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: finalPrice,
+                        method: selectedPaymentMethod,
+                        planId: selectedPlan.id,
+                        cycleId: cycleSelect.value
+                    })
+                });
+                
+                const payment = await response.json();
+                
+                if (selectedPaymentMethod === 'pix') {
+                    showPixPayment(payment);
+                } else if (selectedPaymentMethod === 'boleto') {
+                    showBoletoPayment(payment);
+                } else {
+                    showCardPayment(payment);
+                }
+                
+            } catch (error) {
+                alert('Erro ao processar pagamento: ' + error.message);
+            }
+        }
+        
+        function showPixPayment(payment) {
+            document.getElementById('payment-modal').innerHTML = \`
+                <div class="payment-modal-content">
+                    <h3>Pagamento via PIX</h3>
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h4>Código PIX:</h4>
+                            <div style="font-family: monospace; font-size: 12px; word-break: break-all; background: white; padding: 10px; border-radius: 4px;">
+                                \${payment.pixCode || 'PIX123456789ABCDEF'}
+                            </div>
+                            <button class="module-btn" onclick="navigator.clipboard.writeText('\${payment.pixCode || 'PIX123456789ABCDEF'}')">
+                                Copiar Código PIX
+                            </button>
+                        </div>
+                        <p>Valor: <strong>R$ \${payment.amount.toFixed(2).replace('.', ',')}</strong></p>
+                        <p>Status: <span style="color: #d97706;">Aguardando Pagamento</span></p>
+                    </div>
+                    <button class="module-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>
+                </div>
+            \`;
+        }
+        
+        function showBoletoPayment(payment) {
+            document.getElementById('payment-modal').innerHTML = \`
+                <div class="payment-modal-content">
+                    <h3>Pagamento via Boleto</h3>
+                    <div style="text-align: center; padding: 20px;">
+                        <p>Valor: <strong>R$ \${payment.amount.toFixed(2).replace('.', ',')}</strong></p>
+                        <p>Vencimento: <strong>\${new Date(payment.dueDate).toLocaleDateString('pt-BR')}</strong></p>
+                        <p>Status: <span style="color: #d97706;">Aguardando Pagamento</span></p>
+                        <button class="module-btn" onclick="window.open('\${payment.boletoUrl}', '_blank')">
+                            📄 Visualizar Boleto
+                        </button>
+                    </div>
+                    <button class="module-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>
+                </div>
+            \`;
+        }
+        
+        function showCardPayment(payment) {
+            const status = payment.status === 'APPROVED' ? 'Aprovado' : 'Recusado';
+            const statusColor = payment.status === 'APPROVED' ? '#059669' : '#dc2626';
+            
+            document.getElementById('payment-modal').innerHTML = \`
+                <div class="payment-modal-content">
+                    <h3>Pagamento via Cartão</h3>
+                    <div style="text-align: center; padding: 20px;">
+                        <p>Valor: <strong>R$ \${payment.amount.toFixed(2).replace('.', ',')}</strong></p>
+                        <p>Status: <span style="color: \${statusColor};"><strong>\${status}</strong></span></p>
+                        \${payment.transactionId ? \`<p>ID da Transação: \${payment.transactionId}</p>\` : ''}
+                    </div>
+                    <button class="module-btn" onclick="closePaymentModal(); loadSubscriptionPage();">Fechar</button>
+                </div>
+            \`;
+        }
+        
+        function closePaymentModal() {
+            document.getElementById('payment-modal').style.display = 'none';
+            selectedPlan = null;
+            selectedPaymentMethod = null;
+        }
+        
+        // Add event listener for billing cycle changes
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'billing-cycle' && selectedPlan) {
+                updatePriceBreakdown();
+            }
+        });
         
         // Check for existing session
         const token = localStorage.getItem('auth_token');
