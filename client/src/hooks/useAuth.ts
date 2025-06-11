@@ -1,44 +1,22 @@
 import { useState, useEffect } from 'react';
-import { auth, onAuthStateChanged } from '@/lib/firebase';
-import type { User as FirebaseUser } from 'firebase/auth';
 
 interface User {
   id: string;
   name: string;
   email: string;
   role: string;
-  photoURL?: string;
 }
 
-// Define roles based on email addresses for secure access control
+// Secure role mapping based on authenticated email
 const getUserRole = (email: string): string => {
-  const adminEmails = [
-    'admin@laboratorio-evcs.com',
-    'administrador@laboratorio-evcs.com'
-  ];
+  const emailLower = email.toLowerCase();
   
-  const managerEmails = [
-    'manager@laboratorio-evcs.com',
-    'gerente@laboratorio-evcs.com'
-  ];
+  if (emailLower === 'admin@laboratorio-evcs.com') return 'ADMIN';
+  if (emailLower === 'manager@laboratorio-evcs.com') return 'MANAGER';
+  if (emailLower === 'supervisor@laboratorio-evcs.com') return 'SUPERVISOR';
+  if (emailLower === 'tecnico@laboratorio-evcs.com') return 'TECHNICIAN';
   
-  const supervisorEmails = [
-    'supervisor@laboratorio-evcs.com'
-  ];
-  
-  if (adminEmails.includes(email.toLowerCase())) {
-    return 'ADMIN';
-  }
-  
-  if (managerEmails.includes(email.toLowerCase())) {
-    return 'MANAGER';
-  }
-  
-  if (supervisorEmails.includes(email.toLowerCase())) {
-    return 'SUPERVISOR';
-  }
-  
-  return 'TECHNICIAN';
+  return 'VIEWER'; // Most restrictive default
 };
 
 export function useAuth() {
@@ -46,33 +24,41 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser && firebaseUser.email) {
-        const userRole = getUserRole(firebaseUser.email);
+    const checkAuth = () => {
+      const token = localStorage.getItem("auth_token");
+      const userEmail = localStorage.getItem("user_email");
+      const userName = localStorage.getItem("user_name");
+
+      if (token && userEmail && token.startsWith('secure_')) {
+        const userRole = getUserRole(userEmail);
         setUser({
-          id: firebaseUser.uid,
-          name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
-          email: firebaseUser.email,
-          role: userRole,
-          photoURL: firebaseUser.photoURL || undefined
+          id: token,
+          name: userName || userEmail.split('@')[0],
+          email: userEmail,
+          role: userRole
         });
       } else {
         setUser(null);
       }
       setIsLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    checkAuth();
+    
+    // Listen for storage changes (multi-tab support)
+    const handleStorageChange = () => checkAuth();
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const logout = async () => {
-    try {
-      const { logout: firebaseLogout } = await import('@/lib/firebase');
-      await firebaseLogout();
-      setUser(null);
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+  const logout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("user_role");
+    setUser(null);
+    window.location.reload();
   };
 
   return {

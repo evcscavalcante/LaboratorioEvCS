@@ -1,8 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithRedirect, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signInWithRedirect, GoogleAuthProvider, signOut, onAuthStateChanged, getRedirectResult } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "GOOGLE_API_KEY",
+  apiKey: "AIzaSyC1234567890abcdefghijklmnopqrstuvwx", // Placeholder - needs real API key
   authDomain: "laboratorio-evcs.firebaseapp.com",
   projectId: "laboratorio-evcs",
   storageBucket: "laboratorio-evcs.firebasestorage.app",
@@ -15,13 +15,35 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 const provider = new GoogleAuthProvider();
+provider.addScope('email');
+provider.addScope('profile');
 
-export const signInWithGoogle = () => {
-  signInWithRedirect(auth, provider);
+export const signInWithGoogle = async () => {
+  try {
+    await signInWithRedirect(auth, provider);
+  } catch (error) {
+    console.error("Error during Google sign in:", error);
+    throw error;
+  }
 };
 
-export const logout = () => {
-  signOut(auth);
+export const handleRedirectResult = async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    return result;
+  } catch (error) {
+    console.error("Error handling redirect result:", error);
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Error during logout:", error);
+    throw error;
+  }
 };
 
 export { onAuthStateChanged };

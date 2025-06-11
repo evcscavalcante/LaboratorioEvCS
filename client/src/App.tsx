@@ -9,7 +9,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Laboratory from "@/pages/laboratory";
 import Analytics from "@/pages/analytics";
-import FirebaseLogin from "@/pages/firebase-login";
+import SecureLogin from "@/pages/secure-login";
 import DensidadeInSituPage from "@/pages/solos/densidade-in-situ";
 import DensidadeRealPage from "@/pages/solos/densidade-real";
 import DensidadeMaxMinPage from "@/pages/solos/densidade-max-min";
@@ -35,7 +35,7 @@ function Router() {
   }
 
   if (!isAuthenticated) {
-    return <FirebaseLogin />;
+    return <SecureLogin />;
   }
 
   return (
