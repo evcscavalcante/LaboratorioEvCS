@@ -13,6 +13,7 @@ import {
 export interface IStorage {
   // User operations for Replit Auth
   getUser(id: string): Promise<User | undefined>;
+  getUsers(): Promise<User[]>;
   upsertUser(user: UpsertUser): Promise<User>;
 
   // Density In Situ
@@ -41,6 +42,7 @@ export class MemStorage implements IStorage {
   private densityInSituTests: Map<number, DensityInSituTest>;
   private realDensityTests: Map<number, RealDensityTest>;
   private maxMinDensityTests: Map<number, MaxMinDensityTest>;
+  private users: Map<string, User>;
   private currentId: number;
 
   constructor() {

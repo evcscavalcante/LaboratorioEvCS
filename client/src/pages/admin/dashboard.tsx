@@ -13,7 +13,7 @@ const QUICK_STATS = [
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
     endpoint: '/api/users',
-    filter: (data: User[]) => data.filter(user => user.active).length
+    filter: (data: User[]) => Array.isArray(data) ? data.filter(user => user.active).length : 0
   },
   {
     title: 'Organizações',
@@ -21,7 +21,7 @@ const QUICK_STATS = [
     color: 'text-green-600',
     bgColor: 'bg-green-50',
     endpoint: '/api/organizations',
-    filter: (data: Organization[]) => data.length
+    filter: (data: Organization[]) => Array.isArray(data) ? data.length : 0
   },
   {
     title: 'Administradores',
@@ -81,9 +81,9 @@ export default function AdminDashboard() {
 
   const getStatValue = (endpoint: string, filter: (data: any[]) => number) => {
     if (endpoint === '/api/users') {
-      return filter(users);
+      return filter(users || []);
     } else if (endpoint === '/api/organizations') {
-      return filter(organizations);
+      return filter(organizations || []);
     }
     return 0;
   };
