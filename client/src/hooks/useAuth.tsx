@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { User, getIdToken } from 'firebase/auth';
-import { onAuthStateChange, logout as firebaseLogout } from '../lib/firebase';
+import { onAuthStateChange, logout as firebaseLogout } from '@/lib/firebase';
 
 interface UserProfile {
   uid: string;
