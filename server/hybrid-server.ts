@@ -17,7 +17,7 @@ const sessionTtl = 24 * 60 * 60 * 1000; // 24 hours
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Session configuration
+// Session configuration (para dados adicionais se necessário)
 const MemoryStoreSession = MemoryStore(session);
 app.use(session({
   store: new MemoryStoreSession({
@@ -36,19 +36,13 @@ app.use(session({
 // Firebase Authentication routes
 app.use(hybridAuthRoutes);
 
-// Current user endpoint (protected by Firebase token)
+// API routes protegidas por Firebase Token
 app.get('/api/auth/user', verifyFirebaseToken, (req: Request, res: Response) => {
   res.json(req.user);
 });
 
-// Register main application routes with authentication
-registerRoutes(app);
-
-// Register payment routes
-registerPaymentRoutes(app);
-
-// Admin-only routes
-app.get("/api/admin/users", requireRole(['ADMIN']), (req: Request, res: Response) => {
+app.get("/api/admin/users", verifyFirebaseToken, requireRole(['ADMIN']), (req: Request, res: Response) => {
+  // Lista usuários do sistema (pode vir do Firebase Admin ou PostgreSQL)
   res.json([
     { id: 1, name: "Admin User", role: "ADMIN" },
     { id: 2, name: "Manager User", role: "MANAGER" },
@@ -57,35 +51,45 @@ app.get("/api/admin/users", requireRole(['ADMIN']), (req: Request, res: Response
   ]);
 });
 
-// Mercado Pago Configuration
-const MERCADO_PAGO_ACCESS_TOKEN = 'APP_USR-7d9c3772-5ece-433a-bd1b-2aa3e69c1863';
-const MERCADO_PAGO_PUBLIC_KEY = 'APP_USR-49306117834096-061114-3b017dc53c5db61ee27eb900797c610e-130749701';
+// Routes dos ensaios laboratoriais (PostgreSQL)
+registerRoutes(app);
+registerPaymentRoutes(app);
 
-// Payment configuration endpoint
+// Configuração de pagamentos
 app.get('/api/payment/config', (req: Request, res: Response) => {
   res.json({
-    mercadoPagoPublicKey: MERCADO_PAGO_PUBLIC_KEY
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
+    mercadoPagoKey: process.env.MERCADO_PAGO_PUBLIC_KEY || '',
+    pixEnabled: true,
+    boletoEnabled: true,
+    creditCardEnabled: true
   });
 });
 
-// Error handling middleware
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('Server error:', err);
-  res.status(500).json({ message: "Internal server error" });
-});
-
-// Setup Vite for development or serve static files for production
-if (app.get("env") === "development") {
+// Setup Vite em desenvolvimento
+if (process.env.NODE_ENV === "development") {
   setupVite(app, server);
 } else {
   serveStatic(app);
 }
 
-const PORT = parseInt(process.env.PORT || "5000", 10);
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Servidor iniciado na porta ${PORT}`);
-  console.log(`📊 Autenticação PostgreSQL ativa`);
-  console.log(`🔐 Credenciais padrão disponíveis para todos os níveis`);
+// Error handling
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  
+  console.error(`[${new Date().toISOString()}] Error ${status}: ${message}`);
+  if (err.stack) {
+    console.error(err.stack);
+  }
+  
+  res.status(status).json({ message });
 });
 
-export { app, server };
+const PORT = Number(process.env.PORT) || 5000;
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Servidor híbrido iniciado na porta ${PORT}`);
+  console.log(`🔥 Firebase Authentication (Frontend)`);
+  console.log(`🐘 PostgreSQL Database (Backend)`);
+  console.log(`🔐 Autenticação híbrida configurada`);
+});
