@@ -57,10 +57,15 @@ export async function initializeDefaultUsers() {
         // Hash password
         const hashedPassword = await bcrypt.hash(userData.password, 12);
 
-        // Create user
+        // Create user with proper ID generation
         const user = await storage.upsertUser({
-          ...userData,
-          password: hashedPassword
+          id: userData.id,
+          username: userData.username,
+          name: userData.name,
+          email: userData.email,
+          password: hashedPassword,
+          role: userData.role,
+          isActive: userData.isActive
         });
 
         console.log(`✓ Usuário criado: ${userData.username} (${userData.role})`);

@@ -199,6 +199,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           icon: Building,
           href: '/admin/organizations',
           active: location === '/admin/organizations'
+        },
+        {
+          label: 'Criar Usuário',
+          icon: UserCog,
+          href: '/admin/create-user',
+          active: location === '/admin/create-user'
         }
       ]
     }] : []),
