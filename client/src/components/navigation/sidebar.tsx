@@ -82,50 +82,54 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       active: location === '/analytics'
     },
     {
-      label: 'Assinatura',
-      icon: CreditCard,
-      href: '/subscription',
-      active: location === '/subscription'
-    },
-
-    {
-      label: 'Solos',
-      icon: Mountain,
+      label: 'Ensaios',
+      icon: FlaskRound,
       expandable: true,
       expanded: solosOpen,
       onToggle: () => setSolosOpen(!solosOpen),
       children: [
         {
-          label: 'Densidade In Situ',
-          icon: Target,
-          href: '/solos/densidade-in-situ',
-          active: location === '/solos/densidade-in-situ'
+          label: 'Solos',
+          icon: Mountain,
+          href: '/solos',
+          active: location.includes('/solos')
         },
         {
-          label: 'Densidade Real',
-          icon: Layers,
-          href: '/solos/densidade-real',
-          active: location === '/solos/densidade-real'
+          label: 'Asfalto',
+          icon: Car,
+          href: '/asfalto',
+          active: location.includes('/asfalto'),
+          disabled: true
         },
         {
-          label: 'Densidade Máx/Mín',
-          icon: Scale,
-          href: '/solos/densidade-max-min',
-          active: location === '/solos/densidade-max-min'
+          label: 'Concreto',
+          icon: Building2,
+          href: '/concreto',
+          active: location.includes('/concreto'),
+          disabled: true
         }
       ]
     },
     {
-      label: 'Verificação de Balança',
-      icon: Scale,
-      href: '/balanca-verificacao',
-      active: location === '/balanca-verificacao'
-    },
-    {
       label: 'Gestão de Equipamentos',
-      icon: FlaskRound,
-      href: '/equipamentos',
-      active: location === '/equipamentos'
+      icon: Package,
+      expandable: true,
+      expanded: asfaltoOpen,
+      onToggle: () => setAsfaltoOpen(!asfaltoOpen),
+      children: [
+        {
+          label: 'Equipamentos',
+          icon: FlaskRound,
+          href: '/equipamentos',
+          active: location === '/equipamentos'
+        },
+        {
+          label: 'Verificação de Balança',
+          icon: Scale,
+          href: '/balanca-verificacao',
+          active: location === '/balanca-verificacao'
+        }
+      ]
     },
     {
       label: 'Relatórios',
@@ -133,42 +137,17 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       href: '/relatorios',
       active: location === '/relatorios'
     },
-
+    {
+      label: 'Assinatura',
+      icon: CreditCard,
+      href: '/subscription',
+      active: location === '/subscription'
+    },
     {
       label: 'Configurações',
       icon: Settings,
       href: '/configuracoes',
       active: location === '/configuracoes'
-    },
-    {
-      label: 'Asfalto',
-      icon: Car,
-      expandable: true,
-      expanded: asfaltoOpen,
-      onToggle: () => setAsfaltoOpen(!asfaltoOpen),
-      children: [
-        {
-          label: 'Em Desenvolvimento',
-          icon: Settings,
-          href: '/asfalto',
-          disabled: true
-        }
-      ]
-    },
-    {
-      label: 'Concreto',
-      icon: Building2,
-      expandable: true,
-      expanded: concretoOpen,
-      onToggle: () => setConcretoOpen(!concretoOpen),
-      children: [
-        {
-          label: 'Em Desenvolvimento',
-          icon: Settings,
-          href: '/concreto',
-          disabled: true
-        }
-      ]
     },
     // Admin section - only for authorized users
     ...(permissions.canManageUsers ? [{
