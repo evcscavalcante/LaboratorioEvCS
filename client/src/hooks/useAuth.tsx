@@ -92,7 +92,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           setUserProfile(profile);
           
-          // Sincronização opcional - removida para evitar erros durante desenvolvimento
+          // Sincronizar com backend para obter role correto
+          await syncUser();
         } catch (error) {
           console.error('Erro ao processar autenticação:', error);
         }

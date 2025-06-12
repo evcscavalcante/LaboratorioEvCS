@@ -57,16 +57,34 @@ router.post('/api/auth/sync-user', verifyFirebaseToken, async (req: Request, res
   try {
     const user = (req as any).user;
     
-    // Aqui você pode salvar dados adicionais no PostgreSQL se necessário
-    // Por exemplo: preferências, dados específicos da empresa, etc.
+    // Buscar dados do usuário no PostgreSQL
+    const [dbUser] = await db.select().from(users).where(eq(users.email, user.email));
+    
+    let finalRole = user.role;
+    let finalName = user.name;
+    
+    if (dbUser) {
+      // Se usuário existe no banco, usar role e nome do banco
+      finalRole = dbUser.role;
+      finalName = dbUser.name;
+    } else {
+      // Se não existe, criar no banco
+      await db.insert(users).values({
+        firebase_uid: user.uid,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        active: true
+      });
+    }
     
     res.json({
       success: true,
       user: {
         uid: user.uid,
         email: user.email,
-        name: user.name,
-        role: user.role
+        name: finalName,
+        role: finalRole
       }
     });
   } catch (error) {
