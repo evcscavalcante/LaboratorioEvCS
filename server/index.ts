@@ -214,6 +214,38 @@ async function startServer() {
     }
   });
 
+  // Equipamentos API endpoints
+  app.get('/api/equipamentos', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      // Por enquanto, retornar array vazio até implementar no storage
+      res.json([]);
+    } catch (error) {
+      console.error('Error fetching equipamentos:', error);
+      res.status(500).json({ message: 'Failed to fetch equipamentos' });
+    }
+  });
+
+  app.post('/api/equipamentos', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      // Simular salvamento bem-sucedido
+      const equipamento = { ...req.body, id: req.body.id || crypto.randomUUID() };
+      res.status(201).json(equipamento);
+    } catch (error) {
+      console.error('Error creating equipamento:', error);
+      res.status(500).json({ message: 'Failed to create equipamento' });
+    }
+  });
+
+  app.delete('/api/equipamentos/:id', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      // Simular exclusão bem-sucedida
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting equipamento:', error);
+      res.status(500).json({ message: 'Failed to delete equipamento' });
+    }
+  });
+
   // Register additional routes
   await registerRoutes(app);
   await registerPaymentRoutes(app);

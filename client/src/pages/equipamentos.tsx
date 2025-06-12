@@ -43,6 +43,12 @@ export default function Equipamentos() {
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [busca, setBusca] = useState('');
+  const [syncStatus, setSyncStatus] = useState({
+    online: true,
+    pendingSync: 0,
+    lastSync: null as Date | null,
+    sources: { localStorage: true, postgresql: false, firebase: false }
+  });
   const [formData, setFormData] = useState<Partial<Equipamento>>({
     codigo: '',
     tipo: 'capsula',
@@ -57,6 +63,18 @@ export default function Equipamentos() {
 
   useEffect(() => {
     carregarEquipamentos();
+    
+    // Atualizar status de sincronização periodicamente
+    const interval = setInterval(async () => {
+      try {
+        const status = await robustSyncManager.getStatus();
+        setSyncStatus(status);
+      } catch (error) {
+        console.error('Erro ao obter status:', error);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const carregarEquipamentos = async () => {
@@ -243,8 +261,61 @@ export default function Equipamentos() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestão de Equipamentos</h1>
-          <p className="text-gray-600">Gerencie cápsulas e cilindros do laboratório</p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestão de Equipamentos</h1>
+              <p className="text-gray-600">Gerencie cápsulas e cilindros do laboratório</p>
+            </div>
+            
+            {/* Indicador de Status Triplo de Sincronização */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-white shadow-sm">
+                <div className="flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${syncStatus.sources.localStorage ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span className="text-xs font-medium text-gray-600">Local</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${syncStatus.sources.postgresql ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                  <span className="text-xs font-medium text-gray-600">PostgreSQL</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${syncStatus.sources.firebase ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                  <span className="text-xs font-medium text-gray-600">Firebase</span>
+                </div>
+                {syncStatus.pendingSync > 0 && (
+                  <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-yellow-100 rounded text-xs border border-yellow-200">
+                    <AlertCircle className="h-3 w-3 text-yellow-600" />
+                    <span className="text-yellow-700 font-medium">{syncStatus.pendingSync} pendente</span>
+                  </div>
+                )}
+              </div>
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={async () => {
+                  try {
+                    await robustSyncManager.forcSync();
+                    toast({
+                      title: "Sincronização forçada",
+                      description: "Tentativa de sincronizar dados pendentes iniciada"
+                    });
+                  } catch (error) {
+                    console.error('Erro na sincronização forçada:', error);
+                  }
+                }}
+                className="text-xs"
+              >
+                <Cloud className="h-3 w-3 mr-1" />
+                Sincronizar
+              </Button>
+              
+              <Button onClick={() => setIsDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Equipamento
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Filtros e busca */}
