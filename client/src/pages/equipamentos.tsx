@@ -15,6 +15,7 @@ interface Equipamento {
   id: string;
   codigo: string;
   tipo: 'capsula' | 'cilindro';
+  subtipo?: string;
   peso?: number;
   volume?: number;
   status: 'ativo' | 'inativo';
@@ -43,6 +44,7 @@ export default function Equipamentos() {
   const [formData, setFormData] = useState<Partial<Equipamento>>({
     codigo: '',
     tipo: 'capsula',
+    subtipo: '',
     peso: undefined,
     volume: undefined,
     status: 'ativo',
@@ -135,6 +137,7 @@ export default function Equipamentos() {
       setFormData({
         codigo: '',
         tipo: 'capsula',
+        subtipo: '',
         peso: undefined,
         volume: undefined,
         status: 'ativo',
@@ -195,6 +198,7 @@ export default function Equipamentos() {
     setFormData({
       codigo: '',
       tipo: 'capsula',
+      subtipo: '',
       peso: undefined,
       volume: undefined,
       status: 'ativo',
@@ -292,6 +296,15 @@ export default function Equipamentos() {
                             <SelectItem value="cilindro">Cilindro</SelectItem>
                           </SelectContent>
                         </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Variação/Modelo</Label>
+                        <Input
+                          value={formData.subtipo || ''}
+                          onChange={(e) => setFormData({...formData, subtipo: e.target.value})}
+                          placeholder="Ex: Pequena, Grande, 50ml, 100ml"
+                        />
                       </div>
 
                       <div className="space-y-2">
@@ -397,6 +410,7 @@ export default function Equipamentos() {
                         </div>
                         <p className="text-sm text-gray-600 capitalize">
                           {equipamento.tipo}
+                          {equipamento.subtipo && ` - ${equipamento.subtipo}`}
                           {equipamento.peso && ` • ${equipamento.peso}g`}
                           {equipamento.volume && ` • ${equipamento.volume}cm³`}
                         </p>
