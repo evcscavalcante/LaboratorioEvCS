@@ -21,12 +21,14 @@ export default function Login() {
   useEffect(() => {
     // Verificar status das credenciais Firebase
     const checkFirebaseConfig = () => {
-      const hasApiKey = !!import.meta.env.VITE_FIREBASE_API_KEY;
-      const hasProjectId = !!import.meta.env.VITE_FIREBASE_PROJECT_ID;
-      const hasAppId = !!import.meta.env.VITE_FIREBASE_APP_ID;
+      const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+      const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+      const appId = import.meta.env.VITE_FIREBASE_APP_ID;
       
-      if (!hasApiKey || !hasProjectId || !hasAppId) {
+      if (!apiKey || !projectId || !appId) {
         setFirebaseStatus('Credenciais Firebase não configuradas');
+      } else if (apiKey.length < 20 || !apiKey.startsWith('AIza')) {
+        setFirebaseStatus('API Key Firebase inválida');
       } else {
         setFirebaseStatus('Firebase configurado');
       }
@@ -104,11 +106,14 @@ export default function Login() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {firebaseStatus === 'Credenciais Firebase não configuradas' && (
+          {(firebaseStatus === 'Credenciais Firebase não configuradas' || firebaseStatus === 'API Key Firebase inválida') && (
             <Alert className="mb-4">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                Firebase não configurado. Solicite as credenciais ao administrador.
+                {firebaseStatus === 'API Key Firebase inválida' 
+                  ? 'A chave de API do Firebase é inválida. Verifique as credenciais.' 
+                  : 'Firebase não configurado. Solicite as credenciais ao administrador.'
+                }
               </AlertDescription>
             </Alert>
           )}
@@ -176,9 +181,9 @@ export default function Login() {
 
           <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="text-xs text-gray-500 text-center space-y-1">
-              <p>🔥 Autenticação Firebase</p>
-              <p>🐘 Dados no PostgreSQL</p>
-              <p>🔐 Sistema Híbrido</p>
+              <p>Firebase: {firebaseStatus}</p>
+              <p>PostgreSQL: Conectado</p>
+              <p>Sistema Híbrido Ativo</p>
             </div>
           </div>
         </CardContent>
