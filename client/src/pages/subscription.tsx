@@ -1,22 +1,36 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  CreditCard, 
-  Calendar, 
+  Check, 
   Users, 
-  CheckCircle, 
+  Receipt, 
+  CreditCard, 
+  QrCode, 
   Clock, 
-  AlertTriangle,
-  QrCode,
-  Receipt,
-  DollarSign,
   FileText
 } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -60,8 +74,6 @@ export default function SubscriptionPage() {
   const [paymentType, setPaymentType] = useState('pix');
   const [pixData, setPixData] = useState<any>(null);
 
-
-
   // Load initial data
   useEffect(() => {
     loadPlans();
@@ -95,8 +107,10 @@ export default function SubscriptionPage() {
   const loadCurrentSubscription = async () => {
     try {
       const response = await fetch('/api/subscription/current');
-      const data = await response.json();
-      setCurrentSubscription(data);
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentSubscription(data);
+      }
     } catch (error) {
       console.error('Error loading subscription:', error);
     }
@@ -105,10 +119,13 @@ export default function SubscriptionPage() {
   const loadPaymentMethods = async () => {
     try {
       const response = await fetch('/api/payment/methods');
-      const data = await response.json();
-      setPaymentMethods(data);
+      if (response.ok) {
+        const data = await response.json();
+        setPaymentMethods(Array.isArray(data) ? data : []);
+      }
     } catch (error) {
       console.error('Error loading payment methods:', error);
+      setPaymentMethods([]);
     }
   };
 
@@ -131,6 +148,8 @@ export default function SubscriptionPage() {
     
     setIsLoading(true);
     try {
+      const pricing = calculatePrice();
+      
       // Create subscription
       const subResponse = await fetch('/api/subscription/create', {
         method: 'POST',
@@ -146,7 +165,6 @@ export default function SubscriptionPage() {
       const subscription = await subResponse.json();
       
       // Create invoice
-      const pricing = calculatePrice();
       const invoiceResponse = await fetch('/api/payment/invoices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -160,74 +178,28 @@ export default function SubscriptionPage() {
       if (!invoiceResponse.ok) throw new Error('Failed to create invoice');
       const invoice = await invoiceResponse.json();
       
-      // Process payment based on type
+      // Create payment
+      const paymentResponse = await fetch(`/api/payment/${paymentType}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invoiceId: invoice.id,
+          amount: pricing.finalPrice
+        })
+      });
+      
+      if (!paymentResponse.ok) throw new Error('Failed to create payment');
+      const payment = await paymentResponse.json();
+      
       if (paymentType === 'pix') {
-        await handlePixPayment(invoice.id);
-      } else if (paymentType === 'boleto') {
-        await handleBoletoPayment(invoice.id);
+        setPixData(payment);
+        setActiveTab('payment');
       }
       
-      await loadCurrentSubscription();
     } catch (error) {
       console.error('Error creating subscription:', error);
-      alert('Erro ao criar assinatura. Tente novamente.');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handlePixPayment = async (invoiceId: string) => {
-    try {
-      const response = await fetch('/api/payment/pix', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          invoiceId,
-          provider: 'mercadopago',
-          customerData: {
-            name: 'Cliente Laboratório',
-            email: 'cliente@laboratorio-evcs.com',
-            document: '12345678901'
-          }
-        })
-      });
-      
-      if (!response.ok) throw new Error('Failed to process PIX payment');
-      const data = await response.json();
-      setPixData(data);
-      setActiveTab('payment');
-    } catch (error) {
-      console.error('Error processing PIX payment:', error);
-      throw error;
-    }
-  };
-
-  const handleBoletoPayment = async (invoiceId: string) => {
-    try {
-      const response = await fetch('/api/payment/boleto', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          invoiceId,
-          provider: 'pagseguro',
-          customerData: {
-            name: 'Cliente Laboratório',
-            email: 'cliente@laboratorio-evcs.com',
-            document: '12345678901'
-          }
-        })
-      });
-      
-      if (!response.ok) throw new Error('Failed to process boleto payment');
-      const data = await response.json();
-      
-      // Open boleto in new window
-      if (data.boletoUrl) {
-        window.open(data.boletoUrl, '_blank');
-      }
-    } catch (error) {
-      console.error('Error processing boleto payment:', error);
-      throw error;
     }
   };
 
@@ -238,77 +210,76 @@ export default function SubscriptionPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Gerenciar Assinatura</h1>
         {currentSubscription && (
-          <Badge variant={currentSubscription.status === 'active' ? 'default' : 'secondary'}>
-            {currentSubscription.status === 'active' ? 'Ativa' : 'Inativa'}
+          <Badge variant={currentSubscription.status === 'active' ? 'default' : 'destructive'}>
+            {currentSubscription.status === 'active' ? 'Ativo' : 'Inativo'}
           </Badge>
         )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="plans">Planos</TabsTrigger>
           <TabsTrigger value="payment">Pagamento</TabsTrigger>
-          <TabsTrigger value="billing">Faturas</TabsTrigger>
+          <TabsTrigger value="billing">Cobrança</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
-          {currentSubscription ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  Assinatura Ativa
-                </CardTitle>
-                <CardDescription>
-                  Sua assinatura está ativa e funcionando normalmente
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <Calendar className="h-8 w-8 mx-auto text-blue-600 mb-2" />
-                    <p className="text-sm text-gray-600">Próximo Pagamento</p>
-                    <p className="font-semibold">
-                      {new Date(currentSubscription.currentPeriodEnd).toLocaleDateString('pt-BR')}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <Users className="h-8 w-8 mx-auto text-green-600 mb-2" />
-                    <p className="text-sm text-gray-600">Usuários</p>
-                    <p className="font-semibold">-/-</p>
-                  </div>
-                  <div className="text-center">
-                    <DollarSign className="h-8 w-8 mx-auto text-purple-600 mb-2" />
-                    <p className="text-sm text-gray-600">Valor Mensal</p>
-                    <p className="font-semibold">-</p>
-                  </div>
-                  <div className="text-center">
-                    <Clock className="h-8 w-8 mx-auto text-orange-600 mb-2" />
-                    <p className="text-sm text-gray-600">Ensaios Este Mês</p>
-                    <p className="font-semibold">-/-</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Status da Assinatura</CardTitle>
+              <CardDescription>
+                Informações sobre sua assinatura atual
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {currentSubscription ? (
+                <div className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <Label>Plano Atual</Label>
+                      <p className="text-lg font-semibold">{currentSubscription.planName}</p>
+                    </div>
+                    <div>
+                      <Label>Status</Label>
+                      <Badge variant={currentSubscription.status === 'active' ? 'default' : 'destructive'}>
+                        {currentSubscription.status === 'active' ? 'Ativo' : 'Inativo'}
+                      </Badge>
+                    </div>
+                    <div>
+                      <Label>Próxima Cobrança</Label>
+                      <p>{new Date(currentSubscription.currentPeriodEnd).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div>
+                      <Label>Valor Mensal</Label>
+                      <p className="text-lg font-semibold">R$ {currentSubscription.amount}</p>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Alert>
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                Você não possui uma assinatura ativa. Escolha um plano para começar.
-              </AlertDescription>
-            </Alert>
-          )}
+              ) : (
+                <div className="text-center py-8">
+                  <h3 className="text-lg font-semibold mb-2">Nenhuma assinatura ativa</h3>
+                  <p className="text-gray-500 mb-4">
+                    Escolha um plano para começar a usar o sistema
+                  </p>
+                  <Button onClick={() => setActiveTab('plans')}>
+                    Ver Planos Disponíveis
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Plans Tab */}
         <TabsContent value="plans" className="space-y-6">
           {plans.length === 0 ? (
             <Card>
-              <CardContent className="text-center py-12">
-                <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum plano disponível</h3>
+              <CardHeader>
+                <CardTitle>Planos Indisponíveis</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <p className="text-gray-500 mb-6">
                   Os planos de assinatura não estão configurados no momento. Entre em contato com o administrador do sistema.
                 </p>
@@ -332,12 +303,12 @@ export default function SubscriptionPage() {
                     <ul className="space-y-2">
                       {plan.features.map((feature, index) => (
                         <li key={index} className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <Check className="h-4 w-4 text-green-500" />
                           <span className="text-sm">{feature}</span>
                         </li>
                       ))}
                     </ul>
-                    <div className="mt-4 space-y-2">
+                    <div className="mt-4 pt-4 border-t space-y-2">
                       <p className="text-sm text-gray-600">
                         <Users className="h-4 w-4 inline mr-1" />
                         {plan.maxUsers ? `Até ${plan.maxUsers} usuários` : 'Usuários ilimitados'}
@@ -436,7 +407,7 @@ export default function SubscriptionPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <QrCode className="h-5 w-5" />
-                  Pagamento PIX
+                  Pagamento via PIX
                 </CardTitle>
                 <CardDescription>
                   Escaneie o QR Code ou copie o código PIX abaixo
@@ -483,15 +454,17 @@ export default function SubscriptionPage() {
         <TabsContent value="billing" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Histórico de Faturas</CardTitle>
-              <CardDescription>Suas faturas e pagamentos</CardDescription>
+              <CardTitle>Histórico de Cobrança</CardTitle>
+              <CardDescription>
+                Suas faturas e pagamentos anteriores
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma fatura encontrada</h3>
-                <p className="text-gray-500 mb-6">
-                  Suas faturas aparecerão aqui quando você ativar uma assinatura.
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Nenhuma fatura encontrada</h3>
+                <p className="text-gray-500">
+                  Quando você tiver assinaturas ativas, as faturas aparecerão aqui.
                 </p>
               </div>
             </CardContent>
