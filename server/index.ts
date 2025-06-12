@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import session from "express-session";
+import cors from "cors";
 import hybridAuthRoutes, { verifyFirebaseToken } from "./auth-firebase-hybrid";
 import { registerRoutes } from "./routes";
 import { registerPaymentRoutes } from "./payment-routes";
@@ -21,6 +22,12 @@ async function startServer() {
 
   // Session TTL
   const sessionTtl = 24 * 60 * 60 * 1000; // 24 hours
+
+  // CORS configuration
+  app.use(cors({
+    origin: true,
+    credentials: true
+  }));
 
   // Basic middleware
   app.use(express.json());
