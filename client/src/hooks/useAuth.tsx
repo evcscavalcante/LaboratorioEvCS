@@ -40,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user || !token) return;
 
     try {
+      console.log('🔄 Iniciando sincronização para:', user.email);
       const response = await fetch('/api/auth/sync-user', {
         method: 'POST',
         headers: {
@@ -52,7 +53,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
+          console.log('📥 Dados recebidos do servidor:', data);
           if (data.user) {
+            console.log('✅ Atualizando perfil com role:', data.user.role);
             setUserProfile(data.user);
           }
         }

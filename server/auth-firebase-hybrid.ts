@@ -56,9 +56,11 @@ export const verifyFirebaseToken = async (req: Request, res: Response, next: Nex
 router.post('/api/auth/sync-user', verifyFirebaseToken, async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
+    console.log('🔍 Sincronizando usuário:', user.email);
     
     // Buscar dados do usuário no PostgreSQL
     const [dbUser] = await db.select().from(users).where(eq(users.email, user.email));
+    console.log('📊 Usuário no banco:', dbUser);
     
     let finalRole = user.role;
     let finalName = user.name;
@@ -67,6 +69,7 @@ router.post('/api/auth/sync-user', verifyFirebaseToken, async (req: Request, res
       // Se usuário existe no banco, usar role e nome do banco
       finalRole = dbUser.role;
       finalName = dbUser.name;
+      console.log('✅ Role final do banco:', finalRole);
     } else {
       // Se não existe, criar no banco
       await db.insert(users).values({
@@ -76,9 +79,10 @@ router.post('/api/auth/sync-user', verifyFirebaseToken, async (req: Request, res
         role: user.role,
         active: true
       });
+      console.log('➕ Usuário criado no banco com role:', user.role);
     }
     
-    res.json({
+    const response = {
       success: true,
       user: {
         uid: user.uid,
@@ -86,7 +90,10 @@ router.post('/api/auth/sync-user', verifyFirebaseToken, async (req: Request, res
         name: finalName,
         role: finalRole
       }
-    });
+    };
+    
+    console.log('📤 Resposta enviada:', response);
+    res.json(response);
   } catch (error) {
     console.error('Erro ao sincronizar usuário:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });

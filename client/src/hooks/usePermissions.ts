@@ -61,10 +61,13 @@ const ROLE_PERMISSIONS: Record<UserRole, Permissions> = {
 };
 
 export function usePermissions() {
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
   
-  const userRole = (user?.role || 'VIEWER') as UserRole;
+  const userRole = (userProfile?.role || 'VIEWER') as UserRole;
   const permissions = ROLE_PERMISSIONS[userRole];
+
+  console.log('🔍 usePermissions - userProfile:', userProfile);
+  console.log('🔍 usePermissions - userRole:', userRole);
 
   return {
     ...permissions,
