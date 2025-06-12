@@ -533,12 +533,31 @@ function FormularioEquipamento({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="subtipo">Subtipo</Label>
-            <Input
-              id="subtipo"
-              value={formData.subtipo}
-              onChange={(e) => setFormData({...formData, subtipo: e.target.value})}
-              placeholder="Ex: pequena, média, grande"
-            />
+            <Select value={formData.subtipo} onValueChange={(value) => setFormData({...formData, subtipo: value})}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o subtipo" />
+              </SelectTrigger>
+              <SelectContent>
+                {formData.tipo === 'capsula' && (
+                  <>
+                    <SelectItem value="pequena">Pequena</SelectItem>
+                    <SelectItem value="media">Média</SelectItem>
+                    <SelectItem value="grande">Grande</SelectItem>
+                    <SelectItem value="extra-grande">Extra Grande</SelectItem>
+                  </>
+                )}
+                {formData.tipo === 'cilindro' && (
+                  <>
+                    <SelectItem value="proctor-normal">Proctor Normal</SelectItem>
+                    <SelectItem value="proctor-modificado">Proctor Modificado</SelectItem>
+                    <SelectItem value="cbr">CBR</SelectItem>
+                    <SelectItem value="densidade-in-situ">Densidade In-Situ</SelectItem>
+                    <SelectItem value="densidade-maxima">Densidade Máxima</SelectItem>
+                    <SelectItem value="densidade-minima">Densidade Mínima</SelectItem>
+                  </>
+                )}
+              </SelectContent>
+            </Select>
           </div>
           
           <div>
