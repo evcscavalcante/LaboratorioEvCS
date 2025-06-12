@@ -1,51 +1,63 @@
-import express, { Request, Response } from 'express';
-import { firebaseAuthMiddleware, verifyFirebaseToken, syncUserWithDatabase } from './firebase-auth';
+import express from 'express';
+import bcrypt from 'bcrypt';
+import { storage } from './storage';
+import { Request, Response } from 'express';
 
 const router = express.Router();
 
-// Firebase login endpoint
-router.post('/api/auth/firebase-login', async (req: Request, res: Response) => {
+// Login endpoint
+router.post('/api/auth/login', async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username e password são obrigatórios' });
+  }
+
   try {
-    const { idToken } = req.body;
+    // Check if user exists in database
+    const user = await storage.getUserByUsername(username);
     
-    if (!idToken) {
-      return res.status(400).json({ error: 'Token Firebase necessário' });
+    if (!user) {
+      return res.status(401).json({ error: 'Credenciais inválidas' });
     }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
     
-    const firebaseUser = await verifyFirebaseToken(idToken);
-    
-    if (!firebaseUser) {
-      return res.status(401).json({ error: 'Token Firebase inválido' });
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Credenciais inválidas' });
     }
-    
-    // Sincronizar usuário com banco de dados
-    const dbUser = await syncUserWithDatabase(firebaseUser);
-    
-    // Criar sessão
+
+    // Set user session
     req.session.user = {
-      id: dbUser.id,
-      username: dbUser.username,
-      name: dbUser.name,
-      email: dbUser.email as string,
-      role: dbUser.role,
-      organizationId: dbUser.organizationId as number | undefined
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      email: user.email as string,
+      role: user.role,
+      organizationId: user.organizationId as number | undefined
     };
     
     res.json({
       success: true,
-      user: req.session.user,
-      message: 'Login realizado com sucesso'
+      user: {
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        organizationId: user.organizationId
+      }
     });
-    
   } catch (error) {
-    console.error('Erro no login Firebase:', error);
+    console.error('Erro no login:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
 
-// Verificar status de autenticação
+// Get current user
 router.get('/api/auth/status', (req: Request, res: Response) => {
-  if (req.session.user) {
+  if (req.session && req.session.user) {
     res.json({
       authenticated: true,
       user: req.session.user

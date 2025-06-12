@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { auth } from 'firebase-admin';
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 import { storage } from './storage';
 
 // Initialize Firebase Admin SDK
@@ -26,17 +26,13 @@ export interface FirebaseUser {
 
 export const verifyFirebaseToken = async (idToken: string): Promise<FirebaseUser | null> => {
   if (!admin) {
-    // Development fallback - return mock user for testing
-    return {
-      uid: 'dev-user-' + Date.now(),
-      email: 'dev@laboratorio-evcs.com',
-      name: 'Dev User',
-      emailVerified: true
-    };
+    console.log('Firebase Admin não configurado - requer credenciais');
+    return null;
   }
 
   try {
-    const decodedToken = await auth().verifyIdToken(idToken);
+    const auth = getAuth(admin);
+    const decodedToken = await auth.verifyIdToken(idToken);
     return {
       uid: decodedToken.uid,
       email: decodedToken.email || '',
@@ -78,7 +74,7 @@ export const syncUserWithDatabase = async (firebaseUser: FirebaseUser) => {
         role: user.role,
         active: user.active,
         profileImageUrl: firebaseUser.photoURL || user.profileImageUrl,
-        permissions: user.permissions || {}
+        permissions: (user.permissions as any) || {}
       };
       
       user = await storage.upsertUser(updatedUser);
