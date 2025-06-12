@@ -28,12 +28,20 @@ export const verifyFirebaseToken = async (req: Request, res: Response, next: Nex
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
     
+    // Definir role baseado no email do usuário
+    let userRole = (decodedToken as any).role || 'TECHNICIAN';
+    
+    // Configurar administrador do sistema
+    if (decodedToken.email === 'evcsousa@yahoo.com.br') {
+      userRole = 'ADMIN';
+    }
+    
     // Adicionar informações do usuário Firebase ao request
     (req as any).user = {
       uid: decodedToken.uid,
       email: decodedToken.email || '',
       name: decodedToken.name || decodedToken.email?.split('@')[0] || 'Usuário',
-      role: (decodedToken as any).role || 'TECHNICIAN', // Role customizado do Firebase
+      role: userRole,
       firebaseUser: decodedToken
     };
     

@@ -10,10 +10,14 @@ import { simpleOrgManager, requireRole } from "./simple-org-management";
 import { db } from "./db";
 import { subscriptionPlans, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { initializeAdminUser } from "./init-admin";
 
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Inicializar usuário administrador
+  await initializeAdminUser();
 
   // Session TTL
   const sessionTtl = 24 * 60 * 60 * 1000; // 24 hours

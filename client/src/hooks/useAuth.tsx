@@ -76,11 +76,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           // Extrair informações do usuário Firebase
           const customClaims = (firebaseUser as any).reloadUserRecord?.customClaims || {};
+          
+          // Definir role baseado no email do usuário
+          let userRole = customClaims.role || 'TECHNICIAN';
+          if (firebaseUser.email === 'evcsousa@yahoo.com.br') {
+            userRole = 'ADMIN';
+          }
+          
           const profile: UserProfile = {
             uid: firebaseUser.uid,
             email: firebaseUser.email || '',
             name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuário',
-            role: customClaims.role || 'TECHNICIAN'
+            role: userRole
           };
           
           setUserProfile(profile);
