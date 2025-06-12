@@ -21,6 +21,9 @@ async function startServer() {
   // Basic middleware
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
+  
+  // Serve static assets
+  app.use('/attached_assets', express.static('attached_assets'));
 
   // Session configuration
   const MemoryStoreSession = MemoryStore(session);

@@ -91,14 +91,11 @@ export default function Login() {
         <CardHeader className="space-y-4">
           <div className="flex justify-center">
             <img 
-              src="@assets/file_00000000233061f898ea05ffe6a1752e_1749721558008.png" 
+              src="/attached_assets/file_00000000233061f898ea05ffe6a1752e_1749721558008.png" 
               alt="LABORATÓRIO Ev.C S" 
-              className="w-32 h-32 object-contain"
+              className="w-40 h-24 object-contain"
             />
           </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            LABORATÓRIO Ev.C S
-          </CardTitle>
           <CardDescription className="text-center">
             {isSignUp 
               ? 'Crie sua conta para acessar o sistema' 
