@@ -66,8 +66,7 @@ export function usePermissions() {
   const userRole = (userProfile?.role || 'VIEWER') as UserRole;
   const permissions = ROLE_PERMISSIONS[userRole];
 
-  console.log('🔍 usePermissions - userProfile:', userProfile);
-  console.log('🔍 usePermissions - userRole:', userRole);
+
 
   return {
     ...permissions,

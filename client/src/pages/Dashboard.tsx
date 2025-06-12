@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Users, Shield, Settings, Database, Award } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
+  const userPermissions = usePermissions();
 
-  // Fetch user permissions
-  const { data: permissions, isLoading: permissionsLoading } = useQuery({
+  // Fetch user permissions from API
+  const { data: apiPermissions, isLoading: permissionsLoading } = useQuery({
     queryKey: ['/api/user/permissions'],
     enabled: !!user
   });
@@ -23,13 +25,13 @@ export default function Dashboard() {
   // Fetch admin users (only if user has permission)
   const { data: adminUsers, isLoading: usersLoading } = useQuery({
     queryKey: ['/api/admin/users'],
-    enabled: !!user && permissions?.permissions?.canManageUsers
+    enabled: !!user && userPermissions?.canManageUsers
   });
 
   // Fetch developer info (only if user has permission)
   const { data: developerInfo, isLoading: devLoading } = useQuery({
     queryKey: ['/api/developer/system-info'],
-    enabled: !!user && permissions?.permissions?.canAccessDeveloperTools
+    enabled: !!user && userPermissions?.isAdmin
   });
 
   if (!user) {
@@ -76,12 +78,17 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge className={getRoleBadgeColor(permissions?.currentRole || 'VIEWER')}>
-                {permissions?.currentRole || 'CARREGANDO...'}
+              <Badge className={getRoleBadgeColor(userProfile?.role || 'VIEWER')}>
+                {userProfile?.role === 'ADMIN' && 'Administrador'}
+                {userProfile?.role === 'MANAGER' && 'Gerente'}
+                {userProfile?.role === 'SUPERVISOR' && 'Supervisor'}
+                {userProfile?.role === 'TECHNICIAN' && 'Técnico'}
+                {userProfile?.role === 'VIEWER' && 'Visualizador'}
+                {!userProfile?.role && 'Carregando...'}
               </Badge>
               <div className="text-right">
-                <p className="font-medium">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="font-medium">{userProfile?.name || user?.displayName || 'Usuário'}</p>
+                <p className="text-sm text-gray-500">{user?.email}</p>
               </div>
             </div>
           </div>
@@ -99,14 +106,19 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {permissionsLoading ? (
-              <div className="animate-pulse h-20 bg-gray-200 rounded"></div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {Object.entries(permissions?.permissions || {}).map(([key, value]) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {Object.entries({
+                  'Criar': userPermissions.canCreate,
+                  'Editar': userPermissions.canEdit,
+                  'Excluir': userPermissions.canDelete,
+                  'Visualizar': userPermissions.canView,
+                  'Gerenciar Usuários': userPermissions.canManageUsers,
+                  'Aprovar Ensaios': userPermissions.canApproveTests,
+                  'Exportar Relatórios': userPermissions.canExportReports
+                }).map(([key, value]) => (
                   <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
+                    <span className="text-sm font-medium">
+                      {key}
                     </span>
                     <Badge variant={value ? "default" : "secondary"}>
                       {value ? "Permitido" : "Negado"}
@@ -114,7 +126,6 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-            )}
           </CardContent>
         </Card>
 
