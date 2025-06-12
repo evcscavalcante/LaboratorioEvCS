@@ -244,12 +244,22 @@ export default function Equipamentos() {
     
     carregarEquipamentos();
 
-    // Verificar autenticação periodicamente
-    const authInterval = setInterval(checkAuth, 2000);
+    // Listener para mudanças de autenticação Firebase
+    const handleAuthChange = (event: CustomEvent) => {
+      const { authenticated } = event.detail;
+      setAutenticado(authenticated);
+      setSyncStatus(prev => ({ ...prev, firebase: authenticated }));
+      
+      if (authenticated) {
+        carregarEquipamentos();
+      }
+    };
+
+    window.addEventListener('firebase-auth-changed', handleAuthChange as EventListener);
 
     return () => {
       if (unsubscribe) unsubscribe();
-      clearInterval(authInterval);
+      window.removeEventListener('firebase-auth-changed', handleAuthChange as EventListener);
     };
   }, []);
 

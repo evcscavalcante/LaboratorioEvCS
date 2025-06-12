@@ -137,7 +137,7 @@ export default function Laboratory() {
                 value="density-in-situ" 
                 className="py-4 px-2 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
               >
-                <span className="mr-2">⚖️</span>Densidade In Situ
+                <span className="mr-2">⚖️</span>Densidade In Situ - Cilindro de Cravação
               </TabsTrigger>
               <TabsTrigger 
                 value="density-real"

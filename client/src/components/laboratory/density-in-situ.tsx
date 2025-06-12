@@ -64,31 +64,68 @@ export default function DensityInSitu() {
     cilindros: []
   });
   
-  const [data, setData] = useState<DensityInSituData>({
-    registrationNumber: "",
-    date: new Date().toISOString().split('T')[0],
-    time: new Date().toTimeString().slice(0, 5),
-    operator: "",
-    technicalResponsible: "",
-    verifier: "",
-    material: "",
-    origin: "",
-    coordinates: "",
-    quadrant: "",
-    layer: "",
-    balanceId: "",
-    ovenId: "",
-    realDensityRef: "",
-    maxMinDensityRef: "",
-    det1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
-    det2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
-    moistureTop1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-    moistureTop2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-    moistureTop3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-    moistureBase1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-    moistureBase2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-    moistureBase3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-  });
+  // Função para carregar dados salvos
+  const loadSavedData = (): DensityInSituData => {
+    try {
+      const saved = localStorage.getItem('density-in-situ-progress');
+      if (saved) {
+        const parsedData = JSON.parse(saved);
+        // Manter data e hora atuais se não houver dados salvos
+        return {
+          ...parsedData,
+          date: parsedData.date || new Date().toISOString().split('T')[0],
+          time: parsedData.time || new Date().toTimeString().slice(0, 5),
+        };
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados salvos:', error);
+    }
+    
+    // Dados padrão se não houver salvamento
+    return {
+      registrationNumber: "",
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().slice(0, 5),
+      operator: "",
+      technicalResponsible: "",
+      verifier: "",
+      material: "",
+      origin: "",
+      coordinates: "",
+      quadrant: "",
+      layer: "",
+      balanceId: "",
+      ovenId: "",
+      realDensityRef: "",
+      maxMinDensityRef: "",
+      det1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      det2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      moistureTop1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moistureTop2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moistureTop3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moistureBase1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moistureBase2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moistureBase3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+    };
+  };
+
+  const [data, setData] = useState<DensityInSituData>(loadSavedData);
+
+  // Salvamento automático sempre que os dados mudarem
+  useEffect(() => {
+    const saveProgress = () => {
+      try {
+        localStorage.setItem('density-in-situ-progress', JSON.stringify(data));
+        console.log('💾 Progresso do ensaio salvo automaticamente');
+      } catch (error) {
+        console.error('Erro ao salvar progresso:', error);
+      }
+    };
+
+    // Salvar após um pequeno delay para evitar muitas operações
+    const timeoutId = setTimeout(saveProgress, 500);
+    return () => clearTimeout(timeoutId);
+  }, [data]);
 
   // Carregar equipamentos ao montar o componente
   useEffect(() => {
@@ -107,19 +144,30 @@ export default function DensityInSitu() {
     loadEquipamentos();
   }, []);
 
-  // Função para buscar dados do cilindro pelo código na nova estrutura
+  // Função para buscar dados do cilindro pelo código
   const buscarDadosCilindro = (codigo: string) => {
     if (!codigo) return null;
     
-    // Buscar nos cilindros de cravação (biselado/padrão) usando nova estrutura
+    // Buscar nos cilindros de cravação usando a nova estrutura de sincronização
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('cilindro_') && key.includes(codigo)) {
+      if (key?.startsWith('equipamento_cilindro_')) {
         const item = localStorage.getItem(key);
         if (item) {
-          const cilindro = JSON.parse(item);
-          if (cilindro.codigo === codigo && (cilindro.subtipo === 'biselado' || cilindro.subtipo === 'padrao')) {
-            return cilindro;
+          try {
+            const equipamento = JSON.parse(item);
+            if (equipamento.tipo === 'cilindro' && 
+                equipamento.codigo === codigo && 
+                (equipamento.subtipo === 'biselado' || equipamento.subtipo === 'padrao' || equipamento.subtipo === 'cravacao')) {
+              return {
+                codigo: equipamento.codigo,
+                peso: equipamento.peso,
+                volume: equipamento.volume,
+                subtipo: equipamento.subtipo
+              };
+            }
+          } catch (error) {
+            console.error('Erro ao processar equipamento:', error);
           }
         }
       }
@@ -131,15 +179,19 @@ export default function DensityInSitu() {
   const buscarPesoCapsula = (numero: string) => {
     if (!numero) return null;
     
-    // Buscar nas cápsulas usando nova estrutura
+    // Buscar nas cápsulas usando a nova estrutura de sincronização
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('capsula_') && key.includes(numero)) {
+      if (key?.startsWith('equipamento_capsula_')) {
         const item = localStorage.getItem(key);
         if (item) {
-          const capsula = JSON.parse(item);
-          if (capsula.codigo === numero) {
-            return capsula.peso;
+          try {
+            const equipamento = JSON.parse(item);
+            if (equipamento.tipo === 'capsula' && equipamento.codigo === numero) {
+              return equipamento.peso;
+            }
+          } catch (error) {
+            console.error('Erro ao processar equipamento:', error);
           }
         }
       }
@@ -163,8 +215,8 @@ export default function DensityInSitu() {
 
     if (dadosCilindro) {
       toast({
-        title: "Dados preenchidos automaticamente",
-        description: `Cilindro ${dadosCilindro.codigo} - ${dadosCilindro.subtipo}: ${dadosCilindro.peso}g, ${dadosCilindro.volume}cm³`,
+        title: "Cilindro de Cravação - Dados Preenchidos",
+        description: `Cilindro ${dadosCilindro.codigo} (${dadosCilindro.subtipo}): Peso ${dadosCilindro.peso}g, Volume ${dadosCilindro.volume}cm³`,
       });
     }
   };
