@@ -16,11 +16,15 @@ router.post('/login', async (req, res) => {
     }
 
     // Find user by username or email
+    console.log('Login attempt for:', username);
     const users = await storage.getUsers();
-    const user = users.find(u => 
-      u.username === username || 
-      u.email === username
-    );
+    console.log('Total users found:', users.length);
+    
+    const user = users.find(u => {
+      console.log('Checking user:', u.username || u.email, 'against:', username);
+      return (u.username && u.username === username) || 
+             (u.email && u.email === username);
+    });
 
     if (!user) {
       return res.status(401).json({ error: 'Credenciais inválidas' });

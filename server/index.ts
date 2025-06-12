@@ -2,7 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import authRoutes from "./auth-local";
+import authRoutes from "./simple-auth";
+import MemoryStore from "memorystore";
 
 const app = express();
 const server = createServer(app);
@@ -10,34 +11,26 @@ const server = createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Session configuration
+// Session configuration with memory store for simplicity
+const MemStore = MemoryStore(session);
 const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-const pgStore = connectPg(session);
-const sessionStore = new pgStore({
-  conString: process.env.DATABASE_URL,
-  createTableIfMissing: true,
-  ttl: sessionTtl,
-  tableName: "sessions",
-});
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'laboratorio-evcs-secret-2025',
-  store: sessionStore,
+  store: new MemStore({
+    checkPeriod: sessionTtl
+  }),
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // Set to true in production with HTTPS
+    secure: false,
     maxAge: sessionTtl,
   },
 }));
 
 // Authentication routes
 app.use('/api/auth', authRoutes);
-
-// Initialize default users
-import { initializeDefaultUsers } from './init-users';
-initializeDefaultUsers();
 
 // Mercado Pago Configuration
 const MERCADO_PAGO_ACCESS_TOKEN = 'APP_USR-7d9c3772-5ece-433a-bd1b-2aa3e69c1863';
