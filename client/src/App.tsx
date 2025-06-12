@@ -9,7 +9,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Laboratory from "@/pages/laboratory";
 import Analytics from "@/pages/analytics";
-import Login from "@/pages/Login";
+import Login from "@/pages/login";
 import SubscriptionPage from "@/pages/subscription";
 import DensidadeInSituPage from "@/pages/solos/densidade-in-situ";
 import DensidadeRealPage from "@/pages/solos/densidade-real";
@@ -76,9 +76,11 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <DataSyncProvider>
-        <Router />
-      </DataSyncProvider>
+      <AuthProvider>
+        <DataSyncProvider>
+          <Router />
+        </DataSyncProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
