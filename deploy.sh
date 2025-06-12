@@ -16,7 +16,7 @@ if [ -d "dist/public" ] && [ -f "dist/public/index.html" ]; then
     
     if [ $? -eq 0 ]; then
         echo "Deploy concluído com sucesso!"
-        echo "Seu site está disponível em: https://YOUR-PROJECT-ID.web.app"
+        echo "Seu site está disponível em: https://laboratorio-evcs.web.app"
     else
         echo "Erro no deploy!"
         exit 1
