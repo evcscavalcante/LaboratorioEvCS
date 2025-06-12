@@ -3,6 +3,20 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
+// Subscription Plans
+export const subscriptionPlans = pgTable("subscription_plans", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  price: real("price").notNull(),
+  currency: varchar("currency", { length: 3 }).default("BRL"),
+  maxUsers: integer("max_users").default(5),
+  maxTests: integer("max_tests").default(100),
+  features: json("features").$type<string[]>(),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 // User Management Tables
 export const organizations = pgTable("organizations", {
   id: serial("id").primaryKey(),
@@ -11,6 +25,11 @@ export const organizations = pgTable("organizations", {
   address: text("address"),
   phone: varchar("phone", { length: 20 }),
   email: varchar("email", { length: 255 }),
+  cnpj: varchar("cnpj", { length: 18 }),
+  subscriptionPlanId: integer("subscription_plan_id").references(() => subscriptionPlans.id),
+  subscriptionStatus: varchar("subscription_status", { length: 20 }).default("active"),
+  subscriptionExpiry: timestamp("subscription_expiry"),
+  monthlyTestCount: integer("monthly_test_count").default(0),
   active: boolean("active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
@@ -27,19 +46,14 @@ export const sessions = pgTable(
 );
 
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  username: varchar("username").unique().notNull(),
+  id: serial("id").primaryKey(),
+  firebase_uid: varchar("firebase_uid").unique(),
   email: varchar("email").unique(),
-  password: varchar("password"),
   name: varchar("name").notNull(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  role: varchar("role", { length: 50 }).notNull().default("technician"),
+  role: varchar("role", { length: 50 }).notNull().default("TECHNICIAN"),
   organizationId: integer("organization_id").references(() => organizations.id),
-  permissions: json("permissions"),
+  permissions: json("permissions").$type<string[]>(),
   active: boolean("active").default(true),
-  isActive: boolean("is_active").default(true),
   lastLogin: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -319,7 +333,44 @@ export const insertConferenciaEquipamentoSchema = createInsertSchema(conferencia
   updatedAt: true,
 });
 
+// User Role Types and Permissions
+export const UserRoles = {
+  DEVELOPER: 'DEVELOPER',
+  SUPER_ADMIN: 'SUPER_ADMIN', 
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+  SUPERVISOR: 'SUPERVISOR',
+  TECHNICIAN: 'TECHNICIAN',
+  VIEWER: 'VIEWER'
+} as const;
+
+export type UserRole = typeof UserRoles[keyof typeof UserRoles];
+
+// Role Hierarchy (higher number = more permissions)
+export const RoleHierarchy = {
+  [UserRoles.DEVELOPER]: 100,
+  [UserRoles.SUPER_ADMIN]: 90,
+  [UserRoles.ADMIN]: 80,
+  [UserRoles.MANAGER]: 60,
+  [UserRoles.SUPERVISOR]: 40,
+  [UserRoles.TECHNICIAN]: 20,
+  [UserRoles.VIEWER]: 10
+};
+
+// Subscription Plans Type Definition
+export const SubscriptionPlansEnum = {
+  BASIC: 'BASIC',
+  PROFESSIONAL: 'PROFESSIONAL',
+  ENTERPRISE: 'ENTERPRISE',
+  UNLIMITED: 'UNLIMITED'
+} as const;
+
 // Schemas
+export const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertOrganizationSchema = createInsertSchema(organizations).omit({
   id: true,
   createdAt: true,

@@ -41,14 +41,70 @@ app.get('/api/auth/user', verifyFirebaseToken, (req: Request, res: Response) => 
   res.json({ user: req.user });
 });
 
-// Admin routes (only for ADMINs)
-app.get("/api/admin/users", verifyFirebaseToken, requireRole(['ADMIN']), (req: Request, res: Response) => {
-  res.json([
-    { id: 1, name: "Admin User", role: "ADMIN" },
-    { id: 2, name: "Manager User", role: "MANAGER" },
-    { id: 3, name: "Supervisor User", role: "SUPERVISOR" },
-    { id: 4, name: "Technician User", role: "TECHNICIAN" }
-  ]);
+// Import organization management
+import { organizationManager, requireMinimumRole, checkOrganizationLimits } from "./organization-management";
+import { UserRoles, RoleHierarchy, subscriptionPlans, users } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+
+// Organization and plan management routes
+app.get("/api/organizations", verifyFirebaseToken, requireMinimumRole(UserRoles.ADMIN), async (req: Request, res: Response) => {
+  try {
+    const organizations = await organizationManager.getOrganizationsWithPlans();
+    res.json(organizations);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/subscription/plans", async (req: Request, res: Response) => {
+  try {
+    const plans = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.active, true));
+    res.json(plans);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/organization/limits", verifyFirebaseToken, checkOrganizationLimits, (req: Request, res: Response) => {
+  res.json(req.organizationLimits);
+});
+
+// User role management
+app.get("/api/user/roles", verifyFirebaseToken, (req: Request, res: Response) => {
+  const user = req.user as any;
+  res.json({
+    currentRole: user.role,
+    availableRoles: Object.values(UserRoles),
+    roleHierarchy: RoleHierarchy,
+    permissions: {
+      canManageOrganization: organizationManager.canManageOrganization(user.role),
+      canCreateOrganization: organizationManager.canCreateOrganization(user.role),
+      canModifyPlans: organizationManager.canModifyPlans(user.role)
+    }
+  });
+});
+
+// Admin routes (hierarchical access)
+app.get("/api/admin/users", verifyFirebaseToken, requireMinimumRole(UserRoles.ADMIN), async (req: Request, res: Response) => {
+  try {
+    const users = await db.select().from(users);
+    res.json(users);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Developer only routes
+app.get("/api/developer/system-info", verifyFirebaseToken, requireMinimumRole(UserRoles.DEVELOPER), (req: Request, res: Response) => {
+  res.json({
+    environment: process.env.NODE_ENV,
+    version: "1.0.0",
+    database: "PostgreSQL",
+    authentication: "Firebase Hybrid",
+    totalOrganizations: "dynamic",
+    systemHealth: "operational"
+  });
 });
 
 // Payment configuration endpoint
