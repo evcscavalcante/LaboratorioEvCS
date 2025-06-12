@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { storage } from "./storage-simple";
+import { storage } from "./storage-postgresql";
 import { 
   insertDensityInSituTestSchema,
   insertRealDensityTestSchema,

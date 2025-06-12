@@ -1,12 +1,9 @@
-import { 
-  densityInSituTests,
-  realDensityTests,
-  maxMinDensityTests,
+import {
   type DensityInSituTest,
-  type RealDensityTest,
-  type MaxMinDensityTest,
   type InsertDensityInSituTest,
+  type RealDensityTest,
   type InsertRealDensityTest,
+  type MaxMinDensityTest,
   type InsertMaxMinDensityTest,
   type User,
   type InsertUser
@@ -17,8 +14,8 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUsers(): Promise<User[]>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  upsertUser(user: InsertUser): Promise<User>;
-  createUser(user: InsertUser): Promise<User>;
+  upsertUser(user: any): Promise<User>;
+  createUser(user: any): Promise<User>;
 
   // Density In Situ
   createDensityInSituTest(test: InsertDensityInSituTest): Promise<DensityInSituTest>;
@@ -65,26 +62,25 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
       date: insertTest.date,
       registrationNumber: insertTest.registrationNumber,
-      time: insertTest.time || null,
       operator: insertTest.operator,
+      material: insertTest.material,
+      time: insertTest.time || null,
       technicalResponsible: insertTest.technicalResponsible || null,
       verifier: insertTest.verifier || null,
-      material: insertTest.material,
       origin: insertTest.origin || null,
-      coordinates: insertTest.coordinates || null,
-      quadrant: insertTest.quadrant || null,
-      layer: insertTest.layer || null,
-      balanceId: insertTest.balanceId || null,
-      ovenId: insertTest.ovenId || null,
-      realDensityRef: insertTest.realDensityRef || null,
-      maxMinDensityRef: insertTest.maxMinDensityRef || null,
       userId: insertTest.userId || null,
       createdBy: insertTest.createdBy || null,
       updatedBy: insertTest.updatedBy || null,
-      determinations: insertTest.determinations || null,
-      moistureTop: insertTest.moistureTop || null,
-      moistureBase: insertTest.moistureBase || null,
-      results: insertTest.results || null
+      results: insertTest.results || null,
+      gammaD: insertTest.gammaD || null,
+      gammaS: insertTest.gammaS || null,
+      moisture: insertTest.moisture || null,
+      calibrationFactor: insertTest.calibrationFactor || null,
+      observations: insertTest.observations || null,
+      compactionEnergy: insertTest.compactionEnergy || null,
+      equipmentSerial: insertTest.equipmentSerial || null,
+      temperature: insertTest.temperature || null,
+      equipment: insertTest.equipment || null
     } as DensityInSituTest;
     this.densityInSituTests.set(id, test);
     return test;
@@ -219,7 +215,7 @@ export class MemStorage implements IStorage {
       username: userData.username || userData.email?.split('@')[0] || 'user',
       name: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
       email: userData.email || null,
-      password: userData.password || '',
+      password: userData.password || null,
       role: userData.role || 'VIEWER',
       organizationId: userData.organizationId || null,
       firstName: userData.firstName || null,
@@ -246,7 +242,7 @@ export class MemStorage implements IStorage {
       username: userData.username || userData.email?.split('@')[0] || 'user',
       name: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
       email: userData.email || null,
-      password: userData.password || '',
+      password: userData.password || null,
       role: userData.role || 'VIEWER',
       organizationId: userData.organizationId || null,
       firstName: userData.firstName || null,

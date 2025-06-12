@@ -1,6 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import { storage } from './storage';
+import { storage } from './storage-final';
 import { Request, Response } from 'express';
 
 const router = express.Router();
