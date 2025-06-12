@@ -16,7 +16,8 @@ import {
   AlertTriangle,
   QrCode,
   Receipt,
-  DollarSign
+  DollarSign,
+  FileText
 } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
 
@@ -272,17 +273,17 @@ export default function SubscriptionPage() {
                   <div className="text-center">
                     <Users className="h-8 w-8 mx-auto text-green-600 mb-2" />
                     <p className="text-sm text-gray-600">Usuários</p>
-                    <p className="font-semibold">3/10</p>
+                    <p className="font-semibold">-/-</p>
                   </div>
                   <div className="text-center">
                     <DollarSign className="h-8 w-8 mx-auto text-purple-600 mb-2" />
                     <p className="text-sm text-gray-600">Valor Mensal</p>
-                    <p className="font-semibold">R$ 1.500,00</p>
+                    <p className="font-semibold">-</p>
                   </div>
                   <div className="text-center">
                     <Clock className="h-8 w-8 mx-auto text-orange-600 mb-2" />
                     <p className="text-sm text-gray-600">Ensaios Este Mês</p>
-                    <p className="font-semibold">127/500</p>
+                    <p className="font-semibold">-/-</p>
                   </div>
                 </div>
               </CardContent>
@@ -299,42 +300,54 @@ export default function SubscriptionPage() {
 
         {/* Plans Tab */}
         <TabsContent value="plans" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-3">
-            {plans.map((plan) => (
-              <Card key={plan.id} className={`cursor-pointer transition-all ${
-                selectedPlan === plan.id ? 'ring-2 ring-blue-500' : ''
-              }`} onClick={() => setSelectedPlan(plan.id)}>
-                <CardHeader>
-                  <CardTitle>{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                  <div className="text-2xl font-bold">
-                    R$ {parseFloat(plan.basePrice).toFixed(2)}
-                    <span className="text-sm font-normal text-gray-600">/mês</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-4 space-y-2">
-                    <p className="text-sm text-gray-600">
-                      <Users className="h-4 w-4 inline mr-1" />
-                      {plan.maxUsers ? `Até ${plan.maxUsers} usuários` : 'Usuários ilimitados'}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <Receipt className="h-4 w-4 inline mr-1" />
-                      {plan.maxEnsaios ? `Até ${plan.maxEnsaios} ensaios/mês` : 'Ensaios ilimitados'}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {plans.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum plano disponível</h3>
+                <p className="text-gray-500 mb-6">
+                  Os planos de assinatura não estão configurados no momento. Entre em contato com o administrador do sistema.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-3">
+              {plans.map((plan) => (
+                <Card key={plan.id} className={`cursor-pointer transition-all ${
+                  selectedPlan === plan.id ? 'ring-2 ring-blue-500' : ''
+                }`} onClick={() => setSelectedPlan(plan.id)}>
+                  <CardHeader>
+                    <CardTitle>{plan.name}</CardTitle>
+                    <CardDescription>{plan.description}</CardDescription>
+                    <div className="text-2xl font-bold">
+                      R$ {parseFloat(plan.basePrice).toFixed(2)}
+                      <span className="text-sm font-normal text-gray-600">/mês</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-4 space-y-2">
+                      <p className="text-sm text-gray-600">
+                        <Users className="h-4 w-4 inline mr-1" />
+                        {plan.maxUsers ? `Até ${plan.maxUsers} usuários` : 'Usuários ilimitados'}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <Receipt className="h-4 w-4 inline mr-1" />
+                        {plan.maxEnsaios ? `Até ${plan.maxEnsaios} ensaios/mês` : 'Ensaios ilimitados'}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {selectedPlan && (
             <Card>
@@ -470,28 +483,12 @@ export default function SubscriptionPage() {
               <CardDescription>Suas faturas e pagamentos</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <p className="font-semibold">Fatura #12345</p>
-                    <p className="text-sm text-gray-600">Janeiro 2025 - Plano Profissional</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">R$ 1.500,00</p>
-                    <Badge variant="default">Pago</Badge>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <p className="font-semibold">Fatura #12344</p>
-                    <p className="text-sm text-gray-600">Dezembro 2024 - Plano Profissional</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">R$ 1.500,00</p>
-                    <Badge variant="default">Pago</Badge>
-                  </div>
-                </div>
+              <div className="text-center py-12">
+                <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma fatura encontrada</h3>
+                <p className="text-gray-500 mb-6">
+                  Suas faturas aparecerão aqui quando você ativar uma assinatura.
+                </p>
               </div>
             </CardContent>
           </Card>

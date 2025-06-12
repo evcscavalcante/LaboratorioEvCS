@@ -225,74 +225,24 @@ app.delete('/api/equipamentos/cilindros/:id', mockAuth, (req, res) => {
 });
 
 // Payment and Subscription Routes
-app.get('/api/subscription/plans', (req, res) => {
-  const plans = [
-    {
-      id: '1',
-      name: 'Básico',
-      description: 'Plano ideal para pequenos laboratórios',
-      basePrice: '299.00',
-      maxUsers: 5,
-      maxEnsaios: 100,
-      features: ['Ensaios básicos', 'Relatórios PDF', 'Suporte por email'],
-      active: true
-    },
-    {
-      id: '2',
-      name: 'Profissional',
-      description: 'Plano completo para laboratórios médios',
-      basePrice: '599.00',
-      maxUsers: 15,
-      maxEnsaios: 500,
-      features: ['Todos os ensaios', 'Relatórios avançados', 'Analytics', 'Suporte prioritário'],
-      active: true
-    },
-    {
-      id: '3',
-      name: 'Empresarial',
-      description: 'Solução completa para grandes laboratórios',
-      basePrice: '1199.00',
-      maxUsers: -1,
-      maxEnsaios: -1,
-      features: ['Recursos ilimitados', 'API personalizada', 'Integrações', 'Gerente dedicado'],
-      active: true
-    }
-  ];
-  res.json(plans);
+app.get('/api/subscription/plans', async (req, res) => {
+  try {
+    // Return empty plans - no synthetic data
+    res.json([]);
+  } catch (error) {
+    console.error('Error fetching plans:', error);
+    res.status(500).json({ error: 'Erro ao buscar planos' });
+  }
 });
 
-app.get('/api/subscription/cycles', (req, res) => {
-  const cycles = [
-    {
-      id: '1',
-      name: 'Mensal',
-      months: 1,
-      discountPercent: '0',
-      active: true
-    },
-    {
-      id: '2',
-      name: 'Trimestral',
-      months: 3,
-      discountPercent: '5',
-      active: true
-    },
-    {
-      id: '3',
-      name: 'Semestral',
-      months: 6,
-      discountPercent: '10',
-      active: true
-    },
-    {
-      id: '4',
-      name: 'Anual',
-      months: 12,
-      discountPercent: '20',
-      active: true
-    }
-  ];
-  res.json(cycles);
+app.get('/api/subscription/cycles', async (req, res) => {
+  try {
+    // Return empty cycles - no synthetic data
+    res.json([]);
+  } catch (error) {
+    console.error('Error fetching cycles:', error);
+    res.status(500).json({ error: 'Erro ao buscar ciclos' });
+  }
 });
 
 app.post('/api/subscription/calculate-price', (req, res) => {
@@ -332,18 +282,14 @@ app.post('/api/subscription/create', mockAuth, (req, res) => {
   res.json(subscription);
 });
 
-app.get('/api/subscription/current', mockAuth, (req, res) => {
-  // Mock current subscription
-  const subscription = {
-    id: '1',
-    planId: '1',
-    planName: 'Básico',
-    status: 'ACTIVE',
-    startDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-    nextBillingDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-    price: 'R$ 299,00'
-  };
-  res.json(subscription);
+app.get('/api/subscription/current', async (req, res) => {
+  try {
+    // Return empty subscription - no synthetic data
+    res.json(null);
+  } catch (error) {
+    console.error('Error fetching current subscription:', error);
+    res.status(500).json({ error: 'Erro ao buscar assinatura atual' });
+  }
 });
 
 // Payment Methods
