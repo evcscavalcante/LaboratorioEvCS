@@ -286,32 +286,17 @@ export const conferenciaEquipamentos = pgTable("conferencia_equipamentos", {
 });
 
 // Equipment relations
-export const capsulasRelations = relations(capsulas, ({ many }) => ({
+export const equipamentosRelations = relations(equipamentos, ({ one, many }) => ({
+  user: one(users, {
+    fields: [equipamentos.userId],
+    references: [users.id]
+  }),
+  organization: one(organizations, {
+    fields: [equipamentos.organizationId],
+    references: [organizations.id]
+  }),
   conferencias: many(conferenciaEquipamentos)
 }));
-
-export const cilindrosRelations = relations(cilindros, ({ many }) => ({
-  conferencias: many(conferenciaEquipamentos)
-}));
-
-// Equipment Schemas
-export const insertCapsulaSchema = createInsertSchema(capsulas).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertCilindroSchema = createInsertSchema(cilindros).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertConferenciaEquipamentoSchema = createInsertSchema(conferenciaEquipamentos).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
 
 // User Role Types and Permissions
 export const UserRoles = {
@@ -399,10 +384,8 @@ export type InsertRealDensityTest = z.infer<typeof insertRealDensityTestSchema>;
 export type InsertMaxMinDensityTest = z.infer<typeof insertMaxMinDensityTestSchema>;
 
 export const insertEquipamentoSchema = createInsertSchema(equipamentos);
-export const insertConferenciaEquipamentoSchema = createInsertSchema(conferenciaEquipamentos);
 
 export type InsertEquipamento = z.infer<typeof insertEquipamentoSchema>;
-export type InsertConferenciaEquipamento = z.infer<typeof insertConferenciaEquipamentoSchema>;
 
 export type DensityInSituTest = typeof densityInSituTests.$inferSelect;
 export type RealDensityTest = typeof realDensityTests.$inferSelect;
@@ -410,17 +393,6 @@ export type MaxMinDensityTest = typeof maxMinDensityTests.$inferSelect;
 
 export type Equipamento = typeof equipamentos.$inferSelect;
 export type ConferenciaEquipamento = typeof conferenciaEquipamentos.$inferSelect;
-
-// User role definitions
-export const USER_ROLES = {
-  ADMIN: 'admin',
-  MANAGER: 'manager', 
-  SUPERVISOR: 'supervisor',
-  TECHNICIAN: 'technician',
-  VIEWER: 'viewer'
-} as const;
-
-export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 
 // Permission system
 export const PERMISSIONS = {

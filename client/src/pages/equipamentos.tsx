@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Edit, Trash2, Search, FlaskRound } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, FlaskRound, Wifi, WifiOff, Database, Cloud, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { tripleSyncManager } from '@/lib/triple-sync';
 
 interface Equipamento {
   id: string;
@@ -60,26 +61,18 @@ export default function Equipamentos() {
 
   const carregarEquipamentos = async () => {
     try {
-      const equipamentos: Equipamento[] = [];
-      
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        // Carregar equipamentos com a nova estrutura (equipamento_tipo_codigo_subtipo)
-        if (key?.startsWith('equipamento_')) {
-          const item = localStorage.getItem(key);
-          if (item) {
-            const equipamento = JSON.parse(item);
-            equipamentos.push(equipamento);
-          }
-        }
-      }
-
+      const equipamentos = await tripleSyncManager.loadEquipamentos();
       setEquipamentos(equipamentos);
+      
+      // Atualizar status de sincronização
+      const status = await tripleSyncManager.getSystemStatus();
+      setSyncStatus(status);
+      
     } catch (error) {
       console.error('Erro ao carregar equipamentos:', error);
       toast({
         title: "Erro",
-        description: "Erro ao carregar equipamentos",
+        description: "Erro ao carregar equipamentos. Dados salvos localmente serão mantidos.",
         variant: "destructive"
       });
     }
