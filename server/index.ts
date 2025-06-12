@@ -120,6 +120,99 @@ async function startServer() {
     });
   });
 
+  // Density Tests API Endpoints
+  
+  // Density In Situ Tests
+  app.get('/api/tests/density-in-situ', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      const tests = await storage.getDensityInSituTests();
+      res.json(tests);
+    } catch (error) {
+      console.error('Error fetching density in situ tests:', error);
+      res.status(500).json({ message: 'Failed to fetch tests' });
+    }
+  });
+
+  app.post('/api/tests/density-in-situ', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      const test = await storage.createDensityInSituTest(req.body);
+      res.status(201).json(test);
+    } catch (error) {
+      console.error('Error creating density in situ test:', error);
+      res.status(500).json({ message: 'Failed to create test' });
+    }
+  });
+
+  app.put('/api/tests/density-in-situ/:id', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const test = await storage.updateDensityInSituTest(id, req.body);
+      if (!test) {
+        return res.status(404).json({ message: 'Test not found' });
+      }
+      res.json(test);
+    } catch (error) {
+      console.error('Error updating density in situ test:', error);
+      res.status(500).json({ message: 'Failed to update test' });
+    }
+  });
+
+  app.delete('/api/tests/density-in-situ/:id', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteDensityInSituTest(id);
+      if (!success) {
+        return res.status(404).json({ message: 'Test not found' });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting density in situ test:', error);
+      res.status(500).json({ message: 'Failed to delete test' });
+    }
+  });
+
+  // Real Density Tests
+  app.get('/api/tests/real-density', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      const tests = await storage.getRealDensityTests();
+      res.json(tests);
+    } catch (error) {
+      console.error('Error fetching real density tests:', error);
+      res.status(500).json({ message: 'Failed to fetch tests' });
+    }
+  });
+
+  app.post('/api/tests/real-density', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      const test = await storage.createRealDensityTest(req.body);
+      res.status(201).json(test);
+    } catch (error) {
+      console.error('Error creating real density test:', error);
+      res.status(500).json({ message: 'Failed to create test' });
+    }
+  });
+
+  // Max/Min Density Tests
+  app.get('/api/tests/max-min-density', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      const tests = await storage.getMaxMinDensityTests();
+      res.json(tests);
+    } catch (error) {
+      console.error('Error fetching max/min density tests:', error);
+      res.status(500).json({ message: 'Failed to fetch tests' });
+    }
+  });
+
+  app.post('/api/tests/max-min-density', verifyFirebaseToken, async (req: Request, res: Response) => {
+    try {
+      const test = await storage.createMaxMinDensityTest(req.body);
+      res.status(201).json(test);
+    } catch (error) {
+      console.error('Error creating max/min density test:', error);
+      res.status(500).json({ message: 'Failed to create test' });
+    }
+  });
+
   // Register additional routes
   await registerRoutes(app);
   await registerPaymentRoutes(app);
