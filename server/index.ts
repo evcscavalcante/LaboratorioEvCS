@@ -128,8 +128,8 @@ async function startServer() {
       const tests = await storage.getDensityInSituTests();
       res.json(tests);
     } catch (error) {
-      console.error('Error fetching density in situ tests:', error);
-      res.status(500).json({ message: 'Failed to fetch tests' });
+      console.error('Erro ao buscar ensaios de densidade in situ:', error);
+      res.status(500).json({ message: 'Falha ao buscar ensaios' });
     }
   });
 
