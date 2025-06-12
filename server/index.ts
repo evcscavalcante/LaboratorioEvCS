@@ -539,11 +539,90 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Serve static files from client/public
-import { fileURLToPath } from 'url';
-import path from 'path';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-app.use(express.static(path.join(__dirname, '../client/public')));
+// Serve logo files - must be before Vite middleware
+app.get('/logo-compact.svg', (req, res) => {
+  res.setHeader('Content-Type', 'image/svg+xml');
+  res.send(`<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#047857;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <circle cx="30" cy="30" r="28" fill="url(#grad1)"/>
+  <rect x="15" y="38" width="30" height="4" fill="#8b5a2b" opacity="0.9"/>
+  <rect x="15" y="34" width="30" height="4" fill="#a0522d" opacity="0.9"/>
+  <rect x="15" y="30" width="30" height="4" fill="#cd853f" opacity="0.9"/>
+  <rect x="26" y="18" width="8" height="12" fill="#ffffff" stroke="#e5e7eb" stroke-width="1" rx="1"/>
+  <rect x="27" y="19" width="6" height="10" fill="url(#grad2)" opacity="0.8"/>
+  <line x1="34" y1="22" x2="36" y2="22" stroke="#ffffff" stroke-width="1"/>
+  <line x1="34" y1="26" x2="36" y2="26" stroke="#ffffff" stroke-width="1"/>
+  <text x="30" y="52" font-family="Arial Black, sans-serif" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">Ev.C.S</text>
+</svg>`);
+});
+
+app.get('/logo.svg', (req, res) => {
+  res.setHeader('Content-Type', 'image/svg+xml');
+  res.send(`<svg width="200" height="120" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#047857;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <circle cx="40" cy="40" r="35" fill="url(#gradient1)" filter="url(#shadow)"/>
+  <rect x="20" y="55" width="40" height="8" fill="#8b5a2b" opacity="0.8"/>
+  <rect x="20" y="47" width="40" height="8" fill="#a0522d" opacity="0.8"/>
+  <rect x="20" y="39" width="40" height="8" fill="#cd853f" opacity="0.8"/>
+  <rect x="32" y="25" width="16" height="20" fill="#e5e7eb" stroke="#6b7280" stroke-width="2" rx="2"/>
+  <rect x="34" y="27" width="12" height="16" fill="url(#gradient2)" opacity="0.7"/>
+  <line x1="48" y1="30" x2="52" y2="30" stroke="#374151" stroke-width="1"/>
+  <line x1="48" y1="35" x2="52" y2="35" stroke="#374151" stroke-width="1"/>
+  <line x1="48" y1="40" x2="52" y2="40" stroke="#374151" stroke-width="1"/>
+  <text x="90" y="30" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#1e40af">Ev.C.S</text>
+  <text x="90" y="48" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">LABORATÓRIO GEOTÉCNICO</text>
+  <text x="90" y="62" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af">Ensaios • Análises • Soluções</text>
+  <circle cx="170" cy="25" r="3" fill="#2563eb" opacity="0.6"/>
+  <circle cx="180" cy="35" r="2" fill="#059669" opacity="0.6"/>
+  <circle cx="175" cy="45" r="2.5" fill="#dc2626" opacity="0.6"/>
+  <line x1="90" y1="75" x2="185" y2="75" stroke="url(#gradient1)" stroke-width="2"/>
+</svg>`);
+});
+
+app.get('/favicon.svg', (req, res) => {
+  res.setHeader('Content-Type', 'image/svg+xml');
+  res.send(`<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="faviconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <circle cx="16" cy="16" r="15" fill="url(#faviconGrad)"/>
+  <rect x="8" y="20" width="16" height="2" fill="#8b5a2b" opacity="0.9"/>
+  <rect x="8" y="18" width="16" height="2" fill="#a0522d" opacity="0.9"/>
+  <rect x="8" y="16" width="16" height="2" fill="#cd853f" opacity="0.9"/>
+  <rect x="13" y="10" width="6" height="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="0.5" rx="1"/>
+  <rect x="14" y="11" width="4" height="6" fill="#059669" opacity="0.8"/>
+  <line x1="19" y1="13" x2="20" y2="13" stroke="#ffffff" stroke-width="0.5"/>
+  <line x1="19" y1="15" x2="20" y2="15" stroke="#ffffff" stroke-width="0.5"/>
+  <text x="16" y="27" font-family="Arial Black" font-size="4" font-weight="bold" fill="#ffffff" text-anchor="middle">E</text>
+</svg>`);
+});
 
 // Setup Vite for development
 import { setupVite } from "./vite";
@@ -551,7 +630,11 @@ setupVite(app, server);
 
 // Fallback for SPA routing
 app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
+  if (!req.path.startsWith('/api') && 
+      !req.path.startsWith('/health') && 
+      !req.path.startsWith('/logo') && 
+      !req.path.startsWith('/favicon') && 
+      !req.path.includes('.')) {
     res.send(`<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
