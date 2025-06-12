@@ -242,38 +242,18 @@ export const maxMinDensityTestsRelations = relations(maxMinDensityTests, ({ one 
 }));
 
 // Equipment Management Tables
-export const capsulas = pgTable("capsulas", {
+export const equipamentos = pgTable("equipamentos", {
   id: serial("id").primaryKey(),
-  codigo: varchar("codigo", { length: 50 }).notNull().unique(),
-  descricao: text("descricao"),
-  peso: real("peso").notNull(),
-  material: varchar("material", { length: 100 }),
-  fabricante: varchar("fabricante", { length: 255 }),
-  dataAquisicao: timestamp("data_aquisicao"),
-  status: varchar("status", { length: 50 }).notNull().default("ATIVO"),
-  localizacao: varchar("localizacao", { length: 255 }),
-  observacoes: text("observacoes"),
-  proximaConferencia: timestamp("proxima_conferencia"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
-});
-
-export const cilindros = pgTable("cilindros", {
-  id: serial("id").primaryKey(),
-  codigo: varchar("codigo", { length: 50 }).notNull().unique(),
-  tipo: varchar("tipo", { length: 50 }).notNull(), // 'biselado', 'proctor', 'cbr', 'vazios_minimos'
-  descricao: text("descricao"),
-  peso: real("peso").notNull(),
-  volume: real("volume").notNull(),
+  codigo: varchar("codigo", { length: 50 }).notNull(),
+  tipo: varchar("tipo", { length: 50 }).notNull(), // 'capsula' ou 'cilindro'
+  subtipo: varchar("subtipo", { length: 50 }), // Para cápsulas: 'pequena', 'media', 'grande' | Para cilindros: 'biselado', 'proctor', 'cbr', 'padrao'
+  peso: real("peso"),
+  volume: real("volume"),
   altura: real("altura"),
-  diametro: real("diametro"),
-  material: varchar("material", { length: 100 }),
-  fabricante: varchar("fabricante", { length: 255 }),
-  dataAquisicao: timestamp("data_aquisicao"),
-  status: varchar("status", { length: 50 }).notNull().default("ATIVO"),
-  localizacao: varchar("localizacao", { length: 255 }),
+  status: varchar("status", { length: 50 }).notNull().default("ativo"),
   observacoes: text("observacoes"),
-  proximaConferencia: timestamp("proxima_conferencia"),
+  userId: integer("user_id").references(() => users.id),
+  organizationId: integer("organization_id").references(() => organizations.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
@@ -418,16 +398,17 @@ export type InsertDensityInSituTest = z.infer<typeof insertDensityInSituTestSche
 export type InsertRealDensityTest = z.infer<typeof insertRealDensityTestSchema>;
 export type InsertMaxMinDensityTest = z.infer<typeof insertMaxMinDensityTestSchema>;
 
-export type InsertCapsula = z.infer<typeof insertCapsulaSchema>;
-export type InsertCilindro = z.infer<typeof insertCilindroSchema>;
+export const insertEquipamentoSchema = createInsertSchema(equipamentos);
+export const insertConferenciaEquipamentoSchema = createInsertSchema(conferenciaEquipamentos);
+
+export type InsertEquipamento = z.infer<typeof insertEquipamentoSchema>;
 export type InsertConferenciaEquipamento = z.infer<typeof insertConferenciaEquipamentoSchema>;
 
 export type DensityInSituTest = typeof densityInSituTests.$inferSelect;
 export type RealDensityTest = typeof realDensityTests.$inferSelect;
 export type MaxMinDensityTest = typeof maxMinDensityTests.$inferSelect;
 
-export type Capsula = typeof capsulas.$inferSelect;
-export type Cilindro = typeof cilindros.$inferSelect;
+export type Equipamento = typeof equipamentos.$inferSelect;
 export type ConferenciaEquipamento = typeof conferenciaEquipamentos.$inferSelect;
 
 // User role definitions
