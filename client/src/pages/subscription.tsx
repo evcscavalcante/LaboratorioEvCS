@@ -22,12 +22,12 @@ import {
 import { usePermissions } from '@/hooks/usePermissions';
 
 interface Plan {
-  id: string;
+  id: number;
   name: string;
   description: string;
-  basePrice: string;
+  price: number;
   maxUsers: number | null;
-  maxEnsaios: number | null;
+  maxTests: number | null;
   features: string[];
 }
 
@@ -52,13 +52,15 @@ export default function SubscriptionPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [plans, setPlans] = useState<Plan[]>([]);
   const [cycles, setCycles] = useState<BillingCycle[]>([]);
-  const [selectedPlan, setSelectedPlan] = useState<string>('');
+  const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [selectedCycle, setSelectedCycle] = useState<string>('');
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [currentSubscription, setCurrentSubscription] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [paymentType, setPaymentType] = useState('pix');
   const [pixData, setPixData] = useState<any>(null);
+
+
 
   // Load initial data
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function SubscriptionPage() {
     
     if (!plan || !cycle) return { finalPrice: 0, discount: 0 };
     
-    const basePrice = parseFloat(plan.basePrice);
+    const basePrice = plan.price;
     const discountPercent = parseFloat(cycle.discountPercent);
     const discount = basePrice * (discountPercent / 100);
     const finalPrice = basePrice - discount;
@@ -322,7 +324,7 @@ export default function SubscriptionPage() {
                     <CardTitle>{plan.name}</CardTitle>
                     <CardDescription>{plan.description}</CardDescription>
                     <div className="text-2xl font-bold">
-                      R$ {parseFloat(plan.basePrice).toFixed(2)}
+                      R$ {plan.price.toFixed(2)}
                       <span className="text-sm font-normal text-gray-600">/mês</span>
                     </div>
                   </CardHeader>
@@ -342,7 +344,7 @@ export default function SubscriptionPage() {
                       </p>
                       <p className="text-sm text-gray-600">
                         <Receipt className="h-4 w-4 inline mr-1" />
-                        {plan.maxEnsaios ? `Até ${plan.maxEnsaios} ensaios/mês` : 'Ensaios ilimitados'}
+                        {plan.maxTests ? `Até ${plan.maxTests} ensaios/mês` : 'Ensaios ilimitados'}
                       </p>
                     </div>
                   </CardContent>
