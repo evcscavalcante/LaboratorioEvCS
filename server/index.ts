@@ -1,12 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import session from "express-session";
-import connectPg from "connect-pg-simple";
 import authRoutes, { isAuthenticated, requireRole } from "./auth-complete";
 import { initializeDefaultUsers } from "./init-default-users";
 import { registerRoutes } from "./routes";
 import { registerPaymentRoutes } from "./payment-routes";
 import { setupVite, serveStatic } from "./vite";
+import MemoryStore from "memorystore";
 
 const app = express();
 const server = createServer(app);
@@ -19,12 +19,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Session configuration
-const PostgresStore = connectPg(session);
+const MemoryStoreSession = MemoryStore(session);
 app.use(session({
-  store: new PostgresStore({
-    conString: process.env.DATABASE_URL,
-    tableName: "user_sessions",
-    createTableIfMissing: true,
+  store: new MemoryStoreSession({
+    checkPeriod: sessionTtl
   }),
   secret: process.env.SESSION_SECRET || "fallback-secret-for-development",
   resave: false,

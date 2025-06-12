@@ -72,15 +72,17 @@ export class MemStorage implements IStorage {
       createdBy: insertTest.createdBy || null,
       updatedBy: insertTest.updatedBy || null,
       results: insertTest.results || null,
-      gammaD: insertTest.gammaD || null,
-      gammaS: insertTest.gammaS || null,
-      moisture: insertTest.moisture || null,
-      calibrationFactor: insertTest.calibrationFactor || null,
-      observations: insertTest.observations || null,
-      compactionEnergy: insertTest.compactionEnergy || null,
-      equipmentSerial: insertTest.equipmentSerial || null,
-      temperature: insertTest.temperature || null,
-      equipment: insertTest.equipment || null
+      coordinates: null,
+      quadrant: null,
+      layer: null,
+      balanceId: null,
+      volumeCylinder: null,
+      massWetSample: null,
+      massDrySample: null,
+      moisture: null,
+      gammaH: null,
+      gammaD: null,
+      relativeDensity: null
     } as DensityInSituTest;
     this.densityInSituTests.set(id, test);
     return test;
