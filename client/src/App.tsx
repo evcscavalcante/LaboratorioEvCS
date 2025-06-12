@@ -24,6 +24,7 @@ import UserRoles from "@/pages/admin/user-roles";
 import OrganizationManagement from "@/pages/admin/organization-management";
 import ManualUsuario from "@/pages/help/manual-usuario";
 import ManualAdmin from "@/pages/help/manual-admin";
+import TestAccess from "@/pages/test-access";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -63,6 +64,7 @@ function Router() {
         <Route path="/admin/organizations" component={OrganizationManagement} />
         <Route path="/help/manual-usuario" component={ManualUsuario} />
         <Route path="/help/manual-admin" component={ManualAdmin} />
+        <Route path="/test-access" component={TestAccess} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

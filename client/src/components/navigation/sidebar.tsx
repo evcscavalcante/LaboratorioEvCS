@@ -220,6 +220,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           icon: UserCog,
           href: '/help/manual-admin',
           active: location === '/help/manual-admin'
+        },
+        {
+          label: 'Teste de Acesso',
+          icon: Shield,
+          href: '/test-access',
+          active: location === '/test-access'
         }
       ]
     }
