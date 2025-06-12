@@ -388,8 +388,8 @@ export default function Equipamentos() {
 
       {/* Lista de equipamentos */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {equipamentosFiltrados.map((equipamento) => (
-          <Card key={equipamento.id} className="hover:shadow-md transition-shadow">
+        {equipamentosFiltrados.map((equipamento, index) => (
+          <Card key={`${equipamento.id}-${index}`} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg flex items-center gap-2">

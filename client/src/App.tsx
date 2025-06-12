@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { DataSyncProvider } from "@/contexts/data-sync-context";
 import MainLayout from "@/components/layout/main-layout";
 import NotFound from "@/pages/not-found";
-import Dashboard from "@/pages/Dashboard";
+import Dashboard from "@/pages/dashboard";
 import Laboratory from "@/pages/laboratory";
 import Analytics from "@/pages/analytics";
 import Login from "@/pages/login";
