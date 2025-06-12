@@ -147,10 +147,80 @@ export default function DensityMaxMin() {
     return Number(average.toFixed(2));
   };
 
-  // Função para buscar dados do cilindro pelo número
-  const buscarDadosCilindro = (numero: string) => {
-    const cilindro = equipamentos.cilindros.find(c => c.codigo === numero);
-    return cilindro ? { peso: cilindro.peso, volume: cilindro.volume } : null;
+  // Função para buscar dados do cilindro padrão pelo código
+  const buscarDadosCilindro = (codigo: string) => {
+    if (!codigo) return null;
+    
+    // Buscar nos cilindros padrão usando a nova estrutura de sincronização
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('equipamento_cilindro_')) {
+        const item = localStorage.getItem(key);
+        if (item) {
+          try {
+            const equipamento = JSON.parse(item);
+            if (equipamento.tipo === 'cilindro' && 
+                equipamento.codigo === codigo && 
+                equipamento.subtipo === 'padrao') {
+              return {
+                codigo: equipamento.codigo,
+                peso: equipamento.peso,
+                volume: equipamento.volume,
+                subtipo: equipamento.subtipo
+              };
+            }
+          } catch (error) {
+            console.error('Erro ao processar equipamento:', error);
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  // Função para buscar peso da cápsula pelo número
+  const buscarPesoCapsula = (numero: string) => {
+    if (!numero) return null;
+    
+    // Buscar nas cápsulas usando a nova estrutura de sincronização
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('equipamento_capsula_')) {
+        const item = localStorage.getItem(key);
+        if (item) {
+          try {
+            const equipamento = JSON.parse(item);
+            if (equipamento.tipo === 'capsula' && equipamento.codigo === numero) {
+              return equipamento.peso;
+            }
+          } catch (error) {
+            console.error('Erro ao processar equipamento:', error);
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  // Handler para mudança no número da cápsula
+  const handleCapsuleNumberChange = (field: 'moisture1' | 'moisture2' | 'moisture3', value: string) => {
+    const pesoCapsula = buscarPesoCapsula(value);
+    
+    setData(prev => ({
+      ...prev,
+      [field]: {
+        ...prev[field],
+        capsule: value,
+        tare: pesoCapsula || prev[field].tare
+      }
+    }));
+
+    if (pesoCapsula) {
+      toast({
+        title: "Cápsula - Dados Preenchidos",
+        description: `Cápsula ${value}: Peso ${pesoCapsula}g`,
+      });
+    }
   };
 
   // Handler para mudança no número do cilindro
@@ -221,8 +291,8 @@ export default function DensityMaxMin() {
 
     if (dadosCilindro) {
       toast({
-        title: "Dados preenchidos automaticamente",
-        description: `Peso: ${dadosCilindro.peso}g, Volume: ${dadosCilindro.volume}cm³`,
+        title: "Cilindro Padrão - Dados Preenchidos",
+        description: `Cilindro ${dadosCilindro.codigo} (${dadosCilindro.subtipo}): Peso ${dadosCilindro.peso}g, Volume ${dadosCilindro.volume}cm³`,
       });
     }
   };
@@ -525,7 +595,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.moisture1.capsule}
-                    onChange={(e) => updateNestedData("moisture1", "capsule", e.target.value)}
+                    onChange={(e) => handleCapsuleNumberChange("moisture1", e.target.value)}
                     className="text-sm"
                     placeholder="ID"
                   />
@@ -534,7 +604,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.moisture2.capsule}
-                    onChange={(e) => updateNestedData("moisture2", "capsule", e.target.value)}
+                    onChange={(e) => handleCapsuleNumberChange("moisture2", e.target.value)}
                     className="text-sm"
                     placeholder="ID"
                   />
@@ -543,7 +613,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.moisture3.capsule}
-                    onChange={(e) => updateNestedData("moisture3", "capsule", e.target.value)}
+                    onChange={(e) => handleCapsuleNumberChange("moisture3", e.target.value)}
                     className="text-sm"
                     placeholder="ID"
                   />
@@ -711,7 +781,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.maxDensity1.cylinderNumber}
-                    onChange={(e) => updateNestedData("maxDensity1", "cylinderNumber", e.target.value)}
+                    onChange={(e) => handleCylinderNumberChange("maxDensity1", e.target.value)}
                     className="text-sm"
                     placeholder="Ex: C001"
                   />
@@ -720,7 +790,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.maxDensity2.cylinderNumber}
-                    onChange={(e) => updateNestedData("maxDensity2", "cylinderNumber", e.target.value)}
+                    onChange={(e) => handleCylinderNumberChange("maxDensity2", e.target.value)}
                     className="text-sm"
                     placeholder="Ex: C002"
                   />
@@ -729,7 +799,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.maxDensity3.cylinderNumber}
-                    onChange={(e) => updateNestedData("maxDensity3", "cylinderNumber", e.target.value)}
+                    onChange={(e) => handleCylinderNumberChange("maxDensity3", e.target.value)}
                     className="text-sm"
                     placeholder="Ex: C003"
                   />
@@ -933,7 +1003,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.minDensity1.cylinderNumber}
-                    onChange={(e) => updateNestedData("minDensity1", "cylinderNumber", e.target.value)}
+                    onChange={(e) => handleCylinderNumberChange("minDensity1", e.target.value)}
                     className="text-sm"
                     placeholder="Ex: C004"
                   />
@@ -942,7 +1012,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.minDensity2.cylinderNumber}
-                    onChange={(e) => updateNestedData("minDensity2", "cylinderNumber", e.target.value)}
+                    onChange={(e) => handleCylinderNumberChange("minDensity2", e.target.value)}
                     className="text-sm"
                     placeholder="Ex: C005"
                   />
@@ -951,7 +1021,7 @@ export default function DensityMaxMin() {
                   <Input
                     type="text"
                     value={data.minDensity3.cylinderNumber}
-                    onChange={(e) => updateNestedData("minDensity3", "cylinderNumber", e.target.value)}
+                    onChange={(e) => handleCylinderNumberChange("minDensity3", e.target.value)}
                     className="text-sm"
                     placeholder="Ex: C006"
                   />
