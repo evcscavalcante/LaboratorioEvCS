@@ -122,17 +122,18 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       active: location === '/balanca-verificacao'
     },
     {
+      label: 'Gestão de Equipamentos',
+      icon: FlaskRound,
+      href: '/equipamentos',
+      active: location === '/equipamentos'
+    },
+    {
       label: 'Relatórios',
       icon: FileText,
       href: '/relatorios',
       active: location === '/relatorios'
     },
-    {
-      label: 'Gestão de Equipamentos',
-      icon: Package,
-      href: '/equipamentos',
-      active: location === '/equipamentos'
-    },
+
     {
       label: 'Configurações',
       icon: Settings,

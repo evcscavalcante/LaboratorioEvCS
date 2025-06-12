@@ -16,6 +16,7 @@ import DensidadeInSituPage from "@/pages/solos/densidade-in-situ";
 import DensidadeRealPage from "@/pages/solos/densidade-real";
 import DensidadeMaxMinPage from "@/pages/solos/densidade-max-min";
 import BalancaVerificacao from "@/pages/balanca-verificacao";
+import Equipamentos from "@/pages/equipamentos";
 import Configuracoes from "@/pages/configuracoes";
 import Relatorios from "@/pages/relatorios";
 import EquipamentosGestao from "@/pages/equipamentos-gestao";
@@ -60,6 +61,7 @@ function Router() {
         <Route path="/solos/densidade-real" component={DensidadeRealPage} />
         <Route path="/solos/densidade-max-min" component={DensidadeMaxMinPage} />
         <Route path="/balanca-verificacao" component={BalancaVerificacao} />
+        <Route path="/equipamentos" component={Equipamentos} />
         <Route path="/configuracoes" component={Configuracoes} />
         <Route path="/relatorios" component={Relatorios} />
         <Route path="/equipamentos" component={EquipamentosGestao} />
