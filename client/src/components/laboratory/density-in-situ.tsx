@@ -169,8 +169,6 @@ export default function DensityInSitu() {
     }
   };
 
-
-
   // Handler para mudança no número da cápsula
   const handleCapsuleNumberChange = (field: string, value: string) => {
     const pesoCapsula = buscarPesoCapsula(value);
