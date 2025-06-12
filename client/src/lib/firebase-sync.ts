@@ -89,8 +89,13 @@ class FirebaseSyncManager {
     }
 
     try {
+      // Filtrar campos undefined para evitar erro no Firebase
+      const cleanEquipamento = Object.fromEntries(
+        Object.entries(equipamento).filter(([key, value]) => value !== undefined)
+      );
+
       const equipamentoData = {
-        ...equipamento,
+        ...cleanEquipamento,
         userId: this.currentUser.uid,
         updatedAt: new Date().toISOString()
       };

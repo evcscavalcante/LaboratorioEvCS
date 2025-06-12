@@ -119,8 +119,13 @@ class RobustSyncManager {
     // 3. Tentar salvar no Firebase
     if (this.firestore && this.userId && this.isOnline) {
       try {
+        // Filtrar campos undefined para evitar erro no Firebase
+        const cleanEquipamento = Object.fromEntries(
+          Object.entries(equipamento).filter(([key, value]) => value !== undefined)
+        );
+        
         const docRef = doc(this.firestore, `users/${this.userId}/equipamentos`, equipamento.id);
-        await setDoc(docRef, equipamento);
+        await setDoc(docRef, cleanEquipamento);
         syncItem.synced.firebase = true;
       } catch (error) {
         console.log('Firebase indisponível, salvando na fila');

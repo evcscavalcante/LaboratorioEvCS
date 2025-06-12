@@ -19,15 +19,20 @@ interface MaxMinDensityData {
   material: string;
   origin: string;
   
+  // Moisture determinations
+  moisture1: { capsule: string; wetTare: number; dryTare: number; tare: number; };
+  moisture2: { capsule: string; wetTare: number; dryTare: number; tare: number; };
+  moisture3: { capsule: string; wetTare: number; dryTare: number; tare: number; };
+  
   // Maximum density determinations
-  maxDensity1: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
-  maxDensity2: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
-  maxDensity3: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
+  maxDensity1: { cylinderNumber: string; moldeSolo: number; molde: number; volume: number; };
+  maxDensity2: { cylinderNumber: string; moldeSolo: number; molde: number; volume: number; };
+  maxDensity3: { cylinderNumber: string; moldeSolo: number; molde: number; volume: number; };
   
   // Minimum density determinations
-  minDensity1: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
-  minDensity2: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
-  minDensity3: { cylinderNumber?: string; moldeSolo: number; molde: number; volume: number; moisture?: number; };
+  minDensity1: { cylinderNumber: string; moldeSolo: number; molde: number; volume: number; };
+  minDensity2: { cylinderNumber: string; moldeSolo: number; molde: number; volume: number; };
+  minDensity3: { cylinderNumber: string; moldeSolo: number; molde: number; volume: number; };
 }
 
 export default function DensityMaxMin() {
@@ -57,12 +62,15 @@ export default function DensityMaxMin() {
       operator: "",
       material: "",
       origin: "",
-      maxDensity1: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      maxDensity2: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      maxDensity3: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      minDensity1: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      minDensity2: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      minDensity3: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
+      moisture1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moisture2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moisture3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      maxDensity1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      maxDensity2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      maxDensity3: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      minDensity1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      minDensity2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      minDensity3: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
     };
   };
 
@@ -118,6 +126,26 @@ export default function DensityMaxMin() {
 
     loadEquipamentos();
   }, []);
+
+  // Função para calcular umidade individual
+  const calculateMoisture = (wet: number, dry: number, tare: number): number => {
+    if (dry === 0 || tare === 0) return 0;
+    const moistureContent = ((wet - dry) / (dry - tare)) * 100;
+    return Number(moistureContent.toFixed(2));
+  };
+
+  // Função para calcular umidade média
+  const calculateAverageMoisture = (): number => {
+    const moisture1 = calculateMoisture(data.moisture1.wetTare, data.moisture1.dryTare, data.moisture1.tare);
+    const moisture2 = calculateMoisture(data.moisture2.wetTare, data.moisture2.dryTare, data.moisture2.tare);
+    const moisture3 = calculateMoisture(data.moisture3.wetTare, data.moisture3.dryTare, data.moisture3.tare);
+    
+    const validMoistures = [moisture1, moisture2, moisture3].filter(m => m > 0);
+    if (validMoistures.length === 0) return 0;
+    
+    const average = validMoistures.reduce((sum, m) => sum + m, 0) / validMoistures.length;
+    return Number(average.toFixed(2));
+  };
 
   // Função para buscar dados do cilindro pelo número
   const buscarDadosCilindro = (numero: string) => {
@@ -286,11 +314,7 @@ export default function DensityMaxMin() {
       setData(prev => ({
         ...prev,
         maxDensity1: { 
-          cylinderNumber: prev.maxDensity1.cylinderNumber,
-          moldeSolo: prev.maxDensity1.moldeSolo,
-          molde: prev.maxDensity1.molde,
-          volume: prev.maxDensity1.volume,
-          moisture: prev.maxDensity1.moisture,
+          ...prev.maxDensity1,
           [field]: value 
         }
       }));
@@ -298,11 +322,7 @@ export default function DensityMaxMin() {
       setData(prev => ({
         ...prev,
         maxDensity2: { 
-          cylinderNumber: prev.maxDensity2.cylinderNumber,
-          moldeSolo: prev.maxDensity2.moldeSolo,
-          molde: prev.maxDensity2.molde,
-          volume: prev.maxDensity2.volume,
-          moisture: prev.maxDensity2.moisture,
+          ...prev.maxDensity2,
           [field]: value 
         }
       }));
@@ -310,11 +330,31 @@ export default function DensityMaxMin() {
       setData(prev => ({
         ...prev,
         maxDensity3: { 
-          cylinderNumber: prev.maxDensity3.cylinderNumber,
-          moldeSolo: prev.maxDensity3.moldeSolo,
-          molde: prev.maxDensity3.molde,
-          volume: prev.maxDensity3.volume,
-          moisture: prev.maxDensity3.moisture,
+          ...prev.maxDensity3,
+          [field]: value 
+        }
+      }));
+    } else if (parent === 'moisture1') {
+      setData(prev => ({
+        ...prev,
+        moisture1: { 
+          ...prev.moisture1,
+          [field]: value 
+        }
+      }));
+    } else if (parent === 'moisture2') {
+      setData(prev => ({
+        ...prev,
+        moisture2: { 
+          ...prev.moisture2,
+          [field]: value 
+        }
+      }));
+    } else if (parent === 'moisture3') {
+      setData(prev => ({
+        ...prev,
+        moisture3: { 
+          ...prev.moisture3,
           [field]: value 
         }
       }));
@@ -322,11 +362,7 @@ export default function DensityMaxMin() {
       setData(prev => ({
         ...prev,
         minDensity1: { 
-          cylinderNumber: prev.minDensity1.cylinderNumber,
-          moldeSolo: prev.minDensity1.moldeSolo,
-          molde: prev.minDensity1.molde,
-          volume: prev.minDensity1.volume,
-          moisture: prev.minDensity1.moisture,
+          ...prev.minDensity1,
           [field]: value 
         }
       }));
@@ -334,11 +370,7 @@ export default function DensityMaxMin() {
       setData(prev => ({
         ...prev,
         minDensity2: { 
-          cylinderNumber: prev.minDensity2.cylinderNumber,
-          moldeSolo: prev.minDensity2.moldeSolo,
-          molde: prev.minDensity2.molde,
-          volume: prev.minDensity2.volume,
-          moisture: prev.minDensity2.moisture,
+          ...prev.minDensity2,
           [field]: value 
         }
       }));
@@ -346,11 +378,7 @@ export default function DensityMaxMin() {
       setData(prev => ({
         ...prev,
         minDensity3: { 
-          cylinderNumber: prev.minDensity3.cylinderNumber,
-          moldeSolo: prev.minDensity3.moldeSolo,
-          molde: prev.minDensity3.molde,
-          volume: prev.minDensity3.volume,
-          moisture: prev.minDensity3.moisture,
+          ...prev.minDensity3,
           [field]: value 
         }
       }));
@@ -391,12 +419,15 @@ export default function DensityMaxMin() {
       operator: "",
       material: "",
       origin: "",
-      maxDensity1: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      maxDensity2: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      maxDensity3: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      minDensity1: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      minDensity2: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-      minDensity3: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
+      moisture1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moisture2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moisture3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      maxDensity1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      maxDensity2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      maxDensity3: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      minDensity1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      minDensity2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      minDensity3: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
     });
   };
 
