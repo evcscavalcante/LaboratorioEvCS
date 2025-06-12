@@ -33,7 +33,7 @@ app.use(session({
   },
 }));
 
-// Firebase Authentication routes - API routes FIRST
+// Firebase Authentication routes - BEFORE Vite setup
 app.use('/api', hybridAuthRoutes);
 
 // Current user endpoint (protected by Firebase token)
