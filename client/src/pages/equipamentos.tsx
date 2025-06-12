@@ -548,12 +548,10 @@ function FormularioEquipamento({
                 )}
                 {formData.tipo === 'cilindro' && (
                   <>
-                    <SelectItem value="proctor-normal">Proctor Normal</SelectItem>
-                    <SelectItem value="proctor-modificado">Proctor Modificado</SelectItem>
+                    <SelectItem value="proctor">Proctor</SelectItem>
                     <SelectItem value="cbr">CBR</SelectItem>
-                    <SelectItem value="densidade-in-situ">Densidade In-Situ</SelectItem>
-                    <SelectItem value="densidade-maxima">Densidade Máxima</SelectItem>
-                    <SelectItem value="densidade-minima">Densidade Mínima</SelectItem>
+                    <SelectItem value="biselado">Biselado</SelectItem>
+                    <SelectItem value="padrao">Padrão</SelectItem>
                   </>
                 )}
               </SelectContent>

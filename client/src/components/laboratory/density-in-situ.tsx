@@ -158,7 +158,7 @@ export default function DensityInSitu() {
             const equipamento = JSON.parse(item);
             if (equipamento.tipo === 'cilindro' && 
                 equipamento.codigo === codigo && 
-                equipamento.subtipo === 'densidade-in-situ') {
+                (equipamento.subtipo === 'biselado' || equipamento.subtipo === 'padrao')) {
               return {
                 codigo: equipamento.codigo,
                 peso: equipamento.peso,
