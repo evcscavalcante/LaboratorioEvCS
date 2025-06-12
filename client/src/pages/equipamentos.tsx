@@ -18,6 +18,7 @@ interface Equipamento {
   subtipo?: string;
   peso?: number;
   volume?: number;
+  altura?: number;
   status: 'ativo' | 'inativo';
   observacoes?: string;
   createdAt: string;
@@ -47,6 +48,7 @@ export default function Equipamentos() {
     subtipo: '',
     peso: undefined,
     volume: undefined,
+    altura: undefined,
     status: 'ativo',
     observacoes: ''
   });
@@ -140,6 +142,7 @@ export default function Equipamentos() {
         subtipo: '',
         peso: undefined,
         volume: undefined,
+        altura: undefined,
         status: 'ativo',
         observacoes: ''
       });
@@ -201,6 +204,7 @@ export default function Equipamentos() {
       subtipo: '',
       peso: undefined,
       volume: undefined,
+      altura: undefined,
       status: 'ativo',
       observacoes: ''
     });
@@ -357,6 +361,19 @@ export default function Equipamentos() {
                         />
                       </div>
 
+                      {formData.subtipo === 'cbr' && (
+                        <div className="space-y-2">
+                          <Label>Altura (cm)</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={formData.altura || ''}
+                            onChange={(e) => setFormData({...formData, altura: e.target.value ? parseFloat(e.target.value) : undefined})}
+                            placeholder="Ex: 11.64"
+                          />
+                        </div>
+                      )}
+
                       <div className="space-y-2">
                         <Label>Status</Label>
                         <Select 
@@ -441,6 +458,7 @@ export default function Equipamentos() {
                           {equipamento.subtipo && ` - ${equipamento.subtipo}`}
                           {equipamento.peso && ` • ${equipamento.peso}g`}
                           {equipamento.volume && ` • ${equipamento.volume}cm³`}
+                          {equipamento.altura && ` • ${equipamento.altura}cm altura`}
                         </p>
                         {equipamento.observacoes && (
                           <p className="text-sm text-gray-500 mt-1">
