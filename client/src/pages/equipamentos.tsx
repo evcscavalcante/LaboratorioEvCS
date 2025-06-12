@@ -86,10 +86,26 @@ export default function Equipamentos() {
   };
 
   const equipamentosFiltrados = equipamentos.filter(eq => {
-    const matchTipo = filtroTipo === 'todos' || eq.tipo === filtroTipo;
+    let matchTipo = false;
+    
+    if (filtroTipo === 'todos') {
+      matchTipo = true;
+    } else if (filtroTipo === 'capsula') {
+      matchTipo = eq.tipo === 'capsula';
+    } else if (filtroTipo === 'cilindro') {
+      matchTipo = eq.tipo === 'cilindro';
+    } else if (filtroTipo.startsWith('capsula_')) {
+      const subtipo = filtroTipo.replace('capsula_', '');
+      matchTipo = eq.tipo === 'capsula' && eq.subtipo === subtipo;
+    } else if (filtroTipo.startsWith('cilindro_')) {
+      const subtipo = filtroTipo.replace('cilindro_', '');
+      matchTipo = eq.tipo === 'cilindro' && eq.subtipo === subtipo;
+    }
+    
     const matchStatus = filtroStatus === 'todos' || eq.status === filtroStatus;
     const matchBusca = eq.codigo.toLowerCase().includes(busca.toLowerCase()) ||
-                     eq.observacoes?.toLowerCase().includes(busca.toLowerCase());
+                     eq.observacoes?.toLowerCase().includes(busca.toLowerCase()) ||
+                     eq.subtipo?.toLowerCase().includes(busca.toLowerCase());
     return matchTipo && matchStatus && matchBusca;
   });
 
@@ -123,30 +139,7 @@ export default function Equipamentos() {
       const chaveUnica = `${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
       localStorage.setItem(chaveUnica, JSON.stringify(equipamento));
 
-      // Salvar também nas listas organizadas por tipo
-      if (formData.tipo === 'capsula') {
-        const capsulasExistentes = JSON.parse(localStorage.getItem('capsulas') || '[]');
-        if (equipamentoEdit) {
-          const index = capsulasExistentes.findIndex((c: any) => c.id === equipamentoEdit.id);
-          if (index >= 0) {
-            capsulasExistentes[index] = { ...formData, id: equipamentoEdit.id };
-          }
-        } else {
-          capsulasExistentes.push({ ...equipamento });
-        }
-        localStorage.setItem('capsulas', JSON.stringify(capsulasExistentes));
-      } else if (formData.tipo === 'cilindro') {
-        const cilindrosExistentes = JSON.parse(localStorage.getItem('cilindros') || '[]');
-        if (equipamentoEdit) {
-          const index = cilindrosExistentes.findIndex((c: any) => c.id === equipamentoEdit.id);
-          if (index >= 0) {
-            cilindrosExistentes[index] = { ...formData, id: equipamentoEdit.id };
-          }
-        } else {
-          cilindrosExistentes.push({ ...equipamento });
-        }
-        localStorage.setItem('cilindros', JSON.stringify(cilindrosExistentes));
-      }
+
 
       await carregarEquipamentos();
       setIsDialogOpen(false);
@@ -250,8 +243,15 @@ export default function Equipamentos() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos os tipos</SelectItem>
-                  <SelectItem value="capsula">Cápsulas</SelectItem>
-                  <SelectItem value="cilindro">Cilindros</SelectItem>
+                  <SelectItem value="capsula">Todas as Cápsulas</SelectItem>
+                  <SelectItem value="capsula_pequena">Cápsula Pequena</SelectItem>
+                  <SelectItem value="capsula_media">Cápsula Média</SelectItem>
+                  <SelectItem value="capsula_grande">Cápsula Grande</SelectItem>
+                  <SelectItem value="cilindro">Todos os Cilindros</SelectItem>
+                  <SelectItem value="cilindro_biselado">Cilindro Biselado</SelectItem>
+                  <SelectItem value="cilindro_proctor">Cilindro de Proctor</SelectItem>
+                  <SelectItem value="cilindro_cbr">Cilindro de CBR</SelectItem>
+                  <SelectItem value="cilindro_padrao">Cilindro Padrão</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -462,10 +462,18 @@ export default function Equipamentos() {
                             {equipamento.status}
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-600 capitalize">
-                          {equipamento.tipo}
-                          {equipamento.subtipo && ` - ${equipamento.subtipo}`}
-                          {equipamento.peso && ` • ${equipamento.peso}g`}
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {equipamento.tipo === 'capsula' ? 'Cápsula' : 'Cilindro'}
+                          </Badge>
+                          {equipamento.subtipo && (
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {equipamento.subtipo}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {equipamento.peso && `${equipamento.peso}g`}
                           {equipamento.volume && ` • ${equipamento.volume}cm³`}
                           {equipamento.altura && ` • ${equipamento.altura}cm altura`}
                         </p>
