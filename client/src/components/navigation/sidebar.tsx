@@ -87,12 +87,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       href: '/subscription',
       active: location === '/subscription'
     },
-    {
-      label: 'Ensaios de Densidade',
-      icon: FlaskRound,
-      href: '/tests/density',
-      active: location === '/tests/density'
-    },
+
     {
       label: 'Solos',
       icon: Mountain,
