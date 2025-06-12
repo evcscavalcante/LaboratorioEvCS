@@ -60,25 +60,21 @@ export default function Equipamentos() {
 
   const carregarEquipamentos = async () => {
     try {
-      const capsulas: Equipamento[] = [];
-      const cilindros: Equipamento[] = [];
+      const equipamentos: Equipamento[] = [];
       
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key?.startsWith('capsula_')) {
+        // Carregar equipamentos com a nova estrutura (tipo_codigo_subtipo)
+        if (key?.startsWith('capsula_') || key?.startsWith('cilindro_')) {
           const item = localStorage.getItem(key);
           if (item) {
-            capsulas.push({ ...JSON.parse(item), tipo: 'capsula' as const });
-          }
-        } else if (key?.startsWith('cilindro_')) {
-          const item = localStorage.getItem(key);
-          if (item) {
-            cilindros.push({ ...JSON.parse(item), tipo: 'cilindro' as const });
+            const equipamento = JSON.parse(item);
+            equipamentos.push(equipamento);
           }
         }
       }
 
-      setEquipamentos([...capsulas, ...cilindros]);
+      setEquipamentos(equipamentos);
     } catch (error) {
       console.error('Erro ao carregar equipamentos:', error);
       toast({
@@ -123,15 +119,9 @@ export default function Equipamentos() {
         updatedAt: agora
       } as Equipamento;
 
-      // Salvar no localStorage específico por tipo
-      switch (equipamento.tipo) {
-        case 'capsula':
-          localStorage.setItem(`capsula_${equipamento.codigo}`, JSON.stringify(equipamento));
-          break;
-        case 'cilindro':
-          localStorage.setItem(`cilindro_${equipamento.codigo}`, JSON.stringify(equipamento));
-          break;
-      }
+      // Salvar no localStorage com chave única incluindo tipo e subtipo
+      const chaveUnica = `${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
+      localStorage.setItem(chaveUnica, JSON.stringify(equipamento));
 
       // Salvar também nas listas organizadas por tipo
       if (formData.tipo === 'capsula') {
@@ -196,15 +186,9 @@ export default function Equipamentos() {
     if (!confirm('Tem certeza que deseja excluir este equipamento?')) return;
 
     try {
-      // Remover do localStorage específico por tipo
-      switch (equipamento.tipo) {
-        case 'capsula':
-          localStorage.removeItem(`capsula_${equipamento.codigo}`);
-          break;
-        case 'cilindro':
-          localStorage.removeItem(`cilindro_${equipamento.codigo}`);
-          break;
-      }
+      // Remover usando a nova estrutura de chaves
+      const chaveUnica = `${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
+      localStorage.removeItem(chaveUnica);
 
       await carregarEquipamentos();
       toast({

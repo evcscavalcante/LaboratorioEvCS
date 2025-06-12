@@ -107,16 +107,44 @@ export default function DensityInSitu() {
     loadEquipamentos();
   }, []);
 
-  // Função para buscar dados do cilindro pelo número
-  const buscarDadosCilindro = (numero: string) => {
-    const cilindro = equipamentos.cilindros.find(c => c.codigo === numero);
-    return cilindro ? { peso: cilindro.peso, volume: cilindro.volume } : null;
+  // Função para buscar dados do cilindro pelo código na nova estrutura
+  const buscarDadosCilindro = (codigo: string) => {
+    if (!codigo) return null;
+    
+    // Buscar nos cilindros de cravação (biselado/padrão) usando nova estrutura
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('cilindro_') && key.includes(codigo)) {
+        const item = localStorage.getItem(key);
+        if (item) {
+          const cilindro = JSON.parse(item);
+          if (cilindro.codigo === codigo && (cilindro.subtipo === 'biselado' || cilindro.subtipo === 'padrao')) {
+            return cilindro;
+          }
+        }
+      }
+    }
+    return null;
   };
 
   // Função para buscar peso da cápsula pelo número
   const buscarPesoCapsula = (numero: string) => {
-    const capsula = equipamentos.capsulas.find(c => c.codigo === numero);
-    return capsula ? capsula.peso : null;
+    if (!numero) return null;
+    
+    // Buscar nas cápsulas usando nova estrutura
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('capsula_') && key.includes(numero)) {
+        const item = localStorage.getItem(key);
+        if (item) {
+          const capsula = JSON.parse(item);
+          if (capsula.codigo === numero) {
+            return capsula.peso;
+          }
+        }
+      }
+    }
+    return null;
   };
 
   // Handler para mudança no número do cilindro
@@ -136,10 +164,12 @@ export default function DensityInSitu() {
     if (dadosCilindro) {
       toast({
         title: "Dados preenchidos automaticamente",
-        description: `Peso: ${dadosCilindro.peso}g, Volume: ${dadosCilindro.volume}cm³`,
+        description: `Cilindro ${dadosCilindro.codigo} - ${dadosCilindro.subtipo}: ${dadosCilindro.peso}g, ${dadosCilindro.volume}cm³`,
       });
     }
   };
+
+
 
   // Handler para mudança no número da cápsula
   const handleCapsuleNumberChange = (field: string, value: string) => {
@@ -629,42 +659,20 @@ export default function DensityInSitu() {
               <TableRow>
                 <TableCell className="font-medium">Cilindro de Cravação</TableCell>
                 <TableCell className="mobile-table-cell">
-                  <Select
-                    value={data.det1.cylinderNumber}
-                    onValueChange={(value) => handleCylinderNumberChange("det1", value)}
-                  >
-                    <SelectTrigger className="calculator-input">
-                      <SelectValue placeholder="Selecione cilindro" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {equipamentos.cilindros
-                        .filter(cil => cil.subtipo === 'biselado' || cil.subtipo === 'padrao')
-                        .map((cilindro) => (
-                          <SelectItem key={cilindro.codigo} value={cilindro.codigo}>
-                            {cilindro.codigo} - {cilindro.subtipo} ({cilindro.peso}g, {cilindro.volume}cm³)
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value={data.det1.cylinderNumber || ""}
+                    onChange={(e) => handleCylinderNumberChange("det1", e.target.value)}
+                    placeholder="CIL-01"
+                    className="calculator-input"
+                  />
                 </TableCell>
                 <TableCell className="mobile-table-cell">
-                  <Select
-                    value={data.det2.cylinderNumber}
-                    onValueChange={(value) => handleCylinderNumberChange("det2", value)}
-                  >
-                    <SelectTrigger className="calculator-input">
-                      <SelectValue placeholder="Selecione cilindro" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {equipamentos.cilindros
-                        .filter(cil => cil.subtipo === 'biselado' || cil.subtipo === 'padrao')
-                        .map((cilindro) => (
-                          <SelectItem key={cilindro.codigo} value={cilindro.codigo}>
-                            {cilindro.codigo} - {cilindro.subtipo} ({cilindro.peso}g, {cilindro.volume}cm³)
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value={data.det2.cylinderNumber || ""}
+                    onChange={(e) => handleCylinderNumberChange("det2", e.target.value)}
+                    placeholder="CIL-02"
+                    className="calculator-input"
+                  />
                 </TableCell>
               </TableRow>
               <TableRow>
