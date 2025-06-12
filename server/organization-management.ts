@@ -111,7 +111,7 @@ export class OrganizationManager {
     await db
       .update(organizations)
       .set({ 
-        monthlyTestCount: organizations.monthlyTestCount + 1 
+        monthlyTestCount: sql`${organizations.monthlyTestCount} + 1`
       })
       .where(eq(organizations.id, organizationId));
 

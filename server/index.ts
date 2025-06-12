@@ -1,7 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import session from "express-session";
-import hybridAuthRoutes, { verifyFirebaseToken, requireRole } from "./auth-firebase-hybrid";
+import hybridAuthRoutes, { verifyFirebaseToken } from "./auth-firebase-hybrid";
 import { registerRoutes } from "./routes";
 import { registerPaymentRoutes } from "./payment-routes";
 import { setupVite, serveStatic } from "./vite";
@@ -41,69 +41,57 @@ app.get('/api/auth/user', verifyFirebaseToken, (req: Request, res: Response) => 
   res.json({ user: req.user });
 });
 
-// Import organization management
-import { organizationManager, requireMinimumRole, checkOrganizationLimits } from "./organization-management";
-import { UserRoles, RoleHierarchy, subscriptionPlans, users } from "@shared/schema";
+// Import simplified organization management
+import { simpleOrgManager, requireRole } from "./simple-org-management";
 import { db } from "./db";
+import { subscriptionPlans, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
-// Organization and plan management routes
-app.get("/api/organizations", verifyFirebaseToken, requireMinimumRole(UserRoles.ADMIN), async (req: Request, res: Response) => {
-  try {
-    const organizations = await organizationManager.getOrganizationsWithPlans();
-    res.json(organizations);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
+// Subscription plans (public access)
 app.get("/api/subscription/plans", async (req: Request, res: Response) => {
   try {
-    const plans = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.active, true));
+    const plans = await simpleOrgManager.getSubscriptionPlans();
     res.json(plans);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-app.get("/api/organization/limits", verifyFirebaseToken, checkOrganizationLimits, (req: Request, res: Response) => {
-  res.json(req.organizationLimits);
-});
-
-// User role management
-app.get("/api/user/roles", verifyFirebaseToken, (req: Request, res: Response) => {
+// User role and permissions info
+app.get("/api/user/permissions", verifyFirebaseToken, (req: Request, res: Response) => {
   const user = req.user as any;
   res.json({
     currentRole: user.role,
-    availableRoles: Object.values(UserRoles),
-    roleHierarchy: RoleHierarchy,
+    availableRoles: ['DEVELOPER', 'SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISOR', 'TECHNICIAN', 'VIEWER'],
     permissions: {
-      canManageOrganization: organizationManager.canManageOrganization(user.role),
-      canCreateOrganization: organizationManager.canCreateOrganization(user.role),
-      canModifyPlans: organizationManager.canModifyPlans(user.role)
+      canManageUsers: simpleOrgManager.hasPermission(user.role, 'ADMIN'),
+      canAccessDeveloperTools: simpleOrgManager.hasPermission(user.role, 'DEVELOPER'),
+      canManageOrganization: simpleOrgManager.hasPermission(user.role, 'MANAGER'),
+      canSuperviseTests: simpleOrgManager.hasPermission(user.role, 'SUPERVISOR'),
+      canPerformTests: simpleOrgManager.hasPermission(user.role, 'TECHNICIAN')
     }
   });
 });
 
 // Admin routes (hierarchical access)
-app.get("/api/admin/users", verifyFirebaseToken, requireMinimumRole(UserRoles.ADMIN), async (req: Request, res: Response) => {
+app.get("/api/admin/users", verifyFirebaseToken, requireRole('ADMIN'), async (req: Request, res: Response) => {
   try {
-    const users = await db.select().from(users);
-    res.json(users);
+    const allUsers = await db.select().from(users);
+    res.json(allUsers);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
 // Developer only routes
-app.get("/api/developer/system-info", verifyFirebaseToken, requireMinimumRole(UserRoles.DEVELOPER), (req: Request, res: Response) => {
+app.get("/api/developer/system-info", verifyFirebaseToken, requireRole('DEVELOPER'), (req: Request, res: Response) => {
   res.json({
     environment: process.env.NODE_ENV,
     version: "1.0.0",
     database: "PostgreSQL",
     authentication: "Firebase Hybrid",
-    totalOrganizations: "dynamic",
-    systemHealth: "operational"
+    systemHealth: "operational",
+    features: ["Hybrid Authentication", "Organization Management", "Payment Integration"]
   });
 });
 
