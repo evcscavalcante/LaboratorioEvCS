@@ -300,11 +300,39 @@ export default function Equipamentos() {
 
                       <div className="space-y-2">
                         <Label>Variação/Modelo</Label>
-                        <Input
+                        <Select
                           value={formData.subtipo || ''}
-                          onChange={(e) => setFormData({...formData, subtipo: e.target.value})}
-                          placeholder="Ex: Pequena, Grande, 50ml, 100ml"
-                        />
+                          onValueChange={(value) => setFormData({...formData, subtipo: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a variação" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {formData.tipo === 'capsula' && (
+                              <>
+                                <SelectItem value="pequena">Cápsula Pequena</SelectItem>
+                                <SelectItem value="media">Cápsula Média</SelectItem>
+                                <SelectItem value="grande">Cápsula Grande</SelectItem>
+                              </>
+                            )}
+                            {formData.tipo === 'cilindro' && (
+                              <>
+                                <SelectItem value="biselado">Cilindro Biselado</SelectItem>
+                                <SelectItem value="proctor">Cilindro de Proctor</SelectItem>
+                                <SelectItem value="cbr">Cilindro de CBR</SelectItem>
+                                <SelectItem value="padrao">Cilindro Padrão</SelectItem>
+                              </>
+                            )}
+                            <SelectItem value="outro">Outro (personalizado)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {formData.subtipo === 'outro' && (
+                          <Input
+                            placeholder="Digite a variação personalizada"
+                            onChange={(e) => setFormData({...formData, subtipo: e.target.value})}
+                            className="mt-2"
+                          />
+                        )}
                       </div>
 
                       <div className="space-y-2">
