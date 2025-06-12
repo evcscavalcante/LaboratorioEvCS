@@ -36,19 +36,37 @@ export default function DensityMaxMin() {
     cilindros: []
   });
   
-  const [data, setData] = useState<MaxMinDensityData>({
-    registrationNumber: "",
-    date: new Date().toISOString().split('T')[0],
-    operator: "",
-    material: "",
-    origin: "",
-    maxDensity1: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-    maxDensity2: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-    maxDensity3: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-    minDensity1: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-    minDensity2: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-    minDensity3: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
-  });
+  // Função para carregar dados salvos
+  const loadSavedData = (): MaxMinDensityData => {
+    try {
+      const saved = localStorage.getItem('density-max-min-progress');
+      if (saved) {
+        const parsedData = JSON.parse(saved);
+        return {
+          ...parsedData,
+          date: parsedData.date || new Date().toISOString().split('T')[0],
+        };
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados salvos:', error);
+    }
+    
+    return {
+      registrationNumber: "",
+      date: new Date().toISOString().split('T')[0],
+      operator: "",
+      material: "",
+      origin: "",
+      maxDensity1: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
+      maxDensity2: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
+      maxDensity3: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
+      minDensity1: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
+      minDensity2: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
+      minDensity3: { moldeSolo: 0, molde: 0, volume: 0, moisture: 0 },
+    };
+  };
+
+  const [data, setData] = useState<MaxMinDensityData>(loadSavedData);
 
   const [calculations, setCalculations] = useState({
     maxDensity: {
@@ -71,6 +89,21 @@ export default function DensityMaxMin() {
       status: "AGUARDANDO" as "AGUARDANDO" | "APROVADO" | "REPROVADO"
     }
   });
+
+  // Salvamento automático sempre que os dados mudarem
+  useEffect(() => {
+    const saveProgress = () => {
+      try {
+        localStorage.setItem('density-max-min-progress', JSON.stringify(data));
+        console.log('💾 Progresso do ensaio de densidade máx/mín salvo automaticamente');
+      } catch (error) {
+        console.error('Erro ao salvar progresso:', error);
+      }
+    };
+
+    const timeoutId = setTimeout(saveProgress, 500);
+    return () => clearTimeout(timeoutId);
+  }, [data]);
 
   // Carregar equipamentos ao montar o componente
   useEffect(() => {
@@ -168,11 +201,14 @@ export default function DensityMaxMin() {
 
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
-      return apiRequest("POST", "/api/max-min-density", testData);
+      return apiRequest("POST", "/api/tests/max-min-density", testData);
     },
     onSuccess: () => {
       toast({ title: "Ensaio salvo com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ["/api/max-min-density"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tests/max-min-density"] });
+      // Limpar progresso salvo após salvamento bem-sucedido
+      localStorage.removeItem('density-max-min-progress');
+      console.log('🗑️ Progresso do ensaio de densidade máx/mín limpo após salvamento');
     },
     onError: (error) => {
       toast({ 

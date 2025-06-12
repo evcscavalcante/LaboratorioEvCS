@@ -48,30 +48,48 @@ export default function DensityReal() {
     capsulas: []
   });
   
-  const [data, setData] = useState<RealDensityData>({
-    registrationNumber: "",
-    date: new Date().toISOString().split('T')[0],
-    operator: "",
-    material: "",
-    origin: "",
-    moisture1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-    moisture2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-    moisture3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
-    picnometer1: {
-      massaPicnometro: 0,
-      massaPicAmostraAgua: 0,
-      massaPicAgua: 0,
-      temperatura: 0,
-      massaSoloUmido: 0
-    },
-    picnometer2: {
-      massaPicnometro: 0,
-      massaPicAmostraAgua: 0,
-      massaPicAgua: 0,
-      temperatura: 0,
-      massaSoloUmido: 0
+  // Função para carregar dados salvos
+  const loadSavedData = (): RealDensityData => {
+    try {
+      const saved = localStorage.getItem('density-real-progress');
+      if (saved) {
+        const parsedData = JSON.parse(saved);
+        return {
+          ...parsedData,
+          date: parsedData.date || new Date().toISOString().split('T')[0],
+        };
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados salvos:', error);
     }
-  });
+    
+    return {
+      registrationNumber: "",
+      date: new Date().toISOString().split('T')[0],
+      operator: "",
+      material: "",
+      origin: "",
+      moisture1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moisture2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      moisture3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+      picnometer1: {
+        massaPicnometro: 0,
+        massaPicAmostraAgua: 0,
+        massaPicAgua: 0,
+        temperatura: 0,
+        massaSoloUmido: 0
+      },
+      picnometer2: {
+        massaPicnometro: 0,
+        massaPicAmostraAgua: 0,
+        massaPicAgua: 0,
+        temperatura: 0,
+        massaSoloUmido: 0
+      }
+    };
+  };
+
+  const [data, setData] = useState<RealDensityData>(loadSavedData);
 
   const [calculations, setCalculations] = useState({
     moisture: { det1: { moisture: 0 }, det2: { moisture: 0 }, det3: { moisture: 0 }, average: 0 },
@@ -81,6 +99,21 @@ export default function DensityReal() {
     },
     results: { difference: 0, average: 0, status: "AGUARDANDO" as "AGUARDANDO" | "APROVADO" | "REPROVADO" }
   });
+
+  // Salvamento automático sempre que os dados mudarem
+  useEffect(() => {
+    const saveProgress = () => {
+      try {
+        localStorage.setItem('density-real-progress', JSON.stringify(data));
+        console.log('💾 Progresso do ensaio de densidade real salvo automaticamente');
+      } catch (error) {
+        console.error('Erro ao salvar progresso:', error);
+      }
+    };
+
+    const timeoutId = setTimeout(saveProgress, 500);
+    return () => clearTimeout(timeoutId);
+  }, [data]);
 
   // Carregar equipamentos ao montar o componente
   useEffect(() => {
@@ -145,11 +178,14 @@ export default function DensityReal() {
 
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
-      return apiRequest("POST", "/api/real-density", testData);
+      return apiRequest("POST", "/api/tests/real-density", testData);
     },
     onSuccess: () => {
       toast({ title: "Ensaio salvo com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ["/api/real-density"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tests/real-density"] });
+      // Limpar progresso salvo após salvamento bem-sucedido
+      localStorage.removeItem('density-real-progress');
+      console.log('🗑️ Progresso do ensaio de densidade real limpo após salvamento');
     },
     onError: (error) => {
       toast({ 

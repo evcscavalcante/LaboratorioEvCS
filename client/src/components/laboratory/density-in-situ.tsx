@@ -310,11 +310,14 @@ export default function DensityInSitu() {
 
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
-      return apiRequest("POST", "/api/density-in-situ", testData);
+      return apiRequest("POST", "/api/tests/density-in-situ", testData);
     },
     onSuccess: () => {
       toast({ title: "Ensaio salvo com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ["/api/density-in-situ"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tests/density-in-situ"] });
+      // Limpar progresso salvo após salvamento bem-sucedido
+      localStorage.removeItem('density-in-situ-progress');
+      console.log('🗑️ Progresso do ensaio limpo após salvamento');
     },
     onError: (error) => {
       toast({ 
