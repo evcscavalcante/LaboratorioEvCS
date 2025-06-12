@@ -34,7 +34,7 @@ export default function Login() {
           title: "Login realizado",
           description: "Bem-vindo ao sistema de laboratório geotécnico!",
         });
-        navigate('/dashboard');
+        setLocation('/dashboard');
       }
     } catch (error: any) {
       console.error('Erro de autenticação:', error);
