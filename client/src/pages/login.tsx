@@ -1,108 +1,61 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { loginUser, registerUser } from '@/lib/firebase';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, TestTube } from 'lucide-react';
-
-const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
-});
-
-const registerSchema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
-  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  role: z.enum(['ADMIN', 'MANAGER', 'SUPERVISOR', 'TECHNICIAN']),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
-type RegisterForm = z.infer<typeof registerSchema>;
+import { signIn, signUp } from '@/lib/firebase';
+import { Loader2, LogIn, UserPlus } from 'lucide-react';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const loginForm = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-
-  const registerForm = useForm<RegisterForm>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      name: '',
-      role: 'TECHNICIAN',
-    },
-  });
-
-  const handleLogin = async (data: LoginForm) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    setError('');
-    
-    try {
-      await loginUser(data.email, data.password);
-      toast({
-        title: 'Login realizado com sucesso',
-        description: 'Bem-vindo ao Sistema Laboratorial EVCS',
-      });
-    } catch (error: any) {
-      const errorMessage = error.code === 'auth/invalid-credential' 
-        ? 'Email ou senha incorretos'
-        : error.code === 'auth/user-not-found'
-        ? 'Usuário não encontrado'
-        : error.code === 'auth/wrong-password'
-        ? 'Senha incorreta'
-        : 'Erro ao fazer login. Tente novamente.';
-      
-      setError(errorMessage);
-      toast({
-        title: 'Erro no login',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const handleRegister = async (data: RegisterForm) => {
-    setIsLoading(true);
-    setError('');
-    
     try {
-      await registerUser(data.email, data.password, data.name, data.role);
-      toast({
-        title: 'Conta criada com sucesso',
-        description: 'Sua conta foi criada. Você já está logado.',
-      });
+      if (isSignUp) {
+        await signUp(email, password);
+        toast({
+          title: "Conta criada com sucesso",
+          description: "Você pode agora fazer login com suas credenciais.",
+        });
+        setIsSignUp(false);
+      } else {
+        await signIn(email, password);
+        toast({
+          title: "Login realizado",
+          description: "Bem-vindo ao sistema de laboratório geotécnico!",
+        });
+        navigate('/dashboard');
+      }
     } catch (error: any) {
-      const errorMessage = error.code === 'auth/email-already-in-use'
-        ? 'Este email já está em uso'
-        : error.code === 'auth/weak-password'
-        ? 'Senha muito fraca. Use pelo menos 6 caracteres.'
-        : 'Erro ao criar conta. Tente novamente.';
+      console.error('Erro de autenticação:', error);
       
-      setError(errorMessage);
+      let message = 'Erro ao processar solicitação';
+      if (error.code === 'auth/user-not-found') {
+        message = 'Usuário não encontrado';
+      } else if (error.code === 'auth/wrong-password') {
+        message = 'Senha incorreta';
+      } else if (error.code === 'auth/email-already-in-use') {
+        message = 'Este email já está em uso';
+      } else if (error.code === 'auth/weak-password') {
+        message = 'A senha deve ter pelo menos 6 caracteres';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'Email inválido';
+      }
+      
       toast({
-        title: 'Erro ao criar conta',
-        description: errorMessage,
-        variant: 'destructive',
+        title: "Erro de autenticação",
+        description: message,
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -110,154 +63,88 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
-              <TestTube className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            </div>
-          </div>
-          <CardTitle className="text-2xl font-bold">Sistema Laboratorial EVCS</CardTitle>
-          <CardDescription>
-            Gestão Profissional de Ensaios Geotécnicos
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">
+            {isSignUp ? 'Criar Conta' : 'Login'}
+          </CardTitle>
+          <CardDescription className="text-center">
+            {isSignUp 
+              ? 'Crie sua conta para acessar o sistema' 
+              : 'Entre com suas credenciais Firebase'
+            }
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Entrar</TabsTrigger>
-              <TabsTrigger value="register">Registrar</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login" className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                minLength={6}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || !email || !password}
+            >
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : isSignUp ? (
+                <UserPlus className="mr-2 h-4 w-4" />
+              ) : (
+                <LogIn className="mr-2 h-4 w-4" />
               )}
-              
-              <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
-                  <FormField
-                    control={loginForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="email" placeholder="seu@email.com" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={loginForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Senha</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="password" placeholder="Digite sua senha" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Entrar
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-            
-            <TabsContent value="register" className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              
-              <Form {...registerForm}>
-                <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
-                  <FormField
-                    control={registerForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nome Completo</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Seu nome completo" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={registerForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="email" placeholder="seu@email.com" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={registerForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Senha</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="password" placeholder="Mínimo 6 caracteres" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={registerForm.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Função</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione sua função" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="TECHNICIAN">Técnico</SelectItem>
-                            <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
-                            <SelectItem value="MANAGER">Gerente</SelectItem>
-                            <SelectItem value="ADMIN">Administrador</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Criar Conta
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-          </Tabs>
+              {isLoading 
+                ? 'Processando...' 
+                : isSignUp 
+                  ? 'Criar Conta' 
+                  : 'Entrar'
+              }
+            </Button>
+          </form>
+          
+          <div className="mt-4 text-center">
+            <Button
+              variant="link"
+              onClick={() => setIsSignUp(!isSignUp)}
+              disabled={isLoading}
+              className="text-sm"
+            >
+              {isSignUp 
+                ? 'Já tem uma conta? Fazer login' 
+                : 'Não tem conta? Criar uma'
+              }
+            </Button>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-xs text-gray-500 text-center space-y-1">
+              <p>🔥 Autenticação Firebase</p>
+              <p>🐘 Dados no PostgreSQL</p>
+              <p>🔐 Sistema Híbrido</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

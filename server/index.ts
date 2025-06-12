@@ -47,8 +47,8 @@ registerRoutes(app);
 // Register payment routes
 registerPaymentRoutes(app);
 
-// Admin-only routes
-app.get("/api/admin/users", requireRole(['ADMIN']), (req: Request, res: Response) => {
+// Admin routes (only for ADMINs)
+app.get("/api/admin/users", verifyFirebaseToken, requireRole(['ADMIN']), (req: Request, res: Response) => {
   res.json([
     { id: 1, name: "Admin User", role: "ADMIN" },
     { id: 2, name: "Manager User", role: "MANAGER" },
@@ -83,9 +83,10 @@ if (app.get("env") === "development") {
 
 const PORT = parseInt(process.env.PORT || "5000", 10);
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Servidor iniciado na porta ${PORT}`);
-  console.log(`📊 Autenticação PostgreSQL ativa`);
-  console.log(`🔐 Credenciais padrão disponíveis para todos os níveis`);
+  console.log(`🚀 Servidor híbrido iniciado na porta ${PORT}`);
+  console.log(`🔥 Firebase Authentication (Frontend)`);
+  console.log(`🐘 PostgreSQL Database (Backend)`);
+  console.log(`🔐 Autenticação híbrida configurada`);
 });
 
 export { app, server };

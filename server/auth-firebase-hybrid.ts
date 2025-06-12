@@ -44,7 +44,7 @@ export const verifyFirebaseToken = async (req: Request, res: Response, next: Nex
 // Endpoint para sincronizar usuário Firebase com PostgreSQL
 router.post('/api/auth/sync-user', verifyFirebaseToken, async (req: Request, res: Response) => {
   try {
-    const { uid, email, name, role } = req.user;
+    const user = (req as any).user;
     
     // Aqui você pode salvar dados adicionais no PostgreSQL se necessário
     // Por exemplo: preferências, dados específicos da empresa, etc.
@@ -52,10 +52,10 @@ router.post('/api/auth/sync-user', verifyFirebaseToken, async (req: Request, res
     res.json({
       success: true,
       user: {
-        uid,
-        email,
-        name,
-        role
+        uid: user.uid,
+        email: user.email,
+        name: user.name,
+        role: user.role
       }
     });
   } catch (error) {
@@ -68,7 +68,7 @@ router.post('/api/auth/sync-user', verifyFirebaseToken, async (req: Request, res
 router.post('/api/auth/set-role', verifyFirebaseToken, async (req: Request, res: Response) => {
   try {
     const { targetUid, role } = req.body;
-    const currentUser = req.user;
+    const currentUser = (req as any).user;
     
     // Apenas ADMINs podem definir roles
     if (currentUser.role !== 'ADMIN') {
@@ -88,11 +88,13 @@ router.post('/api/auth/set-role', verifyFirebaseToken, async (req: Request, res:
 // Middleware de autorização por role
 export const requireRole = (allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) {
+    const user = (req as any).user;
+    
+    if (!user) {
       return res.status(401).json({ error: 'Usuário não autenticado' });
     }
     
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!allowedRoles.includes(user.role)) {
       return res.status(403).json({ error: 'Acesso negado' });
     }
     
