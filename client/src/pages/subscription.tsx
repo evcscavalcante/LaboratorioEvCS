@@ -72,9 +72,10 @@ export default function SubscriptionPage() {
     try {
       const response = await fetch('/api/subscription/plans');
       const data = await response.json();
-      setPlans(data);
+      setPlans(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading plans:', error);
+      setPlans([]);
     }
   };
 
@@ -82,9 +83,10 @@ export default function SubscriptionPage() {
     try {
       const response = await fetch('/api/subscription/cycles');
       const data = await response.json();
-      setCycles(data);
+      setCycles(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading cycles:', error);
+      setCycles([]);
     }
   };
 
@@ -109,8 +111,8 @@ export default function SubscriptionPage() {
   };
 
   const calculatePrice = () => {
-    const plan = plans.find(p => p.id === selectedPlan);
-    const cycle = cycles.find(c => c.id === selectedCycle);
+    const plan = plans?.find(p => p.id === selectedPlan);
+    const cycle = cycles?.find(c => c.id === selectedCycle);
     
     if (!plan || !cycle) return { finalPrice: 0, discount: 0 };
     
