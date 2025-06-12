@@ -234,9 +234,11 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <FlaskRound className="h-6 w-6 text-blue-600" />
-          </div>
+          <img 
+            src="/logo-compact.svg" 
+            alt="Laboratório Ev.C.S" 
+            className="w-10 h-10"
+          />
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Laboratório Ev.C.S</h2>
             <p className="text-sm text-gray-500">Sistema Geotécnico</p>

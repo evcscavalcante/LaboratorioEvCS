@@ -539,6 +539,12 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Serve static files from client/public
+import { fileURLToPath } from 'url';
+import path from 'path';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, '../client/public')));
+
 // Setup Vite for development
 import { setupVite } from "./vite";
 setupVite(app, server);
