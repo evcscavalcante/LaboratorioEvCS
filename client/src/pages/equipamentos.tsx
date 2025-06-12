@@ -64,8 +64,8 @@ export default function Equipamentos() {
       
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        // Carregar equipamentos com a nova estrutura (tipo_codigo_subtipo)
-        if (key?.startsWith('capsula_') || key?.startsWith('cilindro_')) {
+        // Carregar equipamentos com a nova estrutura (equipamento_tipo_codigo_subtipo)
+        if (key?.startsWith('equipamento_')) {
           const item = localStorage.getItem(key);
           if (item) {
             const equipamento = JSON.parse(item);
@@ -135,8 +135,16 @@ export default function Equipamentos() {
         updatedAt: agora
       } as Equipamento;
 
+      // Adicionar subtipo se não existir
+      if (formData.subtipo) {
+        equipamento.subtipo = formData.subtipo;
+      }
+      if (formData.altura) {
+        equipamento.altura = formData.altura;
+      }
+
       // Salvar no localStorage com chave única incluindo tipo e subtipo
-      const chaveUnica = `${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
+      const chaveUnica = `equipamento_${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
       localStorage.setItem(chaveUnica, JSON.stringify(equipamento));
 
 
@@ -180,7 +188,7 @@ export default function Equipamentos() {
 
     try {
       // Remover usando a nova estrutura de chaves
-      const chaveUnica = `${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
+      const chaveUnica = `equipamento_${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
       localStorage.removeItem(chaveUnica);
 
       await carregarEquipamentos();
