@@ -1,0 +1,79 @@
+ Corrija o alias @ no vite.config.ts
+Abra o seu vite.config.ts (que está na raiz do seu Repl) e garanta que o resolve.alias aponte para a sua pasta de código-fonte. Por exemplo, se o seu código React fica em client/src, deve ficar assim:
+
+ts
+Copiar
+Editar
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+
+export default defineConfig({
+  root: 'client',              // informa ao Vite onde está o index.html
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'client/src'),
+    },
+  },
+  build: {
+    outDir: path.resolve(__dirname, 'dist/public'),
+    emptyOutDir: true,
+  },
+  base: './',                  // garante paths relativos no bundle final
+});
+root: 'client' faz o Vite ler o index.html dentro de client/.
+
+outDir envia o build já pronto para dist/public, que é onde o Firebase vai hospedar.
+
+base: './' evita referências absolutas que quebram quando servido do Firebase.
+
+2. Padronize seu package.json
+Dentro do seu package.json (na raiz), ajuste os scripts para:
+
+jsonc
+Copiar
+Editar
+{
+  "scripts": {
+    "build": "vite build",
+    "deploy": "npm run build && firebase deploy --only hosting --token=$FIREBASE_TOKEN"
+  }
+}
+Nota: o comando vite build já vai respeitar o root e o outDir que você definiu no vite.config.ts.
+
+3. Simplifique (ou remova) o build-deploy.js
+Você não precisa de um script Node extra se o Vite e o Firebase CLI já estão cuidando do build e copy. Recomendo remover o build-deploy.js e centralizar tudo nos scripts do package.json.
+
+4. Ajuste o .replit
+Seu arquivo .replit deve disparar o deploy direto:
+
+ini
+Copiar
+Editar
+run = "npm install && npm run deploy"
+Desse modo, ao clicar em Run:
+
+Instala as dependências (npm install)
+
+Executa npm run build (gera o dist/public)
+
+Executa firebase deploy --only hosting --token=$FIREBASE_TOKEN
+
+E pronto: seu site vai para o Firebase em uma única etapa.
+
+5. Teste final
+Clique em Run no Replit.
+
+Aguarde o build e o deploy.
+
+No log você verá algo como:
+
+mathematica
+Copiar
+Editar
+✔ Built in xx ms
+✔ Deploy complete!
+
+Hosting URL: https://SEU-PROJETO.web.app
+Acesse a URL e confira o site no ar.
