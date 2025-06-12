@@ -598,3 +598,11 @@ app.get('/favicon.svg', (req, res) => {
 // Setup Vite for development
 import { setupVite } from "./vite";
 setupVite(app, server);
+
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`✅ Servidor funcionando na porta ${PORT}`);
+  console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`⏰ Iniciado em: ${new Date().toISOString()}`);
+  console.log(`📍 Acesse: http://0.0.0.0:${PORT}`);
+});
