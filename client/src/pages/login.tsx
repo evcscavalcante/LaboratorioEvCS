@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,15 +6,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { signIn, signUp } from '@/lib/firebase';
-import { Loader2, LogIn, UserPlus } from 'lucide-react';
+import { Loader2, LogIn, UserPlus, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [firebaseStatus, setFirebaseStatus] = useState('');
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Verificar status das credenciais Firebase
+    const checkFirebaseConfig = () => {
+      const hasApiKey = !!import.meta.env.VITE_FIREBASE_API_KEY;
+      const hasProjectId = !!import.meta.env.VITE_FIREBASE_PROJECT_ID;
+      const hasAppId = !!import.meta.env.VITE_FIREBASE_APP_ID;
+      
+      if (!hasApiKey || !hasProjectId || !hasAppId) {
+        setFirebaseStatus('Credenciais Firebase não configuradas');
+      } else {
+        setFirebaseStatus('Firebase configurado');
+      }
+    };
+    
+    checkFirebaseConfig();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +67,10 @@ export default function Login() {
         message = 'Este email já está em uso';
       } else if (error.code === 'auth/weak-password') {
         message = 'A senha deve ter pelo menos 6 caracteres';
+      } else if (error.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.') {
+        message = 'Erro de configuração do Firebase. Verifique as credenciais.';
+      } else if (error.code === 'auth/network-request-failed') {
+        message = 'Erro de conexão. Verifique sua internet.';
       } else if (error.code === 'auth/invalid-email') {
         message = 'Email inválido';
       }
@@ -65,18 +88,34 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-4">
+          <div className="flex justify-center">
+            <img 
+              src="@assets/file_00000000233061f898ea05ffe6a1752e_1749721558008.png" 
+              alt="LABORATÓRIO Ev.C S" 
+              className="w-32 h-32 object-contain"
+            />
+          </div>
           <CardTitle className="text-2xl font-bold text-center">
-            {isSignUp ? 'Criar Conta' : 'Login'}
+            LABORATÓRIO Ev.C S
           </CardTitle>
           <CardDescription className="text-center">
             {isSignUp 
               ? 'Crie sua conta para acessar o sistema' 
-              : 'Entre com suas credenciais Firebase'
+              : 'Sistema de Gestão Geotécnica'
             }
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {firebaseStatus === 'Credenciais Firebase não configuradas' && (
+            <Alert className="mb-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                Firebase não configurado. Solicite as credenciais ao administrador.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
