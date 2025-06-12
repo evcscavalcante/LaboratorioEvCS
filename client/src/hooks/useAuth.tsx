@@ -48,8 +48,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setUserProfile(data.user);
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          if (data.user) {
+            setUserProfile(data.user);
+          }
+        }
+      } else {
+        console.warn('Falha na sincronização do usuário:', response.status);
       }
     } catch (error) {
       console.error('Erro ao sincronizar usuário:', error);
@@ -77,8 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           setUserProfile(profile);
           
-          // Sincronizar com backend PostgreSQL se necessário
-          await syncUser();
+          // Sincronização opcional - removida para evitar erros durante desenvolvimento
         } catch (error) {
           console.error('Erro ao processar autenticação:', error);
         }
