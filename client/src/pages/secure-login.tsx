@@ -33,49 +33,41 @@ export default function SecureLogin() {
         return;
       }
 
-      let userRole = "VIEWER"; // Most restrictive default
-      let isValidLogin = false;
-      
-      // Secure admin authentication - requires exact match
-      if (credentials.username === "admin@laboratorio-evcs.com" && 
-          credentials.password === "SecureAdmin2025!@#") {
-        userRole = "ADMIN";
-        isValidLogin = true;
-      } 
-      else if (credentials.username === "manager@laboratorio-evcs.com" && 
-               credentials.password === "SecureManager2025!@#") {
-        userRole = "MANAGER";
-        isValidLogin = true;
-      }
-      else if (credentials.username === "supervisor@laboratorio-evcs.com" && 
-               credentials.password === "SecureSupervisor2025!@#") {
-        userRole = "SUPERVISOR";
-        isValidLogin = true;
-      }
-      else if (credentials.username === "tecnico@laboratorio-evcs.com" && 
-               credentials.password === "SecureTech2025!@#") {
-        userRole = "TECHNICIAN";
-        isValidLogin = true;
-      }
-      else {
-        setError("Credenciais inválidas. Verifique email e senha.");
+      // Login via API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password
+        }),
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Erro durante o login');
         return;
       }
 
-      if (isValidLogin) {
-        // Store secure authentication
-        localStorage.setItem("auth_token", `secure_${Date.now()}`);
-        localStorage.setItem("user_role", userRole);
-        localStorage.setItem("user_name", credentials.username.split('@')[0]);
-        localStorage.setItem("user_email", credentials.username);
+      if (data.success) {
+        // Store authentication data
+        localStorage.setItem("auth_token", `session_${Date.now()}`);
+        localStorage.setItem("user_data", JSON.stringify(data.user));
         
         // Clear form
         setCredentials({ username: "", password: "" });
         window.location.reload();
+      } else {
+        setError("Falha na autenticação.");
       }
+
     } catch (error) {
       console.error("Login error:", error);
-      setError("Erro durante o login. Tente novamente.");
+      setError("Erro durante o login. Verifique sua conexão.");
     } finally {
       setIsLoading(false);
     }

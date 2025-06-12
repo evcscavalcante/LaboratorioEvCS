@@ -1,11 +1,43 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
+import authRoutes from "./auth-local";
 
 const app = express();
 const server = createServer(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Session configuration
+const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+const pgStore = connectPg(session);
+const sessionStore = new pgStore({
+  conString: process.env.DATABASE_URL,
+  createTableIfMissing: true,
+  ttl: sessionTtl,
+  tableName: "sessions",
+});
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'laboratorio-evcs-secret-2025',
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: false, // Set to true in production with HTTPS
+    maxAge: sessionTtl,
+  },
+}));
+
+// Authentication routes
+app.use('/api/auth', authRoutes);
+
+// Initialize default users
+import { initializeDefaultUsers } from './init-users';
+initializeDefaultUsers();
 
 // Mercado Pago Configuration
 const MERCADO_PAGO_ACCESS_TOKEN = 'APP_USR-7d9c3772-5ece-433a-bd1b-2aa3e69c1863';
