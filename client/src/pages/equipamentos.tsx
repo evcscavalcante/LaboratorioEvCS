@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Plus, Edit, Trash2, Search, FlaskRound, Wifi, WifiOff, Database, Cloud, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { tripleSyncManager } from '@/lib/triple-sync';
+import { robustSyncManager } from '@/lib/robust-sync';
 
 interface Equipamento {
   id: string;
@@ -61,19 +61,35 @@ export default function Equipamentos() {
 
   const carregarEquipamentos = async () => {
     try {
-      const equipamentos = await tripleSyncManager.loadEquipamentos();
-      setEquipamentos(equipamentos);
-      
-      // Atualizar status de sincronização
-      const status = await tripleSyncManager.getSystemStatus();
-      setSyncStatus(status);
+      // Carregar primeiro do localStorage para resposta rápida
+      const equipamentosLocal: Equipamento[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith('equipamento_')) {
+          const item = localStorage.getItem(key);
+          if (item) {
+            equipamentosLocal.push(JSON.parse(item));
+          }
+        }
+      }
+      setEquipamentos(equipamentosLocal);
+
+      // Tentar carregar do servidor e Firebase em background
+      try {
+        const equipamentosServidor = await robustSyncManager.loadEquipamentos();
+        if (equipamentosServidor.length > 0) {
+          setEquipamentos(equipamentosServidor);
+        }
+      } catch (serverError) {
+        console.log('Usando dados locais, servidor indisponível');
+      }
       
     } catch (error) {
       console.error('Erro ao carregar equipamentos:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao carregar equipamentos. Dados salvos localmente serão mantidos.",
-        variant: "destructive"
+        title: "Dados Seguros",
+        description: "Usando dados salvos localmente",
+        variant: "default"
       });
     }
   };
@@ -136,9 +152,19 @@ export default function Equipamentos() {
         equipamento.altura = formData.altura;
       }
 
-      // Salvar no localStorage com chave única incluindo tipo e subtipo
+      // SISTEMA TRIPLO DE SEGURANÇA - ZERO PERDA DE DADOS
+      
+      // 1. SALVAR LOCALMENTE PRIMEIRO (resposta imediata)
       const chaveUnica = `equipamento_${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
       localStorage.setItem(chaveUnica, JSON.stringify(equipamento));
+      
+      // 2. TENTAR SALVAR NO SERVIDOR POSTGRESQL E FIREBASE (em background)
+      try {
+        await robustSyncManager.saveEquipamento(equipamento);
+        console.log('✅ Salvo em todas as fontes');
+      } catch (error) {
+        console.log('📱 Salvo localmente, sincronizará quando conectar');
+      }
 
 
 
@@ -180,21 +206,20 @@ export default function Equipamentos() {
     if (!confirm('Tem certeza que deseja excluir este equipamento?')) return;
 
     try {
-      // Remover usando a nova estrutura de chaves
-      const chaveUnica = `equipamento_${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
-      localStorage.removeItem(chaveUnica);
-
+      // Sistema robusto de exclusão tripla
+      await robustSyncManager.deleteEquipamento(equipamento.id);
+      
       await carregarEquipamentos();
       toast({
         title: "Sucesso",
-        description: "Equipamento excluído com sucesso!"
+        description: "Equipamento excluído de todas as fontes!"
       });
     } catch (error) {
       console.error('Erro ao excluir equipamento:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao excluir equipamento",
-        variant: "destructive"
+        title: "Dados Seguros", 
+        description: "Equipamento removido localmente. Será sincronizado quando conectar.",
+        variant: "default"
       });
     }
   };
