@@ -1,0 +1,100 @@
+0. Pré-requisitos no Firebase
+Acesse o Console do Firebase e faça login com sua conta Google.
+
+Clique em “Adicionar projeto”, dê um nome (por exemplo, meu-projeto-replit), e conclua a criação.
+
+Anote o Project ID gerado (ex.: meu-projeto-replit-12345).
+
+1. Instalar o Firebase CLI no Repl
+Abra o Shell (aba “Shell” ou terminal) dentro do seu Repl no Replit.
+
+Rode:
+
+bash
+Copiar
+Editar
+npm install -g firebase-tools
+Isso instala a ferramenta de linha de comando do Firebase no ambiente do seu Repl.
+
+2. Gerar o token de CI para deploy automático
+Ainda no Shell do Replit, execute:
+
+bash
+Copiar
+Editar
+firebase login:ci
+Será apresentada uma URL. Copie e cole no seu navegador local (pois no Replit pode não abrir automaticamente).
+
+Autorize o Firebase CLI a acessar sua conta Google.
+
+Ele vai devolver um token longo (começa com 1//). Copie esse token.
+
+3. Guardar o token como Secret no Replit
+No painel lateral do Replit, clique em Secrets (ícone de cadeado).
+
+Crie uma entrada com:
+
+Key: FIREBASE_TOKEN
+
+Value: cole aqui o token que você gerou
+
+4. Inicializar o Hosting do Firebase
+De volta ao Shell, na raiz do seu projeto, rode:
+
+bash
+Copiar
+Editar
+firebase init hosting
+Siga o wizard:
+
+Escolha Hosting: Configure and deploy Firebase Hosting sites.
+
+Selecione o projeto que você criou (pelo nome ou Project ID).
+
+Configure o diretório público (por exemplo, public, build ou dist, dependendo do seu framework).
+
+Se for Single-Page App (SPA), responda “Yes” para reescrever requisições para index.html.
+
+Quando perguntar “Configure as a GitHub Action for deployment?”, responda “No” (já vamos usar o Replit).
+
+Isso cria firebase.json e, opcionalmente, .firebaserc no seu Repl.
+
+5. Ajustar o package.json
+Abra seu package.json e garanta que tenha um script de build e outro de deploy. Por exemplo, para um app React:
+
+jsonc
+Copiar
+Editar
+{
+  "scripts": {
+    "build": "react-scripts build",
+    "deploy": "firebase deploy --only hosting --token=$FIREBASE_TOKEN"
+  }
+}
+Se você não usa React, substitua build pelo comando do seu framework (por exemplo, npm run build, npm run build:ssr, etc).
+
+6. Criar/editar o arquivo .replit
+Na raiz do seu projeto, crie (ou edite) um arquivo chamado .replit com este conteúdo:
+
+ini
+Copiar
+Editar
+run = "npm run build && npm run deploy"
+Isso instrui o Replit a, sempre que você clicar em Run, executar primeiro o build e em seguida o deploy.
+
+7. Fazer o deploy “no clique”
+Clique em Run no topo do Replit.
+
+O console no Replit vai mostrar:
+
+npm run build → processo de build do seu app.
+
+firebase deploy --only hosting --token=$FIREBASE_TOKEN → deploy para o Hosting do Firebase.
+
+Ao final, você verá a URL do seu site, algo como https://meu-projeto-replit-12345.web.app.
+
+Observações Finais
+Nunca comite seu token no código; sempre use Secrets.
+
+Se precisar de configurações customizadas no firebase.json (rewrites, headers, etc), edite-o manualmente.
+
