@@ -2,7 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import authRoutes, { isAuthenticated, requireRole } from "./auth-firebase";
+import authRoutes, { isAuthenticated, requireRole } from "./auth-complete";
+import { initializeDefaultUsers } from "./init-default-users";
+import { registerRoutes } from "./routes";
+import { registerPaymentRoutes } from "./payment-routes";
+import { setupVite, serveStatic } from "./vite";
 import MemoryStore from "memorystore";
 
 const app = express();
@@ -29,14 +33,21 @@ app.use(session({
   },
 }));
 
+// Initialize default users on startup
+initializeDefaultUsers();
+
 // Authentication routes
 app.use(authRoutes);
+
+// Register main application routes with authentication
+registerRoutes(app);
+
+// Register payment routes
+registerPaymentRoutes(app);
 
 // Mercado Pago Configuration
 const MERCADO_PAGO_ACCESS_TOKEN = 'APP_USR-7d9c3772-5ece-433a-bd1b-2aa3e69c1863';
 const MERCADO_PAGO_PUBLIC_KEY = 'APP_USR-49306117834096-061114-3b017dc53c5db61ee27eb900797c610e-130749701';
-
-const mockUsers = new Map([
   ["admin", {
     id: "admin",
     email: "admin@laboratorio-evcs.com", 

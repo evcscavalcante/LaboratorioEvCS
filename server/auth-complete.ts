@@ -22,7 +22,7 @@ router.post('/api/auth/login', async (req: Request, res: Response) => {
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(password, user.password || '');
     
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Credenciais inválidas' });

@@ -13,10 +13,12 @@ import {
 } from "@shared/schema";
 
 export interface IStorage {
-  // User operations for Replit Auth
+  // User operations for Authentication
   getUser(id: string): Promise<User | undefined>;
   getUsers(): Promise<User[]>;
+  getUserByUsername(username: string): Promise<User | undefined>;
   upsertUser(user: InsertUser): Promise<User>;
+  createUser(user: InsertUser): Promise<User>;
 
   // Density In Situ
   createDensityInSituTest(test: InsertDensityInSituTest): Promise<DensityInSituTest>;
@@ -204,21 +206,57 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values());
   }
 
-  async upsertUser(userData: InsertUser): Promise<User> {
-    const userId = String(Date.now());
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => 
+      user.username === username || user.email === username
+    );
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
+    const userId = userData.id || String(Date.now());
     const user: User = {
       id: userId,
+      username: userData.username || userData.email?.split('@')[0] || 'user',
+      name: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
       email: userData.email || null,
+      password: userData.password || '',
+      role: userData.role || 'VIEWER',
+      organizationId: userData.organizationId || null,
       firstName: userData.firstName || null,
       lastName: userData.lastName || null,
       profileImageUrl: userData.profileImageUrl || null,
-      role: userData.role || 'VIEWER',
       active: userData.active !== undefined ? userData.active : true,
-      organizationId: userData.organizationId || null,
       permissions: userData.permissions || null,
       createdAt: new Date(),
       updatedAt: new Date(),
       lastLogin: null
+    };
+    
+    this.users.set(user.id, user);
+    return user;
+  }
+
+  async upsertUser(userData: InsertUser): Promise<User> {
+    const existingUser = userData.id ? this.users.get(userData.id) : null;
+    const userId = userData.id || String(Date.now());
+    
+    const user: User = {
+      id: userId,
+      username: userData.username || userData.email?.split('@')[0] || 'user',
+      name: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+      email: userData.email || null,
+      password: userData.password || '',
+      role: userData.role || 'VIEWER',
+      organizationId: userData.organizationId || null,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      profileImageUrl: userData.profileImageUrl || null,
+      isActive: userData.active !== undefined ? userData.active : true,
+      active: userData.active !== undefined ? userData.active : true,
+      permissions: userData.permissions || null,
+      createdAt: existingUser?.createdAt || new Date(),
+      updatedAt: new Date(),
+      lastLogin: existingUser?.lastLogin || null
     };
     
     this.users.set(user.id, user);
