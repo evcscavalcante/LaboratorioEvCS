@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Edit, Trash2, Search, FlaskRound, Wifi, WifiOff, Database, Cloud, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Wifi, WifiOff, Cloud, Database, LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { robustSyncManager } from '@/lib/robust-sync';
+import { firebaseSyncManager } from '@/lib/firebase-sync';
 
 interface Equipamento {
   id: string;
@@ -24,6 +23,7 @@ interface Equipamento {
   observacoes?: string;
   createdAt: string;
   updatedAt: string;
+  userId: string;
 }
 
 const statusColors = {
@@ -43,606 +43,562 @@ export default function Equipamentos() {
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [busca, setBusca] = useState('');
+  const [autenticado, setAutenticado] = useState(false);
+  const [emailLogin, setEmailLogin] = useState('evcsousa@yahoo.com.br');
+  const [senhaLogin, setSenhaLogin] = useState('');
+  const [showLogin, setShowLogin] = useState(false);
   const [syncStatus, setSyncStatus] = useState({
-    online: true,
-    pendingSync: 0,
-    lastSync: null as Date | null,
-    sources: { localStorage: true, postgresql: false, firebase: false }
-  });
-  const [formData, setFormData] = useState<Partial<Equipamento>>({
-    codigo: '',
-    tipo: 'capsula',
-    subtipo: '',
-    peso: undefined,
-    volume: undefined,
-    altura: undefined,
-    status: 'ativo',
-    observacoes: ''
+    firebase: false,
+    localStorage: true,
+    postgresql: false
   });
   const { toast } = useToast();
 
-  useEffect(() => {
-    carregarEquipamentos();
-    
-    // Atualizar status de sincronização periodicamente
-    const interval = setInterval(async () => {
-      try {
-        const status = await robustSyncManager.getStatus();
-        setSyncStatus(status);
-      } catch (error) {
-        console.error('Erro ao obter status:', error);
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
+  // Carregar equipamentos
   const carregarEquipamentos = async () => {
     try {
-      // Carregar primeiro do localStorage para resposta rápida
-      const equipamentosLocal: Equipamento[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith('equipamento_')) {
-          const item = localStorage.getItem(key);
-          if (item) {
-            equipamentosLocal.push(JSON.parse(item));
+      if (firebaseSyncManager.isAuthenticated()) {
+        // Carregar do Firebase se autenticado
+        const equipamentosFirebase = await firebaseSyncManager.loadEquipamentos();
+        setEquipamentos(equipamentosFirebase);
+        setSyncStatus(prev => ({ ...prev, firebase: true }));
+      } else {
+        // Carregar do localStorage se não autenticado
+        const equipamentosLocal: Equipamento[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key?.startsWith('equipamento_')) {
+            const item = localStorage.getItem(key);
+            if (item) {
+              equipamentosLocal.push(JSON.parse(item));
+            }
           }
         }
+        setEquipamentos(equipamentosLocal);
+        console.log('Usando dados locais, Firebase não autenticado');
       }
-      setEquipamentos(equipamentosLocal);
-
-      // Tentar carregar do servidor e Firebase em background
-      try {
-        const equipamentosServidor = await robustSyncManager.loadEquipamentos();
-        if (equipamentosServidor.length > 0) {
-          setEquipamentos(equipamentosServidor);
-        }
-      } catch (serverError) {
-        console.log('Usando dados locais, servidor indisponível');
-      }
-      
     } catch (error) {
       console.error('Erro ao carregar equipamentos:', error);
       toast({
-        title: "Dados Seguros",
-        description: "Usando dados salvos localmente",
-        variant: "default"
+        title: "Erro",
+        description: "Não foi possível carregar os equipamentos",
+        variant: "destructive",
       });
     }
   };
 
-  const equipamentosFiltrados = equipamentos.filter(eq => {
-    let matchTipo = false;
-    
-    if (filtroTipo === 'todos') {
-      matchTipo = true;
-    } else if (filtroTipo === 'capsula') {
-      matchTipo = eq.tipo === 'capsula';
-    } else if (filtroTipo === 'cilindro') {
-      matchTipo = eq.tipo === 'cilindro';
-    } else if (filtroTipo.startsWith('capsula_')) {
-      const subtipo = filtroTipo.replace('capsula_', '');
-      matchTipo = eq.tipo === 'capsula' && eq.subtipo === subtipo;
-    } else if (filtroTipo.startsWith('cilindro_')) {
-      const subtipo = filtroTipo.replace('cilindro_', '');
-      matchTipo = eq.tipo === 'cilindro' && eq.subtipo === subtipo;
-    }
-    
-    const matchStatus = filtroStatus === 'todos' || eq.status === filtroStatus;
-    const matchBusca = eq.codigo.toLowerCase().includes(busca.toLowerCase()) ||
-                     eq.observacoes?.toLowerCase().includes(busca.toLowerCase()) ||
-                     eq.subtipo?.toLowerCase().includes(busca.toLowerCase());
-    return matchTipo && matchStatus && matchBusca;
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.codigo?.trim()) {
+  // Autenticar no Firebase
+  const autenticarFirebase = async () => {
+    if (!senhaLogin.trim()) {
       toast({
         title: "Erro",
-        description: "Código é obrigatório",
-        variant: "destructive"
+        description: "Digite a senha para autenticar",
+        variant: "destructive",
       });
       return;
     }
 
+    const sucesso = await firebaseSyncManager.authenticateWithEmail(emailLogin, senhaLogin);
+    if (sucesso) {
+      setAutenticado(true);
+      setShowLogin(false);
+      setSenhaLogin('');
+      toast({
+        title: "Sucesso",
+        description: "Autenticado com sucesso no Firebase",
+      });
+      
+      // Sincronizar dados locais para Firebase
+      await firebaseSyncManager.syncToFirebase();
+      await carregarEquipamentos();
+    } else {
+      toast({
+        title: "Erro",
+        description: "Falha na autenticação. Verifique as credenciais.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Salvar equipamento
+  const salvarEquipamento = async (dadosForm: any) => {
     try {
       const agora = new Date().toISOString();
       const equipamento: Equipamento = {
-        id: equipamentoEdit?.id || crypto.randomUUID(),
-        codigo: formData.codigo.trim(),
-        tipo: formData.tipo || 'capsula',
-        peso: formData.peso,
-        volume: formData.volume,
-        status: formData.status || 'ativo',
-        observacoes: formData.observacoes?.trim(),
+        id: equipamentoEdit?.id || `eq_${Date.now()}`,
+        codigo: dadosForm.codigo,
+        tipo: dadosForm.tipo,
+        subtipo: dadosForm.subtipo || undefined,
+        peso: dadosForm.peso ? parseFloat(dadosForm.peso) : undefined,
+        volume: dadosForm.volume ? parseFloat(dadosForm.volume) : undefined,
+        altura: dadosForm.altura ? parseFloat(dadosForm.altura) : undefined,
+        status: dadosForm.status,
+        observacoes: dadosForm.observacoes || undefined,
         createdAt: equipamentoEdit?.createdAt || agora,
-        updatedAt: agora
-      } as Equipamento;
+        updatedAt: agora,
+        userId: firebaseSyncManager.getCurrentUser()?.uid || 'local'
+      };
 
-      // Adicionar subtipo se não existir
-      if (formData.subtipo) {
-        equipamento.subtipo = formData.subtipo;
-      }
-      if (formData.altura) {
-        equipamento.altura = formData.altura;
-      }
-
-      // SISTEMA TRIPLO DE SEGURANÇA - ZERO PERDA DE DADOS
-      
-      // 1. SALVAR LOCALMENTE PRIMEIRO (resposta imediata)
+      // Salvar no localStorage
       const chaveUnica = `equipamento_${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
       localStorage.setItem(chaveUnica, JSON.stringify(equipamento));
-      
-      // 2. TENTAR SALVAR NO SERVIDOR POSTGRESQL E FIREBASE (em background)
-      try {
-        await robustSyncManager.saveEquipamento(equipamento);
-        console.log('✅ Salvo em todas as fontes');
-      } catch (error) {
-        console.log('📱 Salvo localmente, sincronizará quando conectar');
+
+      // Salvar no Firebase se autenticado
+      let firebaseSucesso = false;
+      if (firebaseSyncManager.isAuthenticated()) {
+        firebaseSucesso = await firebaseSyncManager.saveEquipamento(equipamento);
       }
 
+      // Atualizar lista local
+      if (equipamentoEdit) {
+        setEquipamentos(prev => prev.map(eq => eq.id === equipamento.id ? equipamento : eq));
+      } else {
+        setEquipamentos(prev => [...prev, equipamento]);
+      }
 
+      setSyncStatus(prev => ({
+        ...prev,
+        firebase: firebaseSucesso,
+        localStorage: true
+      }));
 
-      await carregarEquipamentos();
+      console.log('✅ Salvo em todas as fontes');
+      
       setIsDialogOpen(false);
       setEquipamentoEdit(null);
-      setFormData({
-        codigo: '',
-        tipo: 'capsula',
-        subtipo: '',
-        peso: undefined,
-        volume: undefined,
-        altura: undefined,
-        status: 'ativo',
-        observacoes: ''
-      });
-
+      
       toast({
         title: "Sucesso",
-        description: equipamentoEdit ? "Equipamento atualizado com sucesso!" : "Equipamento cadastrado com sucesso!"
+        description: `Equipamento ${equipamentoEdit ? 'atualizado' : 'cadastrado'} com sucesso`,
       });
     } catch (error) {
       console.error('Erro ao salvar equipamento:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar equipamento",
-        variant: "destructive"
+        description: "Não foi possível salvar o equipamento",
+        variant: "destructive",
       });
     }
   };
 
-  const handleEditar = (equipamento: Equipamento) => {
-    setEquipamentoEdit(equipamento);
-    setFormData(equipamento);
-    setIsDialogOpen(true);
-  };
-
-  const handleExcluir = async (equipamento: Equipamento) => {
-    if (!confirm('Tem certeza que deseja excluir este equipamento?')) return;
-
+  // Excluir equipamento
+  const excluirEquipamento = async (equipamento: Equipamento) => {
     try {
-      // Sistema robusto de exclusão tripla
-      await robustSyncManager.deleteEquipamento(equipamento.id);
-      
-      await carregarEquipamentos();
+      // Remover do localStorage
+      const chaveUnica = `equipamento_${equipamento.tipo}_${equipamento.codigo}_${equipamento.subtipo || 'padrao'}`;
+      localStorage.removeItem(chaveUnica);
+
+      // Remover do Firebase se autenticado
+      if (firebaseSyncManager.isAuthenticated()) {
+        await firebaseSyncManager.deleteEquipamento(equipamento.id);
+      }
+
+      // Remover da lista local
+      setEquipamentos(prev => prev.filter(eq => eq.id !== equipamento.id));
+
       toast({
         title: "Sucesso",
-        description: "Equipamento excluído de todas as fontes!"
+        description: "Equipamento excluído com sucesso",
       });
     } catch (error) {
       console.error('Erro ao excluir equipamento:', error);
       toast({
-        title: "Dados Seguros", 
-        description: "Equipamento removido localmente. Será sincronizado quando conectar.",
-        variant: "default"
+        title: "Erro",
+        description: "Não foi possível excluir o equipamento",
+        variant: "destructive",
       });
     }
   };
 
-  const resetDialog = () => {
-    setEquipamentoEdit(null);
-    setFormData({
-      codigo: '',
-      tipo: 'capsula',
-      subtipo: '',
-      peso: undefined,
-      volume: undefined,
-      altura: undefined,
-      status: 'ativo',
-      observacoes: ''
-    });
-  };
+  // Filtrar equipamentos
+  const equipamentosFiltrados = equipamentos.filter(equipamento => {
+    const matchBusca = busca === '' || 
+      equipamento.codigo.toLowerCase().includes(busca.toLowerCase()) ||
+      (equipamento.subtipo && equipamento.subtipo.toLowerCase().includes(busca.toLowerCase()));
+    
+    const matchTipo = filtroTipo === 'todos' || equipamento.tipo === filtroTipo;
+    const matchStatus = filtroStatus === 'todos' || equipamento.status === filtroStatus;
+    
+    return matchBusca && matchTipo && matchStatus;
+  });
+
+  useEffect(() => {
+    // Verificar autenticação inicial
+    const checkAuth = () => {
+      const isAuth = firebaseSyncManager.isAuthenticated();
+      setAutenticado(isAuth);
+      setSyncStatus(prev => ({ ...prev, firebase: isAuth }));
+    };
+    
+    checkAuth();
+    
+    // Configurar listener de mudanças em tempo real
+    let unsubscribe: (() => void) | null = null;
+    
+    if (firebaseSyncManager.isAuthenticated()) {
+      unsubscribe = firebaseSyncManager.onEquipamentosChange((equipamentosFirebase) => {
+        setEquipamentos(equipamentosFirebase);
+        setSyncStatus(prev => ({ ...prev, firebase: true }));
+      });
+    }
+    
+    carregarEquipamentos();
+
+    // Verificar autenticação periodicamente
+    const authInterval = setInterval(checkAuth, 2000);
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+      clearInterval(authInterval);
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestão de Equipamentos</h1>
-              <p className="text-gray-600">Gerencie cápsulas e cilindros do laboratório</p>
-            </div>
+    <div className="container mx-auto p-6 max-w-7xl">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Gestão de Equipamentos</h1>
+          <p className="text-muted-foreground mt-1">
+            Gerencie cápsulas e cilindros do laboratório
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          {/* Status de sincronização */}
+          <div className="flex items-center gap-2 text-sm">
+            <div className={`w-2 h-2 rounded-full ${syncStatus.localStorage ? 'bg-green-500' : 'bg-red-500'}`} title="localStorage" />
+            <Database className="w-4 h-4 text-gray-500" />
             
-            {/* Indicador de Status Triplo de Sincronização */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-white shadow-sm">
-                <div className="flex items-center gap-1">
-                  <div className={`w-2 h-2 rounded-full ${syncStatus.sources.localStorage ? 'bg-green-500' : 'bg-red-500'}`} />
-                  <span className="text-xs font-medium text-gray-600">Local</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className={`w-2 h-2 rounded-full ${syncStatus.sources.postgresql ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                  <span className="text-xs font-medium text-gray-600">PostgreSQL</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className={`w-2 h-2 rounded-full ${syncStatus.sources.firebase ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                  <span className="text-xs font-medium text-gray-600">Firebase</span>
-                </div>
-                {syncStatus.pendingSync > 0 && (
-                  <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-yellow-100 rounded text-xs border border-yellow-200">
-                    <AlertCircle className="h-3 w-3 text-yellow-600" />
-                    <span className="text-yellow-700 font-medium">{syncStatus.pendingSync} pendente</span>
+            <div className={`w-2 h-2 rounded-full ${syncStatus.firebase ? 'bg-green-500' : 'bg-yellow-500'}`} title="Firebase" />
+            <Cloud className="w-4 h-4 text-gray-500" />
+          </div>
+
+          {/* Botão de login/status */}
+          {!autenticado ? (
+            <Dialog open={showLogin} onOpenChange={setShowLogin}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Entrar
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Autenticação Firebase</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={emailLogin}
+                      onChange={(e) => setEmailLogin(e.target.value)}
+                    />
                   </div>
-                )}
-              </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={async () => {
-                  try {
-                    await robustSyncManager.forcSync();
-                    toast({
-                      title: "Sincronização forçada",
-                      description: "Tentativa de sincronizar dados pendentes iniciada"
-                    });
-                  } catch (error) {
-                    console.error('Erro na sincronização forçada:', error);
-                  }
-                }}
-                className="text-xs"
-              >
-                <Cloud className="h-3 w-3 mr-1" />
-                Sincronizar
-              </Button>
-              
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
+                  <div>
+                    <Label htmlFor="senha">Senha</Label>
+                    <Input
+                      id="senha"
+                      type="password"
+                      value={senhaLogin}
+                      onChange={(e) => setSenhaLogin(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && autenticarFirebase()}
+                    />
+                  </div>
+                  <Button onClick={autenticarFirebase} className="w-full">
+                    Autenticar
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <Badge variant="outline" className="bg-green-50 text-green-700">
+              <Wifi className="w-3 h-3 mr-1" />
+              Sincronizado
+            </Badge>
+          )}
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => { setEquipamentoEdit(null); setIsDialogOpen(true); }}>
+                <Plus className="w-4 h-4 mr-2" />
                 Novo Equipamento
               </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <FormularioEquipamento
+                equipamento={equipamentoEdit}
+                onSalvar={salvarEquipamento}
+                onCancelar={() => { setIsDialogOpen(false); setEquipamentoEdit(null); }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {/* Filtros */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por código..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="pl-10"
+              />
             </div>
+            
+            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+              <SelectTrigger>
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os tipos</SelectItem>
+                <SelectItem value="capsula">Cápsulas</SelectItem>
+                <SelectItem value="cilindro">Cilindros</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os status</SelectItem>
+                <SelectItem value="ativo">Ativo</SelectItem>
+                <SelectItem value="inativo">Inativo</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Filtros e busca */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex flex-wrap gap-4 items-center">
-              <div className="flex-1 min-w-60">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Buscar por código ou observações..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+      {/* Lista de equipamentos */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {equipamentosFiltrados.map((equipamento) => (
+          <Card key={equipamento.id} className="hover:shadow-md transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span className="text-xl">{tipoIcons[equipamento.tipo]}</span>
+                  {equipamento.codigo}
+                </CardTitle>
+                <Badge className={statusColors[equipamento.status]}>
+                  {equipamento.status}
+                </Badge>
               </div>
-              
-              <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os tipos</SelectItem>
-                  <SelectItem value="capsula">Todas as Cápsulas</SelectItem>
-                  <SelectItem value="capsula_pequena">Cápsula Pequena</SelectItem>
-                  <SelectItem value="capsula_media">Cápsula Média</SelectItem>
-                  <SelectItem value="capsula_grande">Cápsula Grande</SelectItem>
-                  <SelectItem value="cilindro">Todos os Cilindros</SelectItem>
-                  <SelectItem value="cilindro_biselado">Cilindro Biselado</SelectItem>
-                  <SelectItem value="cilindro_proctor">Cilindro de Proctor</SelectItem>
-                  <SelectItem value="cilindro_cbr">Cilindro de CBR</SelectItem>
-                  <SelectItem value="cilindro_padrao">Cilindro Padrão</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os status</SelectItem>
-                  <SelectItem value="ativo">Ativo</SelectItem>
-                  <SelectItem value="inativo">Inativo</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Dialog open={isDialogOpen} onOpenChange={(open) => {
-                setIsDialogOpen(open);
-                if (!open) resetDialog();
-              }}>
-                <DialogTrigger asChild>
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Novo Equipamento
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {equipamentoEdit ? 'Editar Equipamento' : 'Novo Equipamento'}
-                    </DialogTitle>
-                  </DialogHeader>
-
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Código *</Label>
-                        <Input
-                          value={formData.codigo || ''}
-                          onChange={(e) => setFormData({...formData, codigo: e.target.value})}
-                          placeholder="Ex: CAP001, CIL001"
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Tipo *</Label>
-                        <Select 
-                          value={formData.tipo} 
-                          onValueChange={(value) => setFormData({...formData, tipo: value as any})}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="capsula">Cápsula</SelectItem>
-                            <SelectItem value="cilindro">Cilindro</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Variação/Modelo</Label>
-                        <Select
-                          value={formData.subtipo || ''}
-                          onValueChange={(value) => setFormData({...formData, subtipo: value})}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione a variação" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {formData.tipo === 'capsula' && (
-                              <>
-                                <SelectItem value="pequena">Cápsula Pequena</SelectItem>
-                                <SelectItem value="media">Cápsula Média</SelectItem>
-                                <SelectItem value="grande">Cápsula Grande</SelectItem>
-                              </>
-                            )}
-                            {formData.tipo === 'cilindro' && (
-                              <>
-                                <SelectItem value="biselado">Cilindro Biselado</SelectItem>
-                                <SelectItem value="proctor">Cilindro de Proctor</SelectItem>
-                                <SelectItem value="cbr">Cilindro de CBR</SelectItem>
-                                <SelectItem value="padrao">Cilindro Padrão</SelectItem>
-                              </>
-                            )}
-                            <SelectItem value="outro">Outro (personalizado)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {formData.subtipo === 'outro' && (
-                          <Input
-                            placeholder="Digite a variação personalizada"
-                            onChange={(e) => setFormData({...formData, subtipo: e.target.value})}
-                            className="mt-2"
-                          />
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Peso (g)</Label>
-                        <Input
-                          type="number"
-                          step="0.001"
-                          value={formData.peso || ''}
-                          onChange={(e) => setFormData({...formData, peso: e.target.value ? parseFloat(e.target.value) : undefined})}
-                          placeholder="Ex: 25.456"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Volume (cm³)</Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={formData.volume || ''}
-                          onChange={(e) => setFormData({...formData, volume: e.target.value ? parseFloat(e.target.value) : undefined})}
-                          placeholder="Ex: 50.25"
-                        />
-                      </div>
-
-                      {formData.subtipo === 'cbr' && (
-                        <div className="space-y-2">
-                          <Label>Altura (cm)</Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={formData.altura || ''}
-                            onChange={(e) => setFormData({...formData, altura: e.target.value ? parseFloat(e.target.value) : undefined})}
-                            placeholder="Ex: 11.64"
-                          />
-                        </div>
-                      )}
-
-                      <div className="space-y-2">
-                        <Label>Status</Label>
-                        <Select 
-                          value={formData.status} 
-                          onValueChange={(value) => setFormData({...formData, status: value as any})}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ativo">Ativo</SelectItem>
-                            <SelectItem value="inativo">Inativo</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Observações</Label>
-                      <Textarea
-                        value={formData.observacoes || ''}
-                        onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
-                        placeholder="Observações sobre o equipamento..."
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="flex justify-end gap-2 mt-6">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setIsDialogOpen(false)}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                        {equipamentoEdit ? 'Atualizar' : 'Cadastrar'}
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Lista de equipamentos */}
-        <div className="grid gap-4">
-          {equipamentosFiltrados.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <FlaskRound className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Nenhum equipamento encontrado
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {equipamentos.length === 0 
-                    ? 'Comece cadastrando seu primeiro equipamento'
-                    : 'Tente ajustar os filtros de busca'
-                  }
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            equipamentosFiltrados.map((equipamento) => (
-              <Card key={equipamento.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="text-2xl">
-                        {tipoIcons[equipamento.tipo]}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-lg">{equipamento.codigo}</h3>
-                          <Badge variant="outline" className={statusColors[equipamento.status]}>
-                            {equipamento.status}
-                          </Badge>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          <Badge variant="secondary" className="text-xs">
-                            {equipamento.tipo === 'capsula' ? 'Cápsula' : 'Cilindro'}
-                          </Badge>
-                          {equipamento.subtipo && (
-                            <Badge variant="outline" className="text-xs capitalize">
-                              {equipamento.subtipo}
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          {equipamento.peso && `${equipamento.peso}g`}
-                          {equipamento.volume && ` • ${equipamento.volume}cm³`}
-                          {equipamento.altura && ` • ${equipamento.altura}cm altura`}
-                        </p>
-                        {equipamento.observacoes && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            {equipamento.observacoes}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditar(equipamento)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleExcluir(equipamento)}
-                        className="text-red-600 hover:text-red-700 hover:border-red-300"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-
-        {/* Estatísticas */}
-        {equipamentos.length > 0 && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle className="text-lg">Estatísticas</CardTitle>
+              <CardDescription>
+                {equipamento.tipo.charAt(0).toUpperCase() + equipamento.tipo.slice(1)}
+                {equipamento.subtipo && ` - ${equipamento.subtipo}`}
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {equipamentos.length}
-                  </div>
-                  <div className="text-sm text-blue-600">Total</div>
+            
+            <CardContent className="space-y-2">
+              {equipamento.peso && (
+                <div className="text-sm">
+                  <span className="font-medium">Peso:</span> {equipamento.peso}g
                 </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">
-                    {equipamentos.filter(e => e.status === 'ativo').length}
-                  </div>
-                  <div className="text-sm text-green-600">Ativos</div>
+              )}
+              {equipamento.volume && (
+                <div className="text-sm">
+                  <span className="font-medium">Volume:</span> {equipamento.volume}cm³
                 </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">
-                    {equipamentos.filter(e => e.tipo === 'capsula').length}
-                  </div>
-                  <div className="text-sm text-purple-600">Cápsulas</div>
+              )}
+              {equipamento.altura && (
+                <div className="text-sm">
+                  <span className="font-medium">Altura:</span> {equipamento.altura}cm
                 </div>
-                <div className="text-center p-4 bg-orange-50 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {equipamentos.filter(e => e.tipo === 'cilindro').length}
-                  </div>
-                  <div className="text-sm text-orange-600">Cilindros</div>
+              )}
+              {equipamento.observacoes && (
+                <div className="text-sm text-muted-foreground">
+                  {equipamento.observacoes}
                 </div>
+              )}
+              
+              <Separator className="my-3" />
+              
+              <div className="flex justify-between gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { setEquipamentoEdit(equipamento); setIsDialogOpen(true); }}
+                >
+                  <Edit className="w-3 h-3 mr-1" />
+                  Editar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700"
+                  onClick={() => excluirEquipamento(equipamento)}
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Excluir
+                </Button>
               </div>
             </CardContent>
           </Card>
-        )}
+        ))}
       </div>
+
+      {equipamentosFiltrados.length === 0 && (
+        <Card className="text-center py-12">
+          <CardContent>
+            <div className="text-muted-foreground">
+              {equipamentos.length === 0 
+                ? "Nenhum equipamento cadastrado ainda"
+                : "Nenhum equipamento encontrado com os filtros aplicados"
+              }
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
+  );
+}
+
+// Componente do formulário
+function FormularioEquipamento({ 
+  equipamento, 
+  onSalvar, 
+  onCancelar 
+}: {
+  equipamento: Equipamento | null;
+  onSalvar: (dados: any) => void;
+  onCancelar: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    codigo: equipamento?.codigo || '',
+    tipo: equipamento?.tipo || 'capsula',
+    subtipo: equipamento?.subtipo || '',
+    peso: equipamento?.peso?.toString() || '',
+    volume: equipamento?.volume?.toString() || '',
+    altura: equipamento?.altura?.toString() || '',
+    status: equipamento?.status || 'ativo',
+    observacoes: equipamento?.observacoes || ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSalvar(formData);
+  };
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>
+          {equipamento ? 'Editar Equipamento' : 'Novo Equipamento'}
+        </DialogTitle>
+      </DialogHeader>
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="codigo">Código *</Label>
+            <Input
+              id="codigo"
+              value={formData.codigo}
+              onChange={(e) => setFormData({...formData, codigo: e.target.value})}
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="tipo">Tipo *</Label>
+            <Select value={formData.tipo} onValueChange={(value) => setFormData({...formData, tipo: value as 'capsula' | 'cilindro'})}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="capsula">Cápsula</SelectItem>
+                <SelectItem value="cilindro">Cilindro</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="subtipo">Subtipo</Label>
+            <Input
+              id="subtipo"
+              value={formData.subtipo}
+              onChange={(e) => setFormData({...formData, subtipo: e.target.value})}
+              placeholder="Ex: pequena, média, grande"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="status">Status *</Label>
+            <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value as 'ativo' | 'inativo'})}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ativo">Ativo</SelectItem>
+                <SelectItem value="inativo">Inativo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="peso">Peso (g)</Label>
+            <Input
+              id="peso"
+              type="number"
+              step="0.01"
+              value={formData.peso}
+              onChange={(e) => setFormData({...formData, peso: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="volume">Volume (cm³)</Label>
+            <Input
+              id="volume"
+              type="number"
+              step="0.01"
+              value={formData.volume}
+              onChange={(e) => setFormData({...formData, volume: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="altura">Altura (cm)</Label>
+            <Input
+              id="altura"
+              type="number"
+              step="0.01"
+              value={formData.altura}
+              onChange={(e) => setFormData({...formData, altura: e.target.value})}
+            />
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="observacoes">Observações</Label>
+          <Input
+            id="observacoes"
+            value={formData.observacoes}
+            onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
+            placeholder="Observações adicionais..."
+          />
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={onCancelar}>
+            Cancelar
+          </Button>
+          <Button type="submit">
+            {equipamento ? 'Atualizar' : 'Cadastrar'}
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }
