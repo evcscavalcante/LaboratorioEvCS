@@ -1,6 +1,9 @@
 import express from 'express';
 import admin from 'firebase-admin';
 import { Request, Response, NextFunction } from 'express';
+import { db } from './db';
+import { users } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 const router = express.Router();
 
