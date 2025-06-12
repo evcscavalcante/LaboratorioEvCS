@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { User } from 'firebase/auth';
 import { onAuthStateChange, getUserProfile, UserProfile } from '@/lib/firebase';
 
@@ -64,7 +64,7 @@ export const useFirebaseAuth = () => {
   };
 };
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const auth = useFirebaseAuth();
   
   return (

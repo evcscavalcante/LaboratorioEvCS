@@ -1,7 +1,7 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 
 import { DataSyncProvider } from "@/contexts/data-sync-context";
 import MainLayout from "@/components/layout/main-layout";
@@ -9,7 +9,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Laboratory from "@/pages/laboratory";
 import Analytics from "@/pages/analytics";
-import SecureLogin from "@/pages/secure-login";
+import Login from "@/pages/Login";
 import SubscriptionPage from "@/pages/subscription";
 import DensidadeInSituPage from "@/pages/solos/densidade-in-situ";
 import DensidadeRealPage from "@/pages/solos/densidade-real";
@@ -28,9 +28,9 @@ import TestAccess from "@/pages/test-access";
 import UserCreation from "@/pages/admin/user-creation";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
@@ -41,8 +41,8 @@ function Router() {
     );
   }
 
-  if (!isAuthenticated) {
-    return <SecureLogin />;
+  if (!user) {
+    return <Login />;
   }
 
   return (
