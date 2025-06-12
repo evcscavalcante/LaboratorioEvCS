@@ -627,22 +627,44 @@ export default function DensityInSitu() {
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell className="font-medium">Número do Cilindro</TableCell>
+                <TableCell className="font-medium">Cilindro de Cravação</TableCell>
                 <TableCell className="mobile-table-cell">
-                  <Input
-                    className="calculator-input"
+                  <Select
                     value={data.det1.cylinderNumber}
-                    onChange={(e) => handleCylinderNumberChange("det1", e.target.value)}
-                    placeholder="CIL-01"
-                  />
+                    onValueChange={(value) => handleCylinderNumberChange("det1", value)}
+                  >
+                    <SelectTrigger className="calculator-input">
+                      <SelectValue placeholder="Selecione cilindro" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {equipamentos.cilindros
+                        .filter(cil => cil.subtipo === 'biselado' || cil.subtipo === 'padrao')
+                        .map((cilindro) => (
+                          <SelectItem key={cilindro.codigo} value={cilindro.codigo}>
+                            {cilindro.codigo} - {cilindro.subtipo} ({cilindro.peso}g, {cilindro.volume}cm³)
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
                 <TableCell className="mobile-table-cell">
-                  <Input
-                    className="calculator-input"
+                  <Select
                     value={data.det2.cylinderNumber}
-                    onChange={(e) => handleCylinderNumberChange("det2", e.target.value)}
-                    placeholder="CIL-02"
-                  />
+                    onValueChange={(value) => handleCylinderNumberChange("det2", value)}
+                  >
+                    <SelectTrigger className="calculator-input">
+                      <SelectValue placeholder="Selecione cilindro" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {equipamentos.cilindros
+                        .filter(cil => cil.subtipo === 'biselado' || cil.subtipo === 'padrao')
+                        .map((cilindro) => (
+                          <SelectItem key={cilindro.codigo} value={cilindro.codigo}>
+                            {cilindro.codigo} - {cilindro.subtipo} ({cilindro.peso}g, {cilindro.volume}cm³)
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
               </TableRow>
               <TableRow>

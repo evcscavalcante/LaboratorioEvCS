@@ -133,6 +133,31 @@ export default function Equipamentos() {
           break;
       }
 
+      // Salvar também nas listas organizadas por tipo
+      if (formData.tipo === 'capsula') {
+        const capsulasExistentes = JSON.parse(localStorage.getItem('capsulas') || '[]');
+        if (equipamentoEdit) {
+          const index = capsulasExistentes.findIndex((c: any) => c.id === equipamentoEdit.id);
+          if (index >= 0) {
+            capsulasExistentes[index] = { ...formData, id: equipamentoEdit.id };
+          }
+        } else {
+          capsulasExistentes.push({ ...equipamento });
+        }
+        localStorage.setItem('capsulas', JSON.stringify(capsulasExistentes));
+      } else if (formData.tipo === 'cilindro') {
+        const cilindrosExistentes = JSON.parse(localStorage.getItem('cilindros') || '[]');
+        if (equipamentoEdit) {
+          const index = cilindrosExistentes.findIndex((c: any) => c.id === equipamentoEdit.id);
+          if (index >= 0) {
+            cilindrosExistentes[index] = { ...formData, id: equipamentoEdit.id };
+          }
+        } else {
+          cilindrosExistentes.push({ ...equipamento });
+        }
+        localStorage.setItem('cilindros', JSON.stringify(cilindrosExistentes));
+      }
+
       await carregarEquipamentos();
       setIsDialogOpen(false);
       setEquipamentoEdit(null);
