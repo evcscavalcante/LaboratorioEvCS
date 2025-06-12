@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { User, getIdToken } from 'firebase/auth';
-import { onAuthStateChange } from '@/lib/firebase';
+import { onAuthStateChange, logout as firebaseLogout } from '@/lib/firebase';
 
 interface UserProfile {
   uid: string;
@@ -17,6 +17,7 @@ interface AuthContextType {
   hasRole: (role: string) => boolean;
   hasAnyRole: (roles: string[]) => boolean;
   syncUser: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -107,6 +108,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return userProfile?.role ? roles.includes(userProfile.role) : false;
   };
 
+  const logout = async () => {
+    try {
+      await firebaseLogout();
+      setUser(null);
+      setUserProfile(null);
+      setToken(null);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -115,7 +127,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       token,
       hasRole,
       hasAnyRole,
-      syncUser
+      syncUser,
+      logout
     }}>
       {children}
     </AuthContext.Provider>

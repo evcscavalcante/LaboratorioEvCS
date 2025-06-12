@@ -247,13 +247,13 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
           <img 
-            src="/logo-compact.svg" 
-            alt="Laboratório Ev.C.S" 
-            className="w-10 h-10"
+            src="/attached_assets/file_00000000233061f898ea05ffe6a1752e_1749721558008.png" 
+            alt="LABORATÓRIO Ev.C S" 
+            className="w-12 h-8 object-contain"
           />
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Laboratório Ev.C.S</h2>
-            <p className="text-sm text-gray-500">Sistema Geotécnico</p>
+            <h2 className="text-lg font-semibold text-gray-900">Sistema Geotécnico</h2>
+            <p className="text-sm text-gray-500">Versão 1.0.0</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
