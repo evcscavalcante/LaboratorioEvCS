@@ -25,10 +25,8 @@ import { localDataManager } from '@/lib/local-storage';
 import { notificationManager } from '@/lib/notification-system';
 import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest, getQueryFn } from '@/lib/queryClient';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 interface DashboardStats {
   totalTests: number;
@@ -64,55 +62,9 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const [savedTests, setSavedTests] = useState<any[]>([]);
-  const [testsLoading, setTestsLoading] = useState(false);
-
-  // Carregar ensaios salvos
-  const loadSavedTests = async () => {
-    setTestsLoading(true);
-    try {
-      const response = await fetch('/api/tests/density-in-situ/temp');
-      if (response.ok) {
-        const data = await response.json();
-        setSavedTests(data || []);
-      }
-    } catch (error) {
-      console.error('Error loading tests:', error);
-      setSavedTests([]);
-    }
-    setTestsLoading(false);
-  };
-
-  // Deletar ensaio
-  const deleteTest = async (testId: number) => {
-    try {
-      const response = await fetch(`/api/tests/density-in-situ/${testId}`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        toast({
-          title: "Ensaio excluído",
-          description: "O ensaio foi removido com sucesso.",
-        });
-        loadSavedTests(); // Recarregar lista
-      } else {
-        throw new Error('Falha ao excluir');
-      }
-    } catch (error: any) {
-      toast({
-        title: "Erro ao excluir",
-        description: error.message || "Não foi possível excluir o ensaio.",
-        variant: "destructive",
-      });
-    }
-  };
 
   useEffect(() => {
     loadDashboardData();
-    loadSavedTests();
     
     // Subscribe to notifications
     const unsubscribe = notificationManager.subscribe((notifications) => {
@@ -406,115 +358,6 @@ export default function Dashboard() {
 
         {/* Recent Activity & Notifications */}
         <div className="space-y-6">
-          {/* Ensaios Salvos */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Ensaios Salvos
-            </h2>
-            <Card>
-              <CardContent className="p-6">
-                {testsLoading ? (
-                  <div className="text-center py-4">
-                    <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2" />
-                    <p className="text-muted-foreground">Carregando ensaios...</p>
-                  </div>
-                ) : savedTests && savedTests.length > 0 ? (
-                  <div className="space-y-3">
-                    {savedTests.slice(0, 5).map((test: any) => (
-                      <div key={test.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Target className="w-4 h-4 text-blue-600" />
-                            <span className="font-medium">Densidade In Situ</span>
-                            <Badge variant={test.status === 'APROVADO' ? 'default' : test.status === 'REPROVADO' ? 'destructive' : 'secondary'}>
-                              {test.status || 'AGUARDANDO'}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Registro: {test.registrationNumber || test.registro} | Operador: {test.operator || test.operador}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {test.date || test.dataEnsaio ? format(new Date(test.date || test.dataEnsaio), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'Data não informada'}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                          >
-                            <Link href={`/solos/densidade-in-situ?view=${test.id}`}>
-                              <Eye className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                          >
-                            <Link href={`/solos/densidade-in-situ?edit=${test.id}`}>
-                              <Edit className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Tem certeza que deseja excluir o ensaio "{test.registrationNumber || test.registro}"? Esta ação não pode ser desfeita.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => deleteTest(test.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Excluir
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </div>
-                    ))}
-                    {savedTests.length > 5 && (
-                      <div className="text-center pt-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href="/tests">Ver todos os {savedTests.length} ensaios</Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="font-medium mb-2">Nenhum ensaio salvo</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Crie seu primeiro ensaio para vê-lo aqui
-                    </p>
-                    <Button asChild>
-                      <Link href="/solos/densidade-in-situ">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Novo Ensaio
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
           {/* Recent Activity */}
           <div>
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">

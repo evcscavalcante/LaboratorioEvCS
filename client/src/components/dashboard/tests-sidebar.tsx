@@ -85,7 +85,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
 
   // Buscar todos os ensaios
   const { data: densityInSituTests = [] } = useQuery({
-    queryKey: ['/api/tests/density-in-situ/temp'],
+    queryKey: ['/api/density-in-situ'],
     queryFn: getQueryFn({ on401: 'returnNull' }),
     staleTime: 0,
     gcTime: 0,
@@ -183,13 +183,6 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     ...realDensityTests.map((test: any) => ({ ...test, type: 'real-density', typeName: 'Densidade Real' })),
     ...maxMinDensityTests.map((test: any) => ({ ...test, type: 'max-min-density', typeName: 'Densidade Máx/Mín' }))
   ];
-
-  console.log('🔍 Debug Sidebar - Dados carregados:', {
-    densityInSituTests: densityInSituTests?.length || 0,
-    realDensityTests: realDensityTests?.length || 0, 
-    maxMinDensityTests: maxMinDensityTests?.length || 0,
-    allTests: allTests.length
-  });
 
   // Filtrar ensaios
   const filteredTests = allTests.filter(test => {

@@ -30,7 +30,6 @@ import ManualAdmin from "@/pages/help/manual-admin";
 import TestAccess from "@/pages/test-access";
 import UserCreation from "@/pages/admin/user-creation";
 import SystemStatus from "@/pages/system-status";
-import TestsList from "@/pages/tests-list";
 
 function Router() {
   const { user, loading } = useAuth();
@@ -77,7 +76,6 @@ function Router() {
         <Route path="/help/manual-admin" component={ManualAdmin} />
         <Route path="/test-access" component={TestAccess} />
         <Route path="/system-status" component={SystemStatus} />
-        <Route path="/tests" component={TestsList} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
