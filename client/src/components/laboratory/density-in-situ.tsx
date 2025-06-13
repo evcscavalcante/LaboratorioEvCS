@@ -53,11 +53,28 @@ interface DensityInSituData {
   moistureBase3: { capsule: string; wetTare: number; dryTare: number; tare: number; };
 }
 
-export default function DensityInSitu() {
+interface DensityInSituProps {
+  testId?: number;
+  mode?: 'view' | 'edit' | 'new';
+}
+
+export default function DensityInSitu({ testId, mode = 'new' }: DensityInSituProps) {
   const { toast } = useToast();
   const [equipamentos, setEquipamentos] = useState<{capsulas: any[], cilindros: any[]}>({
     capsulas: [],
     cilindros: []
+  });
+
+  // Query para buscar dados do ensaio específico
+  const { data: testData, isLoading: loadingTest } = useQuery({
+    queryKey: ['/api/tests/density-in-situ/temp', testId],
+    queryFn: async () => {
+      if (!testId) return null;
+      const response = await apiRequest('GET', `/api/tests/density-in-situ/temp`);
+      const tests = await response.json();
+      return tests.find((test: any) => test.id === testId) || null;
+    },
+    enabled: !!testId
   });
 
   // Buscar ensaios de densidade real salvos

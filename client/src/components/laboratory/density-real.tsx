@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import StatusIndicator from "./status-indicator";
 import { calculateMoistureContent, getWaterDensity } from "@/lib/calculations";
 import { generateRealDensityVerticalPDF } from "@/lib/pdf-vertical-tables";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { localDataManager } from "@/lib/local-storage";
@@ -42,10 +42,27 @@ interface RealDensityData {
   };
 }
 
-export default function DensityReal() {
+interface DensityRealProps {
+  testId?: number;
+  mode?: 'view' | 'edit' | 'new';
+}
+
+export default function DensityReal({ testId, mode = 'new' }: DensityRealProps) {
   const { toast } = useToast();
   const [equipamentos, setEquipamentos] = useState<{capsulas: any[]}>({
     capsulas: []
+  });
+
+  // Query para buscar dados do ensaio específico
+  const { data: testData, isLoading: loadingTest } = useQuery({
+    queryKey: ['/api/tests/real-density/temp', testId],
+    queryFn: async () => {
+      if (!testId) return null;
+      const response = await apiRequest('GET', `/api/tests/real-density/temp`);
+      const tests = await response.json();
+      return tests.find((test: any) => test.id === testId) || null;
+    },
+    enabled: !!testId
   });
   
   // Função para carregar dados salvos
@@ -90,6 +107,36 @@ export default function DensityReal() {
   };
 
   const [data, setData] = useState<RealDensityData>(loadSavedData);
+
+  // Atualizar dados quando testData estiver disponível
+  useEffect(() => {
+    if (testData && mode !== 'new') {
+      setData({
+        registrationNumber: testData.registrationNumber || "",
+        date: testData.date || new Date().toISOString().split('T')[0],
+        operator: testData.operator || "",
+        material: testData.material || "",
+        origin: testData.origin || "",
+        moisture1: testData.moisture1 || { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+        moisture2: testData.moisture2 || { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+        moisture3: testData.moisture3 || { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+        picnometer1: testData.picnometer1 || {
+          massaPicnometro: 0,
+          massaPicAmostraAgua: 0,
+          massaPicAgua: 0,
+          temperatura: 0,
+          massaSoloUmido: 0
+        },
+        picnometer2: testData.picnometer2 || {
+          massaPicnometro: 0,
+          massaPicAmostraAgua: 0,
+          massaPicAgua: 0,
+          temperatura: 0,
+          massaSoloUmido: 0
+        }
+      });
+    }
+  }, [testData, mode]);
 
   const [calculations, setCalculations] = useState({
     moisture: { det1: { moisture: 0 }, det2: { moisture: 0 }, det3: { moisture: 0 }, average: 0 },
