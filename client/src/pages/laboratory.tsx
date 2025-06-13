@@ -8,7 +8,7 @@ import { getQueryFn } from "@/lib/queryClient";
 import DensityInSitu from "@/components/laboratory/density-in-situ";
 import DensityReal from "@/components/laboratory/density-real";
 import DensityMaxMin from "@/components/laboratory/density-max-min";
-import TestsSidebar from "@/components/dashboard/tests-sidebar";
+import TestsSidebar from "@/components/dashboard/tests-sidebar-fixed";
 
 export default function Laboratory() {
   const [currentDateTime, setCurrentDateTime] = useState("");
