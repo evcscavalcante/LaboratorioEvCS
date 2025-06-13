@@ -405,8 +405,8 @@ export default function DensityInSitu({ testId, mode = 'new' }: DensityInSituPro
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Nenhum registro selecionado</SelectItem>
-                  {realDensityTests.map((test: any) => (
-                    <SelectItem key={test.id} value={test.registrationNumber}>
+                  {realDensityTests.filter((test: any) => test.registrationNumber && test.registrationNumber.trim() !== "").map((test: any) => (
+                    <SelectItem key={test.id} value={test.registrationNumber.trim()}>
                       {test.registrationNumber} - {test.material}
                     </SelectItem>
                   ))}
@@ -421,8 +421,8 @@ export default function DensityInSitu({ testId, mode = 'new' }: DensityInSituPro
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Nenhum registro selecionado</SelectItem>
-                  {maxMinDensityTests.map((test: any) => (
-                    <SelectItem key={test.id} value={test.registrationNumber}>
+                  {maxMinDensityTests.filter((test: any) => test.registrationNumber && test.registrationNumber.trim() !== "").map((test: any) => (
+                    <SelectItem key={test.id} value={test.registrationNumber.trim()}>
                       {test.registrationNumber} - {test.material}
                     </SelectItem>
                   ))}
