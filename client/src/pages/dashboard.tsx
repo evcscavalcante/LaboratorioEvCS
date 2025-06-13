@@ -66,49 +66,53 @@ export default function Dashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Query para buscar ensaios salvos
-  const {
-    data: savedTests = [],
-    isLoading: testsLoading,
-    refetch: refetchTests
-  } = useQuery({
-    queryKey: ['/api/tests/density-in-situ'],
-    queryFn: async () => {
-      try {
-        const response = await fetch('/api/tests/density-in-situ/temp');
-        if (!response.ok) throw new Error('Failed to fetch tests');
-        return await response.json();
-      } catch (error) {
-        console.error('Error fetching tests:', error);
-        return [];
-      }
-    }
-  });
+  const [savedTests, setSavedTests] = useState<any[]>([]);
+  const [testsLoading, setTestsLoading] = useState(false);
 
-  // Mutation para deletar ensaio
-  const deleteTestMutation = useMutation({
-    mutationFn: async (testId: number) => {
-      return apiRequest('DELETE', `/api/tests/density-in-situ/${testId}`);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Ensaio excluído",
-        description: "O ensaio foi removido com sucesso.",
+  // Carregar ensaios salvos
+  const loadSavedTests = async () => {
+    setTestsLoading(true);
+    try {
+      const response = await fetch('/api/tests/density-in-situ/temp');
+      if (response.ok) {
+        const data = await response.json();
+        setSavedTests(data || []);
+      }
+    } catch (error) {
+      console.error('Error loading tests:', error);
+      setSavedTests([]);
+    }
+    setTestsLoading(false);
+  };
+
+  // Deletar ensaio
+  const deleteTest = async (testId: number) => {
+    try {
+      const response = await fetch(`/api/tests/density-in-situ/${testId}`, {
+        method: 'DELETE'
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/tests/density-in-situ'] });
-      refetchTests();
-    },
-    onError: (error: any) => {
+      
+      if (response.ok) {
+        toast({
+          title: "Ensaio excluído",
+          description: "O ensaio foi removido com sucesso.",
+        });
+        loadSavedTests(); // Recarregar lista
+      } else {
+        throw new Error('Falha ao excluir');
+      }
+    } catch (error: any) {
       toast({
         title: "Erro ao excluir",
         description: error.message || "Não foi possível excluir o ensaio.",
         variant: "destructive",
       });
     }
-  });
+  };
 
   useEffect(() => {
     loadDashboardData();
+    loadSavedTests();
     
     // Subscribe to notifications
     const unsubscribe = notificationManager.subscribe((notifications) => {
@@ -428,10 +432,10 @@ export default function Dashboard() {
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Registro: {test.registro} | Operador: {test.operador}
+                            Registro: {test.registrationNumber || test.registro} | Operador: {test.operator || test.operador}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {format(new Date(test.dataEnsaio), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                            {test.date || test.dataEnsaio ? format(new Date(test.date || test.dataEnsaio), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'Data não informada'}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -467,13 +471,13 @@ export default function Dashboard() {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tem certeza que deseja excluir o ensaio "{test.registro}"? Esta ação não pode ser desfeita.
+                                  Tem certeza que deseja excluir o ensaio "{test.registrationNumber || test.registro}"? Esta ação não pode ser desfeita.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() => deleteTestMutation.mutate(test.id)}
+                                  onClick={() => deleteTest(test.id)}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
                                   Excluir
