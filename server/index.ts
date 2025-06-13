@@ -381,15 +381,13 @@ async function startServer() {
     }
   });
 
-  // Serve static files
-  app.use(express.static('client'));
-  
-  // Serve the main HTML file for all non-API routes
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
-      res.sendFile(path.resolve('client/index.html'));
-    }
-  });
+  // Static file serving
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static("dist/public"));
+    app.get("*", (_req, res) => {
+      res.sendFile(path.resolve("dist/public/index.html"));
+    });
+  }
 
   // Error handling
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
