@@ -1,5 +1,7 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { hybridStorage } from "./hybrid-storage";
+import { auth } from "./firebase";
+import { getIdToken } from "firebase/auth";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -13,6 +15,18 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  // Get Firebase token for authorization
+  let authHeaders: Record<string, string> = {};
+  
+  if (auth.currentUser) {
+    try {
+      const token = await getIdToken(auth.currentUser);
+      authHeaders.Authorization = `Bearer ${token}`;
+    } catch (error) {
+      console.warn('Não foi possível obter token Firebase:', error);
+    }
+  }
+
   // Intercept API calls and use hybrid storage for Firebase/offline sync (only for test data)
   if (method === 'POST' && url.includes('/api/density-in-situ')) {
     const result = await hybridStorage.createDensityInSituTest(data as any);
@@ -30,9 +44,14 @@ export async function apiRequest(
   }
 
   // For all other API calls (users, organizations, etc.), use direct server API
+  const headers = {
+    ...authHeaders,
+    ...(data ? { "Content-Type": "application/json" } : {}),
+  };
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -50,19 +69,32 @@ export const getQueryFn: <T>(options: {
     // Use hybrid storage for specific endpoints
     const url = queryKey[0] as string;
     
-    if (url === '/api/density-in-situ') {
+    if (url === '/api/tests/density-in-situ') {
       return await hybridStorage.getDensityInSituTests();
     }
     
-    if (url === '/api/real-density') {
+    if (url === '/api/tests/real-density') {
       return await hybridStorage.getRealDensityTests();
     }
     
-    if (url === '/api/max-min-density') {
+    if (url === '/api/tests/max-min-density') {
       return await hybridStorage.getMaxMinDensityTests();
     }
 
+    // Get Firebase token for authorization
+    let authHeaders: Record<string, string> = {};
+    
+    if (auth.currentUser) {
+      try {
+        const token = await getIdToken(auth.currentUser);
+        authHeaders.Authorization = `Bearer ${token}`;
+      } catch (error) {
+        console.warn('Não foi possível obter token Firebase:', error);
+      }
+    }
+
     const res = await fetch(url, {
+      headers: authHeaders,
       credentials: "include",
     });
 
