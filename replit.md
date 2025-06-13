@@ -121,6 +121,13 @@ User Input → Local Storage → API Validation → PostgreSQL → Firestore Syn
   - Cada ensaio aparece como arquivo individual que abre na calculadora
   - Autenticação Firebase configurada com token nas requisições API
   - Servidor detectando ensaios salvos corretamente
+- June 13, 2025: Sistema reformulado para interface dinâmica e escalável
+  - Removido sistema de pastas fixas por tipo
+  - Implementada lista única "Ensaios Salvos" com todos os ensaios
+  - Três botões principais para criar novos ensaios (⚖️ Densidade In Situ, ⚛️ Densidade Real, ↕️ Densidade Máx/Mín)
+  - Sistema agora suporta quantidade ilimitada de tipos de ensaios
+  - Mantida funcionalidade de clique direto para abrir na calculadora correspondente
+  - Busca e filtros funcionais para localizar ensaios específicos
 
 ## User Preferences
 
