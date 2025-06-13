@@ -151,10 +151,13 @@ export default function Laboratory() {
                   variant="outline" 
                   size="sm"
                   onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 relative"
                 >
                   {sidebarOpen ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
-                  {sidebarOpen ? 'Fechar' : 'Ensaios Salvos'}
+                  {sidebarOpen ? 'Fechar Lista' : 'Ver Ensaios Salvos'}
+                  <div className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    3
+                  </div>
                 </Button>
                 <Button 
                   variant="outline"
