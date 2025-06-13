@@ -63,13 +63,37 @@ export default function Laboratory() {
   }, []);
 
   const handleSelectTest = (testId: number, testType: string) => {
-    console.log('Visualizar ensaio:', testId, testType);
-    // Implementar navegação para visualizar ensaio
+    // Navegar para visualizar ensaio específico
+    const tabMap: { [key: string]: string } = {
+      'density-in-situ': 'density-in-situ',
+      'real-density': 'density-real',
+      'max-min-density': 'density-max-min'
+    };
+    
+    const tab = tabMap[testType];
+    if (tab) {
+      setActiveTab(tab);
+      setSidebarOpen(false);
+      // Aqui você pode implementar carregamento específico do ensaio para visualização
+      window.location.hash = `${tab}?id=${testId}&mode=view`;
+    }
   };
 
   const handleEditTest = (testId: number, testType: string) => {
-    console.log('Editar ensaio:', testId, testType);
-    // Implementar navegação para editar ensaio
+    // Navegar para editar ensaio específico
+    const tabMap: { [key: string]: string } = {
+      'density-in-situ': 'density-in-situ',
+      'real-density': 'density-real',
+      'max-min-density': 'density-max-min'
+    };
+    
+    const tab = tabMap[testType];
+    if (tab) {
+      setActiveTab(tab);
+      setSidebarOpen(false);
+      // Aqui você pode implementar carregamento específico do ensaio para edição
+      window.location.hash = `${tab}?id=${testId}&mode=edit`;
+    }
   };
 
   return (
@@ -154,15 +178,24 @@ export default function Laboratory() {
             </TabsList>
 
             <TabsContent value="density-in-situ">
-              <DensityInSitu />
+              <DensityInSitu 
+                testId={testId ? parseInt(testId) : undefined}
+                mode={mode as 'view' | 'edit' | 'new'}
+              />
             </TabsContent>
 
             <TabsContent value="density-real">
-              <DensityReal />
+              <DensityReal 
+                testId={testId ? parseInt(testId) : undefined}
+                mode={mode as 'view' | 'edit' | 'new'}
+              />
             </TabsContent>
 
             <TabsContent value="density-max-min">
-              <DensityMaxMin />
+              <DensityMaxMin 
+                testId={testId ? parseInt(testId) : undefined}
+                mode={mode as 'view' | 'edit' | 'new'}
+              />
             </TabsContent>
           </Tabs>
         </main>

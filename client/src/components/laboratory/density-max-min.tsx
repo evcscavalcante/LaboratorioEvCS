@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import StatusIndicator from "./status-indicator";
 import { generateMaxMinDensityVerticalPDF } from "@/lib/pdf-vertical-tables";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { localDataManager } from "@/lib/local-storage";
@@ -35,10 +35,28 @@ interface MaxMinDensityData {
   minDensity3: { cylinderNumber: string; moldeSolo: number; molde: number; volume: number; };
 }
 
-export default function DensityMaxMin() {
+interface DensityMaxMinProps {
+  testId?: number;
+  mode?: 'view' | 'edit' | 'new';
+}
+
+export default function DensityMaxMin({ testId, mode = 'new' }: DensityMaxMinProps) {
   const { toast } = useToast();
   const [equipamentos, setEquipamentos] = useState<{cilindros: any[]}>({
     cilindros: []
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Query para buscar dados do ensaio específico
+  const { data: testData, isLoading: loadingTest } = useQuery({
+    queryKey: ['/api/tests/max-min-density/temp', testId],
+    queryFn: async () => {
+      if (!testId) return null;
+      const response = await apiRequest('GET', `/api/tests/max-min-density/temp`);
+      const tests = await response.json();
+      return tests.find((test: any) => test.id === testId) || null;
+    },
+    enabled: !!testId
   });
   
   // Função para carregar dados salvos
@@ -75,6 +93,28 @@ export default function DensityMaxMin() {
   };
 
   const [data, setData] = useState<MaxMinDensityData>(loadSavedData);
+
+  // Atualizar dados quando testData estiver disponível
+  useEffect(() => {
+    if (testData && mode !== 'new') {
+      setData({
+        registrationNumber: testData.registrationNumber || "",
+        date: testData.date || new Date().toISOString().split('T')[0],
+        operator: testData.operator || "",
+        material: testData.material || "",
+        origin: testData.origin || "",
+        moisture1: testData.moisture1 || { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+        moisture2: testData.moisture2 || { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+        moisture3: testData.moisture3 || { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
+        maxDensity1: testData.maxDensity1 || { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+        maxDensity2: testData.maxDensity2 || { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+        maxDensity3: testData.maxDensity3 || { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+        minDensity1: testData.minDensity1 || { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+        minDensity2: testData.minDensity2 || { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+        minDensity3: testData.minDensity3 || { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      });
+    }
+  }, [testData, mode]);
 
   const [calculations, setCalculations] = useState({
     maxDensity: {
