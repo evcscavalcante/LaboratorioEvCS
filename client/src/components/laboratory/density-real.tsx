@@ -178,11 +178,11 @@ export default function DensityReal() {
 
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
-      return apiRequest("POST", "/api/tests/real-density", testData);
+      return apiRequest("POST", "/api/tests/real-density/temp", testData);
     },
     onSuccess: () => {
       toast({ title: "Ensaio salvo com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ["/api/tests/real-density"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tests/real-density/temp"] });
       // Limpar progresso salvo após salvamento bem-sucedido
       localStorage.removeItem('density-real-progress');
       console.log('🗑️ Progresso do ensaio de densidade real limpo após salvamento');

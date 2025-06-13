@@ -303,7 +303,7 @@ export default function DensityMaxMin() {
     },
     onSuccess: () => {
       toast({ title: "Ensaio salvo com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ["/api/tests/max-min-density"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tests/max-min-density/temp"] });
       // Limpar progresso salvo após salvamento bem-sucedido
       localStorage.removeItem('density-max-min-progress');
       console.log('🗑️ Progresso do ensaio de densidade máx/mín limpo após salvamento');

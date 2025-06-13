@@ -62,18 +62,18 @@ export default function DensityInSitu() {
 
   // Buscar ensaios de densidade real salvos
   const { data: realDensityTests = [] } = useQuery({
-    queryKey: ["/api/tests/real-density"],
+    queryKey: ["/api/tests/real-density/temp"],
     queryFn: async () => {
-      const response = await apiRequest("GET", "/api/tests/real-density");
+      const response = await apiRequest("GET", "/api/tests/real-density/temp");
       return response.json();
     }
   });
 
   // Buscar ensaios de densidade máx/mín salvos
   const { data: maxMinDensityTests = [] } = useQuery({
-    queryKey: ["/api/tests/max-min-density"],
+    queryKey: ["/api/tests/max-min-density/temp"],
     queryFn: async () => {
-      const response = await apiRequest("GET", "/api/tests/max-min-density");
+      const response = await apiRequest("GET", "/api/tests/max-min-density/temp");
       return response.json();
     }
   });
@@ -92,7 +92,7 @@ export default function DensityInSitu() {
         title: "Ensaio salvo com sucesso",
         description: "O ensaio foi salvo no banco de dados.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/tests/density-in-situ"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tests/density-in-situ/temp"] });
       localStorage.removeItem('density-in-situ-progress');
     },
     onError: (error: any) => {

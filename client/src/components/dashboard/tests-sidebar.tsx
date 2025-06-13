@@ -85,7 +85,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
 
   // Buscar todos os ensaios
   const { data: densityInSituTests = [] } = useQuery({
-    queryKey: ['/api/density-in-situ'],
+    queryKey: ['/api/tests/density-in-situ/temp'],
     queryFn: getQueryFn({ on401: 'returnNull' }),
     staleTime: 0,
     gcTime: 0,
@@ -94,7 +94,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
   });
 
   const { data: realDensityTests = [] } = useQuery({
-    queryKey: ['/api/real-density'],
+    queryKey: ['/api/tests/real-density/temp'],
     queryFn: getQueryFn({ on401: 'returnNull' }),
     staleTime: 0,
     gcTime: 0,
@@ -103,7 +103,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
   });
 
   const { data: maxMinDensityTests = [] } = useQuery({
-    queryKey: ['/api/max-min-density'],
+    queryKey: ['/api/tests/max-min-density/temp'],
     queryFn: getQueryFn({ on401: 'returnNull' }),
     staleTime: 0,
     gcTime: 0,
@@ -118,7 +118,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     },
     onSuccess: () => {
       toast({ title: "Ensaio excluído com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/density-in-situ'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tests/density-in-situ/temp'] });
     },
     onError: (error: any) => {
       toast({ 
@@ -135,7 +135,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     },
     onSuccess: () => {
       toast({ title: "Ensaio excluído com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/real-density'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tests/real-density/temp'] });
     },
     onError: (error: any) => {
       toast({ 
@@ -152,7 +152,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     },
     onSuccess: () => {
       toast({ title: "Ensaio excluído com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/max-min-density'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tests/max-min-density/temp'] });
     },
     onError: (error: any) => {
       toast({ 
