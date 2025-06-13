@@ -308,21 +308,8 @@ class NotificationManager {
 
   // Verificações automáticas
   async checkAndNotifyBackupReminder(): Promise<void> {
-    try {
-      const lastBackup = await localDataManager.getUserPreference('lastBackupDate');
-      const preferences = await this.getNotificationPreferences();
-      
-      if (!lastBackup || !preferences.autoBackupReminders) return;
-
-      const lastBackupDate = new Date(lastBackup);
-      const daysSinceBackup = Math.floor((Date.now() - lastBackupDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (daysSinceBackup >= 7) {
-        await this.notifyBackupReminder();
-      }
-    } catch (error) {
-      console.error('Erro ao verificar lembrete de backup:', error);
-    }
+    // Temporariamente desabilitado para evitar erros do IndexedDB
+    return;
   }
 
   async startPeriodicChecks(): Promise<void> {

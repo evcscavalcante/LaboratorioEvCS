@@ -74,8 +74,27 @@ class LocalDataManager {
     if (!this.db) {
       await this.initDB();
     }
-    const transaction = this.db!.transaction([storeName], mode);
-    return transaction.objectStore(storeName);
+    
+    if (!this.db) {
+      throw new Error('Database connection failed');
+    }
+    
+    try {
+      const transaction = this.db.transaction([storeName], mode);
+      transaction.onerror = (event) => {
+        console.error('Transaction error:', event);
+      };
+      return transaction.objectStore(storeName);
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+      // Retry once with fresh connection
+      await this.initDB();
+      if (!this.db) {
+        throw new Error('Database reconnection failed');
+      }
+      const transaction = this.db.transaction([storeName], mode);
+      return transaction.objectStore(storeName);
+    }
   }
 
   // Operações CRUD para densidade in situ

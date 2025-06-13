@@ -82,7 +82,7 @@ export default function Dashboard() {
         apiRequest('GET', '/api/tests/density-in-situ/temp').then(res => res.json()).catch(() => []),
         apiRequest('GET', '/api/tests/real-density/temp').then(res => res.json()).catch(() => []),
         apiRequest('GET', '/api/tests/max-min-density/temp').then(res => res.json()).catch(() => []),
-        localDataManager.getBalanceVerifications()
+        localDataManager.getBalanceVerifications().catch(() => [])
       ]);
 
       const densityInSitu = densityInSituResponse || [];
