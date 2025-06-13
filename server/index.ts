@@ -151,11 +151,11 @@ async function startServer() {
     try {
       console.log('📥 Recebendo dados do ensaio (temp):', JSON.stringify(req.body, null, 2));
       
-      // Adicionar userId padrão para desenvolvimento
+      // Remover userId para evitar erro de foreign key
       const testData = {
         ...req.body,
-        userId: 1,
-        createdBy: 'evcsousa@yahoo.com.br'
+        userId: null,
+        createdBy: 'sistema-temp'
       };
       
       console.log('📝 Dados preparados para salvamento:', JSON.stringify(testData, null, 2));
@@ -254,8 +254,8 @@ async function startServer() {
       
       const testData = {
         ...req.body,
-        userId: 1,
-        createdBy: 'evcsousa@yahoo.com.br'
+        userId: null,
+        createdBy: 'sistema-temp'
       };
       
       console.log('📝 Dados preparados para salvamento:', JSON.stringify(testData, null, 2));
@@ -311,8 +311,8 @@ async function startServer() {
       
       const testData = {
         ...req.body,
-        userId: 1,
-        createdBy: 'evcsousa@yahoo.com.br'
+        userId: null,
+        createdBy: 'sistema-temp'
       };
       
       console.log('📝 Dados preparados para salvamento:', JSON.stringify(testData, null, 2));
