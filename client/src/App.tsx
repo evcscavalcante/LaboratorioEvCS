@@ -7,7 +7,6 @@ import { DataSyncProvider } from "@/contexts/data-sync-context";
 import MainLayout from "@/components/layout/main-layout";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
-import DashboardWorking from "@/pages/dashboard-working";
 import Laboratory from "@/pages/laboratory";
 import Analytics from "@/pages/analytics";
 import Login from "@/pages/login";
@@ -54,8 +53,8 @@ function Router() {
   return (
     <MainLayout>
       <Switch>
-        <Route path="/" component={DashboardWorking} />
-        <Route path="/dashboard" component={DashboardWorking} />
+        <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
         <Route path="/laboratory" component={Laboratory} />
         <Route path="/analytics" component={Analytics} />
         <Route path="/subscription" component={SubscriptionPage} />
