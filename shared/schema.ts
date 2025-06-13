@@ -96,18 +96,12 @@ export const densityInSituTests = pgTable("density_in_situ_tests", {
       moldeSolo: number;
       molde: number;
       volume: number;
-      massaSeca: number;
-      massaUmida: number;
-      umidade: number;
     };
     det2: {
       cylinderNumber: string;
       moldeSolo: number;
       molde: number;
       volume: number;
-      massaSeca: number;
-      massaUmida: number;
-      umidade: number;
     };
   }>(),
   moistureTop: json("moisture_top").$type<{

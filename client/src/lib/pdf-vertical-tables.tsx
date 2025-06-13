@@ -243,7 +243,7 @@ const TwoColumnHeader: React.FC<{ data: any }> = ({ data }) => (
   </View>
 );
 
-// Componente para dados de densidade in situ completo
+// Componente para dados de densidade in situ com cálculos corretos
 const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, calculations }) => (
   <View style={styles.multiColumnTable}>
     <Text style={styles.sectionTitle}>DETERMINAÇÕES - DENSIDADE IN SITU</Text>
@@ -296,10 +296,10 @@ const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, 
         <Text style={styles.labelText}>Solo úmido (g)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{((data.det1?.moldeSolo || 0) - (data.det1?.molde || 0)).toFixed(2)}</Text>
+        <Text style={styles.dataText}>{(calculations?.det1?.soil || ((data.det1?.moldeSolo || 0) - (data.det1?.molde || 0))).toFixed(2)}</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{((data.det2?.moldeSolo || 0) - (data.det2?.molde || 0)).toFixed(2)}</Text>
+        <Text style={styles.dataText}>{(calculations?.det2?.soil || ((data.det2?.moldeSolo || 0) - (data.det2?.molde || 0))).toFixed(2)}</Text>
       </View>
     </View>
     <View style={styles.tableRow}>
@@ -318,10 +318,10 @@ const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, 
         <Text style={styles.labelText}>Teor de Umidade (%)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{(data.det1?.umidade || calculations?.averageMoisture || 0).toFixed(2)}</Text>
+        <Text style={styles.dataText}>{(calculations?.averageMoisture || 0).toFixed(2)}</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{(data.det2?.umidade || calculations?.averageMoisture || 0).toFixed(2)}</Text>
+        <Text style={styles.dataText}>{(calculations?.averageMoisture || 0).toFixed(2)}</Text>
       </View>
     </View>
     <View style={styles.tableRow}>
@@ -330,12 +330,12 @@ const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, 
       </View>
       <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
         <Text style={[styles.dataText, { fontWeight: 'bold' }]}>
-          {(((data.det1?.moldeSolo || 0) - (data.det1?.molde || 0)) / (data.det1?.volume || 1)).toFixed(3)}
+          {(calculations?.det1?.gammaNatWet || ((calculations?.det1?.soil || 0) / (data.det1?.volume || 1))).toFixed(3)}
         </Text>
       </View>
       <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
         <Text style={[styles.dataText, { fontWeight: 'bold' }]}>
-          {(((data.det2?.moldeSolo || 0) - (data.det2?.molde || 0)) / (data.det2?.volume || 1)).toFixed(3)}
+          {(calculations?.det2?.gammaNatWet || ((calculations?.det2?.soil || 0) / (data.det2?.volume || 1))).toFixed(3)}
         </Text>
       </View>
     </View>
@@ -345,12 +345,12 @@ const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, 
       </View>
       <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
         <Text style={[styles.dataText, { fontWeight: 'bold' }]}>
-          {((((data.det1?.moldeSolo || 0) - (data.det1?.molde || 0)) / (data.det1?.volume || 1)) / (1 + (data.det1?.umidade || calculations?.averageMoisture || 0) / 100)).toFixed(3)}
+          {(calculations?.det1?.gammaNatDry || (calculations?.det1?.gammaNatWet || 0) / (1 + (calculations?.averageMoisture || 0) / 100)).toFixed(3)}
         </Text>
       </View>
       <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
         <Text style={[styles.dataText, { fontWeight: 'bold' }]}>
-          {((((data.det2?.moldeSolo || 0) - (data.det2?.molde || 0)) / (data.det2?.volume || 1)) / (1 + (data.det2?.umidade || calculations?.averageMoisture || 0) / 100)).toFixed(3)}
+          {(calculations?.det2?.gammaNatDry || (calculations?.det2?.gammaNatWet || 0) / (1 + (calculations?.averageMoisture || 0) / 100)).toFixed(3)}
         </Text>
       </View>
     </View>

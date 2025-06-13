@@ -38,18 +38,12 @@ interface DensityInSituData {
     moldeSolo: number;
     molde: number;
     volume: number;
-    massaSeca: number;
-    massaUmida: number;
-    umidade: number;
   };
   det2: {
     cylinderNumber: string;
     moldeSolo: number;
     molde: number;
     volume: number;
-    massaSeca: number;
-    massaUmida: number;
-    umidade: number;
   };
   
   // Moisture Top
@@ -104,8 +98,8 @@ export default function DensityInSitu() {
       ovenId: "",
       realDensityRef: "",
       maxMinDensityRef: "",
-      det1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0, massaSeca: 0, massaUmida: 0, umidade: 0 },
-      det2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0, massaSeca: 0, massaUmida: 0, umidade: 0 },
+      det1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      det2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
       moistureTop1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
       moistureTop2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
       moistureTop3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
@@ -491,8 +485,8 @@ export default function DensityInSitu() {
       ovenId: "",
       realDensityRef: "",
       maxMinDensityRef: "",
-      det1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0, massaSeca: 0, massaUmida: 0, umidade: 0 },
-      det2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0, massaSeca: 0, massaUmida: 0, umidade: 0 },
+      det1: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
+      det2: { cylinderNumber: "", moldeSolo: 0, molde: 0, volume: 0 },
       moistureTop1: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
       moistureTop2: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
       moistureTop3: { capsule: "", wetTare: 0, dryTare: 0, tare: 0 },
