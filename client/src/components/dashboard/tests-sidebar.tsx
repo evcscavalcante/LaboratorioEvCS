@@ -41,28 +41,43 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Buscar ensaios dos três tipos
+  // Buscar ensaios dos três tipos usando apiRequest com autenticação
   const { data: densityInSituTests = [] } = useQuery({
     queryKey: ['/api/tests/density-in-situ'],
     queryFn: async () => {
-      const response = await fetch('/api/tests/density-in-situ');
-      return response.json();
+      try {
+        const response = await apiRequest('GET', '/api/tests/density-in-situ');
+        return response;
+      } catch (error) {
+        console.error('Erro ao buscar ensaios density-in-situ:', error);
+        return [];
+      }
     }
   });
 
   const { data: realDensityTests = [] } = useQuery({
     queryKey: ['/api/tests/real-density'],
     queryFn: async () => {
-      const response = await fetch('/api/tests/real-density');
-      return response.json();
+      try {
+        const response = await apiRequest('GET', '/api/tests/real-density');
+        return response;
+      } catch (error) {
+        console.error('Erro ao buscar ensaios real-density:', error);
+        return [];
+      }
     }
   });
 
   const { data: maxMinDensityTests = [] } = useQuery({
     queryKey: ['/api/tests/max-min-density'],
     queryFn: async () => {
-      const response = await fetch('/api/tests/max-min-density');
-      return response.json();
+      try {
+        const response = await apiRequest('GET', '/api/tests/max-min-density');
+        return response;
+      } catch (error) {
+        console.error('Erro ao buscar ensaios max-min-density:', error);
+        return [];
+      }
     }
   });
 
