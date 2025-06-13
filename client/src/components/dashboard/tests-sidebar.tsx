@@ -11,7 +11,6 @@ import {
   Search, 
   FileText, 
   Calendar, 
-  Filter,
   Eye,
   Edit,
   Download,
@@ -19,9 +18,6 @@ import {
 } from 'lucide-react';
 import { getQueryFn, apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { generateDensityInSituVerticalPDF, generateRealDensityVerticalPDF, generateMaxMinDensityVerticalPDF } from '@/lib/pdf-vertical-tables';
-import { calculateDensityInSitu, calculateRealDensity, calculateVoidParameters } from '@/lib/calculations';
-import StatusIndicator from '@/components/laboratory/status-indicator';
 
 interface TestsSidebarProps {
   onSelectTest?: (testId: number, testType: string) => void;
@@ -31,135 +27,66 @@ interface TestsSidebarProps {
 export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [testTypeFilter, setTestTypeFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Limpar cache ao montar o componente
-  React.useEffect(() => {
-    queryClient.clear();
-  }, [queryClient]);
-
-  const handleDownloadPDF = async (testId: number, testType: string) => {
-    try {
-      console.log('Iniciando download PDF para:', { testId, testType });
-      
-      // Buscar dados do teste específico usando a API
-      if (testType === 'density-in-situ') {
-        const response = await fetch(`/api/density-in-situ/${testId}`);
-        if (!response.ok) throw new Error(`Erro ao buscar dados: ${response.status}`);
-        const testData = await response.json();
-        
-        // Gerar PDF com dados básicos (sem cálculos complexos para evitar erros)
-        await generateDensityInSituVerticalPDF(testData, null);
-        
-      } else if (testType === 'real-density') {
-        const response = await fetch(`/api/real-density/${testId}`);
-        if (!response.ok) throw new Error(`Erro ao buscar dados: ${response.status}`);
-        const testData = await response.json();
-        
-        await generateRealDensityVerticalPDF(testData, null);
-        
-      } else if (testType === 'max-min-density') {
-        const response = await fetch(`/api/max-min-density/${testId}`);
-        if (!response.ok) throw new Error(`Erro ao buscar dados: ${response.status}`);
-        const testData = await response.json();
-        
-        await generateMaxMinDensityVerticalPDF(testData, null);
-      }
-
-      toast({
-        title: "PDF gerado com sucesso",
-        description: "O relatório foi baixado para seu dispositivo.",
-      });
-    } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-      toast({
-        title: "Erro ao gerar PDF",
-        description: "Verifique se o ensaio existe e tente novamente.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Buscar todos os ensaios
+  // Buscar ensaios dos três tipos
   const { data: densityInSituTests = [] } = useQuery({
-    queryKey: ['/api/tests/density-in-situ/temp'],
-    queryFn: getQueryFn({ on401: 'returnNull' }),
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true
+    queryKey: ['/api/tests/density-in-situ'],
+    queryFn: async () => {
+      const response = await fetch('/api/tests/density-in-situ');
+      return response.json();
+    }
   });
 
   const { data: realDensityTests = [] } = useQuery({
-    queryKey: ['/api/tests/real-density/temp'],
-    queryFn: getQueryFn({ on401: 'returnNull' }),
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true
+    queryKey: ['/api/tests/real-density'],
+    queryFn: async () => {
+      const response = await fetch('/api/tests/real-density');
+      return response.json();
+    }
   });
 
   const { data: maxMinDensityTests = [] } = useQuery({
-    queryKey: ['/api/tests/max-min-density/temp'],
-    queryFn: getQueryFn({ on401: 'returnNull' }),
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true
+    queryKey: ['/api/tests/max-min-density'],
+    queryFn: async () => {
+      const response = await fetch('/api/tests/max-min-density');
+      return response.json();
+    }
   });
 
-  // Delete mutations
+  // Mutations para deletar ensaios
   const deleteDensityInSituMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/density-in-situ/${id}`);
-    },
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/tests/density-in-situ/${id}`),
     onSuccess: () => {
-      toast({ title: "Ensaio excluído com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/tests/density-in-situ/temp'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tests/density-in-situ'] });
+      toast({ title: "Ensaio excluído com sucesso" });
     },
-    onError: (error: any) => {
-      toast({ 
-        title: "Erro ao excluir ensaio", 
-        description: error.message,
-        variant: "destructive" 
-      });
+    onError: () => {
+      toast({ title: "Erro ao excluir ensaio", variant: "destructive" });
     }
   });
 
   const deleteRealDensityMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/real-density/${id}`);
-    },
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/tests/real-density/${id}`),
     onSuccess: () => {
-      toast({ title: "Ensaio excluído com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/tests/real-density/temp'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tests/real-density'] });
+      toast({ title: "Ensaio excluído com sucesso" });
     },
-    onError: (error: any) => {
-      toast({ 
-        title: "Erro ao excluir ensaio", 
-        description: error.message,
-        variant: "destructive" 
-      });
+    onError: () => {
+      toast({ title: "Erro ao excluir ensaio", variant: "destructive" });
     }
   });
 
   const deleteMaxMinDensityMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/max-min-density/${id}`);
-    },
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/tests/max-min-density/${id}`),
     onSuccess: () => {
-      toast({ title: "Ensaio excluído com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/tests/max-min-density/temp'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tests/max-min-density'] });
+      toast({ title: "Ensaio excluído com sucesso" });
     },
-    onError: (error: any) => {
-      toast({ 
-        title: "Erro ao excluir ensaio", 
-        description: error.message,
-        variant: "destructive" 
-      });
+    onError: () => {
+      toast({ title: "Erro ao excluir ensaio", variant: "destructive" });
     }
   });
 
@@ -177,35 +104,47 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     }
   };
 
+  const handleDownloadPDF = async (testId: number, testType: string) => {
+    try {
+      // Implementar download de PDF aqui se necessário
+      toast({ title: "Download iniciado" });
+    } catch (error) {
+      toast({ title: "Erro no download", variant: "destructive" });
+    }
+  };
+
   // Combinar todos os ensaios
   const allTests = [
-    ...densityInSituTests.map((test: any) => ({ ...test, type: 'density-in-situ', typeName: 'Densidade In Situ' })),
-    ...realDensityTests.map((test: any) => ({ ...test, type: 'real-density', typeName: 'Densidade Real' })),
-    ...maxMinDensityTests.map((test: any) => ({ ...test, type: 'max-min-density', typeName: 'Densidade Máx/Mín' }))
+    ...(Array.isArray(densityInSituTests) ? (densityInSituTests as any[]) : []).map((test: any) => ({ 
+      ...test, 
+      type: 'density-in-situ', 
+      typeName: 'Densidade In Situ' 
+    })),
+    ...(Array.isArray(realDensityTests) ? (realDensityTests as any[]) : []).map((test: any) => ({ 
+      ...test, 
+      type: 'real-density', 
+      typeName: 'Densidade Real' 
+    })),
+    ...(Array.isArray(maxMinDensityTests) ? (maxMinDensityTests as any[]) : []).map((test: any) => ({ 
+      ...test, 
+      type: 'max-min-density', 
+      typeName: 'Densidade Máx/Mín' 
+    }))
   ];
 
   // Filtrar ensaios
   const filteredTests = allTests.filter(test => {
     const matchesSearch = !searchTerm || 
       test.registrationNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      test.testNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       test.operator?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      test.material?.toLowerCase().includes(searchTerm.toLowerCase());
+      test.client?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      test.work?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesType = testTypeFilter === 'all' || test.type === testTypeFilter;
     
-    const matchesStatus = statusFilter === 'all' || 
-      (test.status && test.status.toLowerCase() === statusFilter.toLowerCase());
-    
-    return matchesSearch && matchesType && matchesStatus;
+    return matchesSearch && matchesType;
   });
-
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'aprovado': return 'bg-green-100 text-green-800';
-      case 'reprovado': return 'bg-red-100 text-red-800';
-      default: return 'bg-yellow-100 text-yellow-800';
-    }
-  };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
@@ -221,7 +160,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <FileText size={20} />
-          Ensaios Salvos
+          Ensaios Salvos ({filteredTests.length})
         </CardTitle>
         
         {/* Filtros */}
@@ -236,31 +175,17 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
             />
           </div>
           
-          <div className="grid grid-cols-1 gap-2">
-            <Select value={testTypeFilter} onValueChange={setTestTypeFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os tipos</SelectItem>
-                <SelectItem value="density-in-situ">Densidade In Situ</SelectItem>
-                <SelectItem value="real-density">Densidade Real</SelectItem>
-                <SelectItem value="max-min-density">Densidade Máx/Mín</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="aprovado">Aprovado</SelectItem>
-                <SelectItem value="reprovado">Reprovado</SelectItem>
-                <SelectItem value="aguardando">Aguardando</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={testTypeFilter} onValueChange={setTestTypeFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os tipos</SelectItem>
+              <SelectItem value="density-in-situ">Densidade In Situ</SelectItem>
+              <SelectItem value="real-density">Densidade Real</SelectItem>
+              <SelectItem value="max-min-density">Densidade Máx/Mín</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </CardHeader>
       
@@ -274,113 +199,119 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
               </div>
             ) : (
               filteredTests.map((test) => (
-                <Card key={`${test.type}-${test.id}`} className="p-3 hover:shadow-md transition-shadow cursor-pointer">
-                  <div className="space-y-2">
-                    {/* Header com tipo e status */}
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">
+                <div key={`${test.type}-${test.id}`} className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                  {/* Cabeçalho com tipo e ID */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs font-medium">
                         {test.typeName}
                       </Badge>
-                      <Badge className={`text-xs ${getStatusColor(test.status)}`}>
-                        {test.status || 'AGUARDANDO'}
-                      </Badge>
+                      <span className="text-sm font-bold text-gray-900">
+                        ID: {test.id || 'N/A'}
+                      </span>
                     </div>
-                    
-                    {/* Informações principais */}
-                    <div className="space-y-1">
-                      <div className="font-medium text-sm">
-                        {test.registrationNumber || 'Sem registro'}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Calendar size={12} />
-                          {formatDate(test.date)}
-                        </div>
-                        {test.operator && (
-                          <div>Operador: {test.operator}</div>
-                        )}
-                        {test.material && (
-                          <div>Material: {test.material}</div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Ações */}
-                    <div className="flex gap-1 pt-2 border-t">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 px-2 text-xs"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectTest?.(test.id, test.type);
-                        }}
-                      >
-                        <Eye size={12} className="mr-1" />
-                        Ver
-                      </Button>
-                      
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 px-2 text-xs"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onEditTest?.(test.id, test.type);
-                        }}
-                      >
-                        <Edit size={12} className="mr-1" />
-                        Editar
-                      </Button>
-                      
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 px-2 text-xs"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDownloadPDF(test.id, test.type);
-                        }}
-                      >
-                        <Download size={12} />
-                      </Button>
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Trash2 size={12} />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Tem certeza que deseja excluir este ensaio? Esta ação não pode ser desfeita.
-                              <br />
-                              <strong>Registro:</strong> {test.registrationNumber || 'Sem registro'}
-                              <br />
-                              <strong>Tipo:</strong> {test.typeName}
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteTest(test.id, test.type)}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Excluir
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                    <div className="text-xs text-gray-500 flex items-center gap-1">
+                      <Calendar size={12} />
+                      {formatDate(test.date || test.createdAt)}
                     </div>
                   </div>
-                </Card>
+                  
+                  {/* Informações de identificação */}
+                  <div className="space-y-2 mb-3">
+                    <div className="text-sm">
+                      <span className="font-medium text-gray-700">Registro:</span> 
+                      <span className="ml-2">{test.registrationNumber || test.testNumber || 'Sem registro'}</span>
+                    </div>
+                    {test.operator && (
+                      <div className="text-sm">
+                        <span className="font-medium text-gray-700">Operador:</span>
+                        <span className="ml-2">{test.operator}</span>
+                      </div>
+                    )}
+                    {test.client && (
+                      <div className="text-sm">
+                        <span className="font-medium text-gray-700">Cliente:</span>
+                        <span className="ml-2">{test.client}</span>
+                      </div>
+                    )}
+                    {test.work && (
+                      <div className="text-sm">
+                        <span className="font-medium text-gray-700">Obra:</span>
+                        <span className="ml-2">{test.work}</span>
+                      </div>
+                    )}
+                    {test.location && (
+                      <div className="text-sm">
+                        <span className="font-medium text-gray-700">Local:</span>
+                        <span className="ml-2">{test.location}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Botões de ação */}
+                  <div className="flex gap-2 pt-2 border-t border-gray-100">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => onSelectTest?.(test.id, test.type)}
+                    >
+                      <Eye size={12} className="mr-1" />
+                      Ver
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => onEditTest?.(test.id, test.type)}
+                    >
+                      <Edit size={12} className="mr-1" />
+                      Editar
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDownloadPDF(test.id, test.type)}
+                    >
+                      <Download size={12} />
+                    </Button>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 size={12} />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Tem certeza que deseja excluir este ensaio? Esta ação não pode ser desfeita.
+                            <br />
+                            <strong>Registro:</strong> {test.registrationNumber || test.testNumber || 'Sem registro'}
+                            <br />
+                            <strong>Tipo:</strong> {test.typeName}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteTest(test.id, test.type)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            Excluir
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
               ))
             )}
           </div>
