@@ -669,8 +669,8 @@ export default function DensityInSitu() {
                   <SelectValue placeholder="Selecionar registro..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="DR-001">DR-001 - Material A (2.67 g/cm³)</SelectItem>
-                  <SelectItem value="DR-002">DR-002 - Material B (2.65 g/cm³)</SelectItem>
+                  <SelectItem value="">Nenhum registro selecionado</SelectItem>
+                  {/* TODO: Carregar ensaios de densidade real salvos */}
                 </SelectContent>
               </Select>
             </div>
@@ -681,8 +681,8 @@ export default function DensityInSitu() {
                   <SelectValue placeholder="Selecionar registro..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="DM-001">DM-001 - Material A (1.85/1.45 g/cm³)</SelectItem>
-                  <SelectItem value="DM-002">DM-002 - Material B (1.92/1.52 g/cm³)</SelectItem>
+                  <SelectItem value="">Nenhum registro selecionado</SelectItem>
+                  {/* TODO: Carregar ensaios de densidade máx/mín salvos */}
                 </SelectContent>
               </Select>
             </div>
