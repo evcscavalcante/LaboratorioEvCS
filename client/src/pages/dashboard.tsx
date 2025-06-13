@@ -78,17 +78,25 @@ export default function Dashboard() {
     setLoading(true);
     try {
       // Carregar dados do PostgreSQL
+      console.log('🔄 Iniciando carregamento dos dados do dashboard...');
       const [densityInSituResponse, realDensityResponse, maxMinDensityResponse, balanceData] = await Promise.all([
-        apiRequest('GET', '/api/tests/density-in-situ/temp').then(res => res.json()).catch(() => []),
-        apiRequest('GET', '/api/tests/real-density/temp').then(res => res.json()).catch(() => []),
-        apiRequest('GET', '/api/tests/max-min-density/temp').then(res => res.json()).catch(() => []),
+        apiRequest('GET', '/api/tests/density-in-situ/temp').then(res => res.json()).catch((err) => { console.error('❌ Erro density-in-situ:', err); return []; }),
+        apiRequest('GET', '/api/tests/real-density/temp').then(res => res.json()).catch((err) => { console.error('❌ Erro real-density:', err); return []; }),
+        apiRequest('GET', '/api/tests/max-min-density/temp').then(res => res.json()).catch((err) => { console.error('❌ Erro max-min-density:', err); return []; }),
         localDataManager.getBalanceVerifications()
       ]);
 
       const densityInSitu = densityInSituResponse || [];
       const densityReal = realDensityResponse || [];
       const densityMaxMin = maxMinDensityResponse || [];
+      
+      console.log('📊 Dados carregados:');
+      console.log('  - Densidade In-Situ:', densityInSitu.length, densityInSitu);
+      console.log('  - Densidade Real:', densityReal.length, densityReal);
+      console.log('  - Densidade Máx/Mín:', densityMaxMin.length, densityMaxMin);
+      
       const allTests = [...densityInSitu, ...densityReal, ...densityMaxMin];
+      console.log('📋 Total de ensaios combinados:', allTests.length, allTests);
       
       // Calculate statistics
       const totalTests = allTests.length;
