@@ -148,44 +148,7 @@ export default function DensityInSitu() {
     };
   };
 
-  const [data, setData] = useState<DensityInSituData>(() => {
-    // Dados de teste para verificar o salvamento
-    return {
-      registrationNumber: "TEST-2025-001",
-      date: "2025-06-13",
-      time: "15:30",
-      operator: "João Silva",
-      technicalResponsible: "Dr. Maria Santos",
-      verifier: "Carlos Oliveira",
-      material: "Areia Fina",
-      origin: "Obra Teste - São Paulo",
-      coordinates: "23°33'S 46°38'W",
-      quadrant: "Q1",
-      layer: "Camada Superior",
-      balanceId: "BAL-001",
-      ovenId: "EST-001",
-      realDensityRef: "RD-2025-001",
-      maxMinDensityRef: "MM-2025-001",
-      det1: { 
-        cylinderNumber: "CIL-001", 
-        moldeSolo: 2500.5, 
-        molde: 450.2, 
-        volume: 1000.0 
-      },
-      det2: { 
-        cylinderNumber: "CIL-002", 
-        moldeSolo: 2480.3, 
-        molde: 455.1, 
-        volume: 1000.0 
-      },
-      moistureTop1: { capsule: "CAP-T1", wetTare: 150.5, dryTare: 140.2, tare: 50.1 },
-      moistureTop2: { capsule: "CAP-T2", wetTare: 160.3, dryTare: 148.7, tare: 52.2 },
-      moistureTop3: { capsule: "CAP-T3", wetTare: 155.8, dryTare: 143.4, tare: 51.3 },
-      moistureBase1: { capsule: "CAP-B1", wetTare: 145.2, dryTare: 135.6, tare: 48.5 },
-      moistureBase2: { capsule: "CAP-B2", wetTare: 158.9, dryTare: 146.3, tare: 50.8 },
-      moistureBase3: { capsule: "CAP-B3", wetTare: 152.1, dryTare: 141.7, tare: 49.2 },
-    };
-  });
+  const [data, setData] = useState<DensityInSituData>(loadSavedData());
 
   // Salvamento automático
   useEffect(() => {
