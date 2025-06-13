@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { getQueryFn } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import DensityInSitu from "@/components/laboratory/density-in-situ";
 import DensityReal from "@/components/laboratory/density-real";
 import DensityMaxMin from "@/components/laboratory/density-max-min";
@@ -18,6 +18,47 @@ export default function Laboratory() {
   // Parse URL parameters from hash
   const [testId, setTestId] = useState<number | undefined>();
   const [mode, setMode] = useState<'view' | 'edit' | 'new'>('new');
+
+  // Buscar ensaios dos três tipos
+  const { data: densityInSituTests = [] } = useQuery({
+    queryKey: ['/api/tests/density-in-situ'],
+    queryFn: () => apiRequest('GET', '/api/tests/density-in-situ').catch(() => [])
+  });
+
+  const { data: realDensityTests = [] } = useQuery({
+    queryKey: ['/api/tests/real-density'],
+    queryFn: () => apiRequest('GET', '/api/tests/real-density').catch(() => [])
+  });
+
+  const { data: maxMinDensityTests = [] } = useQuery({
+    queryKey: ['/api/tests/max-min-density'],
+    queryFn: () => apiRequest('GET', '/api/tests/max-min-density').catch(() => [])
+  });
+
+  // Combinar todos os ensaios
+  const allTests = [
+    ...(Array.isArray(densityInSituTests) ? densityInSituTests : []).map((test: any) => ({ 
+      ...test, 
+      type: 'density-in-situ', 
+      icon: '⚖️', 
+      typeName: 'Densidade In Situ',
+      route: '/solos/densidade-in-situ'
+    })),
+    ...(Array.isArray(realDensityTests) ? realDensityTests : []).map((test: any) => ({ 
+      ...test, 
+      type: 'real-density', 
+      icon: '⚛️', 
+      typeName: 'Densidade Real',
+      route: '/solos/densidade-real'
+    })),
+    ...(Array.isArray(maxMinDensityTests) ? maxMinDensityTests : []).map((test: any) => ({ 
+      ...test, 
+      type: 'max-min-density', 
+      icon: '↕️', 
+      typeName: 'Densidade Máx/Mín',
+      route: '/solos/densidade-max-min'
+    }))
+  ];
   
   useEffect(() => {
     const hash = window.location.hash;
@@ -116,7 +157,7 @@ export default function Laboratory() {
           <div className="p-4 border-b">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <FileText size={20} />
-              Ensaios Salvos (3)
+              Ensaios Salvos ({allTests.length})
             </h2>
             
             {/* Três botões para novos ensaios */}
@@ -147,50 +188,40 @@ export default function Laboratory() {
             </div>
           </div>
           
-          {/* Lista de ensaios salvos */}
+          {/* Lista de ensaios salvos dinâmica */}
           <div className="flex-1 p-4">
             <div className="space-y-2">
-              {/* Ensaio 1 - Densidade Real */}
-              <div 
-                onClick={() => setLocation('/solos/densidade-real?load=1')}
-                className="p-3 border rounded cursor-pointer hover:bg-gray-50 hover:border-blue-300 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">⚛️</span>
-                  <div className="flex-1">
-                    <div className="font-medium text-sm">Ensaio_1</div>
-                    <div className="text-xs text-gray-500">Densidade Real • ID: 1</div>
-                  </div>
+              {allTests.length === 0 ? (
+                <div className="text-center text-gray-500 py-8">
+                  <FileText size={48} className="mx-auto mb-2 opacity-50" />
+                  <p>Nenhum ensaio salvo</p>
                 </div>
-              </div>
-              
-              {/* Ensaio 2 - Densidade Máx/Mín */}
-              <div 
-                onClick={() => setLocation('/solos/densidade-max-min?load=2')}
-                className="p-3 border rounded cursor-pointer hover:bg-gray-50 hover:border-blue-300 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">↕️</span>
-                  <div className="flex-1">
-                    <div className="font-medium text-sm">Ensaio_2</div>
-                    <div className="text-xs text-gray-500">Densidade Máx/Mín • ID: 2</div>
+              ) : (
+                allTests.map((test: any) => (
+                  <div 
+                    key={`${test.type}-${test.id}`}
+                    onClick={() => setLocation(`${test.route}?load=${test.id}`)}
+                    className="p-3 border rounded cursor-pointer hover:bg-gray-50 hover:border-blue-300 transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{test.icon}</span>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">
+                          {test.registrationNumber || test.testNumber || `Ensaio_${test.id}`}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {test.typeName} • ID: {test.id}
+                        </div>
+                        {test.client && (
+                          <div className="text-xs text-gray-400">
+                            Cliente: {test.client}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              
-              {/* Ensaio 3 - Densidade Máx/Mín */}
-              <div 
-                onClick={() => setLocation('/solos/densidade-max-min?load=3')}
-                className="p-3 border rounded cursor-pointer hover:bg-gray-50 hover:border-blue-300 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">↕️</span>
-                  <div className="flex-1">
-                    <div className="font-medium text-sm">Ensaio_3</div>
-                    <div className="text-xs text-gray-500">Densidade Máx/Mín • ID: 3</div>
-                  </div>
-                </div>
-              </div>
+                ))
+              )}
             </div>
           </div>
         </div>
