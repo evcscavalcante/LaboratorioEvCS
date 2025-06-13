@@ -30,6 +30,7 @@ import ManualAdmin from "@/pages/help/manual-admin";
 import TestAccess from "@/pages/test-access";
 import UserCreation from "@/pages/admin/user-creation";
 import SystemStatus from "@/pages/system-status";
+import TestsList from "@/pages/tests-list";
 
 function Router() {
   const { user, loading } = useAuth();

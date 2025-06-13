@@ -184,6 +184,13 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     ...maxMinDensityTests.map((test: any) => ({ ...test, type: 'max-min-density', typeName: 'Densidade Máx/Mín' }))
   ];
 
+  console.log('🔍 Debug Sidebar - Dados carregados:', {
+    densityInSituTests: densityInSituTests?.length || 0,
+    realDensityTests: realDensityTests?.length || 0, 
+    maxMinDensityTests: maxMinDensityTests?.length || 0,
+    allTests: allTests.length
+  });
+
   // Filtrar ensaios
   const filteredTests = allTests.filter(test => {
     const matchesSearch = !searchTerm || 
