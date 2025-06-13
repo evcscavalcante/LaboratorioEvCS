@@ -182,15 +182,17 @@ export default function DensityInSitu() {
   const [calculations, setCalculations] = useState({
     det1: { soil: 0, gammaNatWet: 0, gammaNatDry: 0 },
     det2: { soil: 0, gammaNatWet: 0, gammaNatDry: 0 },
-    gammaNatDryAvg: 0,
-    moistureTop: { det1: { dryWeight: 0, water: 0, moisture: 0 }, det2: { dryWeight: 0, water: 0, moisture: 0 }, det3: { dryWeight: 0, water: 0, moisture: 0 }, average: 0 },
-    moistureBase: { det1: { dryWeight: 0, water: 0, moisture: 0 }, det2: { dryWeight: 0, water: 0, moisture: 0 }, det3: { dryWeight: 0, water: 0, moisture: 0 }, average: 0 },
-    results: { 
-      gammaDTop: 0, 
-      gammaDBase: 0, 
-      voidIndex: 0, 
-      relativeCompactness: 0, 
-      status: "AGUARDANDO" 
+    moistureTop1: 0,
+    moistureTop2: 0,
+    moistureTop3: 0,
+    moistureBase1: 0,
+    moistureBase2: 0,
+    moistureBase3: 0,
+    results: {
+      averageMoistureTop: 0,
+      averageMoistureBase: 0,
+      averageGammaNatDry: 0,
+      relativeCompactness: 0
     }
   });
 
@@ -202,49 +204,46 @@ export default function DensityInSitu() {
     const det1GammaNatWet = data.det1.volume > 0 ? det1Soil / data.det1.volume : 0;
     const det2GammaNatWet = data.det2.volume > 0 ? det2Soil / data.det2.volume : 0;
 
-    const moistureTopCalcs = [data.moistureTop1, data.moistureTop2, data.moistureTop3].map(m => {
-      const dryWeight = m.dryTare - m.tare;
-      const water = m.wetTare - m.dryTare;
-      const moisture = dryWeight > 0 ? (water / dryWeight) * 100 : 0;
-      return { dryWeight, water, moisture };
-    });
+    // Calculate moisture content for each determination manually
+    const moistureTop1 = data.moistureTop1.dryTare > data.moistureTop1.tare ? 
+      ((data.moistureTop1.wetTare - data.moistureTop1.dryTare) / (data.moistureTop1.dryTare - data.moistureTop1.tare)) * 100 : 0;
+    const moistureTop2 = data.moistureTop2.dryTare > data.moistureTop2.tare ? 
+      ((data.moistureTop2.wetTare - data.moistureTop2.dryTare) / (data.moistureTop2.dryTare - data.moistureTop2.tare)) * 100 : 0;
+    const moistureTop3 = data.moistureTop3.dryTare > data.moistureTop3.tare ? 
+      ((data.moistureTop3.wetTare - data.moistureTop3.dryTare) / (data.moistureTop3.dryTare - data.moistureTop3.tare)) * 100 : 0;
+    
+    const moistureBase1 = data.moistureBase1.dryTare > data.moistureBase1.tare ? 
+      ((data.moistureBase1.wetTare - data.moistureBase1.dryTare) / (data.moistureBase1.dryTare - data.moistureBase1.tare)) * 100 : 0;
+    const moistureBase2 = data.moistureBase2.dryTare > data.moistureBase2.tare ? 
+      ((data.moistureBase2.wetTare - data.moistureBase2.dryTare) / (data.moistureBase2.dryTare - data.moistureBase2.tare)) * 100 : 0;
+    const moistureBase3 = data.moistureBase3.dryTare > data.moistureBase3.tare ? 
+      ((data.moistureBase3.wetTare - data.moistureBase3.dryTare) / (data.moistureBase3.dryTare - data.moistureBase3.tare)) * 100 : 0;
 
-    const moistureBaseCalcs = [data.moistureBase1, data.moistureBase2, data.moistureBase3].map(m => {
-      const dryWeight = m.dryTare - m.tare;
-      const water = m.wetTare - m.dryTare;
-      const moisture = dryWeight > 0 ? (water / dryWeight) * 100 : 0;
-      return { dryWeight, water, moisture };
-    });
-
-    const avgMoistureTop = moistureTopCalcs.reduce((sum, calc) => sum + calc.moisture, 0) / 3;
-    const avgMoistureBase = moistureBaseCalcs.reduce((sum, calc) => sum + calc.moisture, 0) / 3;
+    const avgMoistureTop = (moistureTop1 + moistureTop2 + moistureTop3) / 3;
+    const avgMoistureBase = (moistureBase1 + moistureBase2 + moistureBase3) / 3;
 
     const det1GammaNatDry = det1GammaNatWet / (1 + avgMoistureTop / 100);
     const det2GammaNatDry = det2GammaNatWet / (1 + avgMoistureBase / 100);
     const gammaNatDryAvg = (det1GammaNatDry + det2GammaNatDry) / 2;
 
+    // Calculate relative compactness using real density references
+    let relativeCompactness = 0;
+    // This would need real density reference data from the database
+    
     setCalculations({
       det1: { soil: det1Soil, gammaNatWet: det1GammaNatWet, gammaNatDry: det1GammaNatDry },
       det2: { soil: det2Soil, gammaNatWet: det2GammaNatWet, gammaNatDry: det2GammaNatDry },
-      gammaNatDryAvg,
-      moistureTop: {
-        det1: moistureTopCalcs[0],
-        det2: moistureTopCalcs[1],
-        det3: moistureTopCalcs[2],
-        average: avgMoistureTop
-      },
-      moistureBase: {
-        det1: moistureBaseCalcs[0],
-        det2: moistureBaseCalcs[1],
-        det3: moistureBaseCalcs[2],
-        average: avgMoistureBase
-      },
+      moistureTop1: isNaN(moistureTop1) ? 0 : moistureTop1,
+      moistureTop2: isNaN(moistureTop2) ? 0 : moistureTop2,
+      moistureTop3: isNaN(moistureTop3) ? 0 : moistureTop3,
+      moistureBase1: isNaN(moistureBase1) ? 0 : moistureBase1,
+      moistureBase2: isNaN(moistureBase2) ? 0 : moistureBase2,
+      moistureBase3: isNaN(moistureBase3) ? 0 : moistureBase3,
       results: {
-        gammaDTop: det1GammaNatDry,
-        gammaDBase: det2GammaNatDry,
-        voidIndex: 0,
-        relativeCompactness: 0,
-        status: "AGUARDANDO"
+        averageMoistureTop: isNaN(avgMoistureTop) ? 0 : avgMoistureTop,
+        averageMoistureBase: isNaN(avgMoistureBase) ? 0 : avgMoistureBase,
+        averageGammaNatDry: isNaN(gammaNatDryAvg) ? 0 : gammaNatDryAvg,
+        relativeCompactness: isNaN(relativeCompactness) ? 0 : relativeCompactness
       }
     });
   }, [data]);
@@ -388,6 +387,614 @@ export default function DensityInSitu() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Density In Situ Determinations */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Calculator className="mr-2 text-blue-600" size={20} />
+            Densidade In Situ (2 Determinações)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-2 md:p-6">
+          <div className="mobile-responsive-table">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[200px]">Parâmetro</TableHead>
+                  <TableHead className="text-center">Determinação 1</TableHead>
+                  <TableHead className="text-center">Determinação 2</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Cilindro nº</TableCell>
+                  <TableCell>
+                    <Input
+                      type="text"
+                      value={data.det1.cylinderNumber}
+                      onChange={(e) => updateData("det1", { ...data.det1, cylinderNumber: e.target.value })}
+                      placeholder="Número do cilindro"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="text"
+                      value={data.det2.cylinderNumber}
+                      onChange={(e) => updateData("det2", { ...data.det2, cylinderNumber: e.target.value })}
+                      placeholder="Número do cilindro"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Molde + Solo (g)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.det1.moldeSolo}
+                      onChange={(e) => updateData("det1", { ...data.det1, moldeSolo: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.det2.moldeSolo}
+                      onChange={(e) => updateData("det2", { ...data.det2, moldeSolo: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Molde (g)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.det1.molde}
+                      onChange={(e) => updateData("det1", { ...data.det1, molde: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.det2.molde}
+                      onChange={(e) => updateData("det2", { ...data.det2, molde: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow className="bg-blue-50">
+                  <TableCell className="font-medium">Solo (g) <Calculator className="inline ml-1" size={12} /></TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={calculations.det1.soil.toFixed(2)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={calculations.det2.soil.toFixed(2)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Volume (cm³)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.det1.volume}
+                      onChange={(e) => updateData("det1", { ...data.det1, volume: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.det2.volume}
+                      onChange={(e) => updateData("det2", { ...data.det2, volume: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow className="bg-blue-50">
+                  <TableCell className="font-medium">γnat úmido (g/cm³) <Calculator className="inline ml-1" size={12} /></TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={calculations.det1.gammaNatWet.toFixed(3)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={calculations.det2.gammaNatWet.toFixed(3)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow className="bg-blue-50">
+                  <TableCell className="font-medium">γnat seco (g/cm³) <Calculator className="inline ml-1" size={12} /></TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={calculations.det1.gammaNatDry.toFixed(3)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={calculations.det2.gammaNatDry.toFixed(3)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Moisture Content Top */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Droplet className="mr-2 text-blue-500" size={20} />
+            Teor de Umidade - Topo
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-2 md:p-6">
+          <div className="mobile-responsive-table">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[200px]">Parâmetro</TableHead>
+                  <TableHead className="text-center">Determinação 1</TableHead>
+                  <TableHead className="text-center">Determinação 2</TableHead>
+                  <TableHead className="text-center">Determinação 3</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Cápsula nº</TableCell>
+                  <TableCell>
+                    <Select 
+                      value={data.moistureTop1.capsule} 
+                      onValueChange={(value) => updateData("moistureTop1", { ...data.moistureTop1, capsule: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {equipamentos.capsulas.map((cap: any) => (
+                          <SelectItem key={cap.id} value={cap.id}>
+                            {cap.id} ({cap.peso}g)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Select 
+                      value={data.moistureTop2.capsule} 
+                      onValueChange={(value) => updateData("moistureTop2", { ...data.moistureTop2, capsule: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {equipamentos.capsulas.map((cap: any) => (
+                          <SelectItem key={cap.id} value={cap.id}>
+                            {cap.id} ({cap.peso}g)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Select 
+                      value={data.moistureTop3.capsule} 
+                      onValueChange={(value) => updateData("moistureTop3", { ...data.moistureTop3, capsule: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {equipamentos.capsulas.map((cap: any) => (
+                          <SelectItem key={cap.id} value={cap.id}>
+                            {cap.id} ({cap.peso}g)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Úmido + Tara (g)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop1.wetTare}
+                      onChange={(e) => updateData("moistureTop1", { ...data.moistureTop1, wetTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop2.wetTare}
+                      onChange={(e) => updateData("moistureTop2", { ...data.moistureTop2, wetTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop3.wetTare}
+                      onChange={(e) => updateData("moistureTop3", { ...data.moistureTop3, wetTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Seco + Tara (g)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop1.dryTare}
+                      onChange={(e) => updateData("moistureTop1", { ...data.moistureTop1, dryTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop2.dryTare}
+                      onChange={(e) => updateData("moistureTop2", { ...data.moistureTop2, dryTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop3.dryTare}
+                      onChange={(e) => updateData("moistureTop3", { ...data.moistureTop3, dryTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Tara (g)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop1.tare}
+                      onChange={(e) => updateData("moistureTop1", { ...data.moistureTop1, tare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop2.tare}
+                      onChange={(e) => updateData("moistureTop2", { ...data.moistureTop2, tare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureTop3.tare}
+                      onChange={(e) => updateData("moistureTop3", { ...data.moistureTop3, tare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow className="bg-blue-50">
+                  <TableCell className="font-medium">Umidade (%) <Calculator className="inline ml-1" size={12} /></TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={calculations.moistureTop1.toFixed(2)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={calculations.moistureTop2.toFixed(2)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={calculations.moistureTop3.toFixed(2)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Moisture Content Base */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Droplet className="mr-2 text-green-500" size={20} />
+            Teor de Umidade - Base
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-2 md:p-6">
+          <div className="mobile-responsive-table">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[200px]">Parâmetro</TableHead>
+                  <TableHead className="text-center">Determinação 1</TableHead>
+                  <TableHead className="text-center">Determinação 2</TableHead>
+                  <TableHead className="text-center">Determinação 3</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Cápsula nº</TableCell>
+                  <TableCell>
+                    <Select 
+                      value={data.moistureBase1.capsule} 
+                      onValueChange={(value) => updateData("moistureBase1", { ...data.moistureBase1, capsule: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {equipamentos.capsulas.map((cap: any) => (
+                          <SelectItem key={cap.id} value={cap.id}>
+                            {cap.id} ({cap.peso}g)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Select 
+                      value={data.moistureBase2.capsule} 
+                      onValueChange={(value) => updateData("moistureBase2", { ...data.moistureBase2, capsule: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {equipamentos.capsulas.map((cap: any) => (
+                          <SelectItem key={cap.id} value={cap.id}>
+                            {cap.id} ({cap.peso}g)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Select 
+                      value={data.moistureBase3.capsule} 
+                      onValueChange={(value) => updateData("moistureBase3", { ...data.moistureBase3, capsule: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {equipamentos.capsulas.map((cap: any) => (
+                          <SelectItem key={cap.id} value={cap.id}>
+                            {cap.id} ({cap.peso}g)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Úmido + Tara (g)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase1.wetTare}
+                      onChange={(e) => updateData("moistureBase1", { ...data.moistureBase1, wetTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase2.wetTare}
+                      onChange={(e) => updateData("moistureBase2", { ...data.moistureBase2, wetTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase3.wetTare}
+                      onChange={(e) => updateData("moistureBase3", { ...data.moistureBase3, wetTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Seco + Tara (g)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase1.dryTare}
+                      onChange={(e) => updateData("moistureBase1", { ...data.moistureBase1, dryTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase2.dryTare}
+                      onChange={(e) => updateData("moistureBase2", { ...data.moistureBase2, dryTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase3.dryTare}
+                      onChange={(e) => updateData("moistureBase3", { ...data.moistureBase3, dryTare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Tara (g)</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase1.tare}
+                      onChange={(e) => updateData("moistureBase1", { ...data.moistureBase1, tare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase2.tare}
+                      onChange={(e) => updateData("moistureBase2", { ...data.moistureBase2, tare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={data.moistureBase3.tare}
+                      onChange={(e) => updateData("moistureBase3", { ...data.moistureBase3, tare: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow className="bg-blue-50">
+                  <TableCell className="font-medium">Umidade (%) <Calculator className="inline ml-1" size={12} /></TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={calculations.moistureBase1.toFixed(2)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={calculations.moistureBase2.toFixed(2)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={calculations.moistureBase3.toFixed(2)}
+                      readOnly
+                      className="bg-blue-50 border-blue-200 font-mono"
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Final Results */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <BarChart className="mr-2 text-green-600" size={20} />
+            Resultados Finais
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-2 md:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <Label className="text-sm font-medium text-blue-700">Umidade Média Topo (%)</Label>
+              <p className="text-2xl font-bold text-blue-900 font-mono">
+                {calculations.results.averageMoistureTop.toFixed(2)}
+              </p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <Label className="text-sm font-medium text-green-700">Umidade Média Base (%)</Label>
+              <p className="text-2xl font-bold text-green-900 font-mono">
+                {calculations.results.averageMoistureBase.toFixed(2)}
+              </p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+              <Label className="text-sm font-medium text-purple-700">γnat seco médio (g/cm³)</Label>
+              <p className="text-2xl font-bold text-purple-900 font-mono">
+                {calculations.results.averageGammaNatDry.toFixed(3)}
+              </p>
+            </div>
+            <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+              <Label className="text-sm font-medium text-orange-700">Compacidade Relativa (%)</Label>
+              <p className="text-2xl font-bold text-orange-900 font-mono">
+                {calculations.results.relativeCompactness.toFixed(1)}
+              </p>
             </div>
           </div>
         </CardContent>
