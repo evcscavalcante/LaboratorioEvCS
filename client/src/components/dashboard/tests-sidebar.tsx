@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { getQueryFn, apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { generateDensityInSituPDF, generateRealDensityPDF, generateMaxMinDensityPDF } from '@/lib/pdf-generator';
+import { generateDensityInSituVerticalPDF, generateRealDensityVerticalPDF, generateMaxMinDensityVerticalPDF } from '@/lib/pdf-vertical-tables';
 import { calculateDensityInSitu, calculateRealDensity, calculateVoidParameters } from '@/lib/calculations';
 import StatusIndicator from '@/components/laboratory/status-indicator';
 
@@ -52,21 +52,21 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
         const testData = await response.json();
         
         // Gerar PDF com dados básicos (sem cálculos complexos para evitar erros)
-        await generateDensityInSituPDF(testData, null);
+        await generateDensityInSituVerticalPDF(testData, null);
         
       } else if (testType === 'real-density') {
         const response = await fetch(`/api/real-density/${testId}`);
         if (!response.ok) throw new Error(`Erro ao buscar dados: ${response.status}`);
         const testData = await response.json();
         
-        await generateRealDensityPDF(testData, null);
+        await generateRealDensityVerticalPDF(testData, null);
         
       } else if (testType === 'max-min-density') {
         const response = await fetch(`/api/max-min-density/${testId}`);
         if (!response.ok) throw new Error(`Erro ao buscar dados: ${response.status}`);
         const testData = await response.json();
         
-        await generateMaxMinDensityPDF(testData, null);
+        await generateMaxMinDensityVerticalPDF(testData, null);
       }
 
       toast({
