@@ -85,7 +85,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
 
   // Buscar todos os ensaios
   const { data: densityInSituTests = [] } = useQuery({
-    queryKey: ['/api/density-in-situ'],
+    queryKey: ['/api/tests/density-in-situ/temp'],
     queryFn: getQueryFn({ on401: 'returnNull' }),
     staleTime: 0,
     gcTime: 0,
