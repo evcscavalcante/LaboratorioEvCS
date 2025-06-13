@@ -381,8 +381,30 @@ async function startServer() {
     }
   });
 
-  // Static file serving
-  if (process.env.NODE_ENV === "production") {
+  // Development setup with Vite integration
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      const { createServer: createViteServer } = await import("vite");
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+        root: "./client",
+        base: "/",
+      });
+      
+      app.use(vite.ssrFixStacktrace);
+      app.use(vite.middlewares);
+    } catch (error) {
+      console.log("Vite integration failed, using fallback static serving");
+      app.use(express.static("client/public"));
+      app.get("*", (req, res) => {
+        if (!req.path.startsWith('/api')) {
+          res.sendFile(path.resolve("client/index.html"));
+        }
+      });
+    }
+  } else {
+    // Production static file serving
     app.use(express.static("dist/public"));
     app.get("*", (_req, res) => {
       res.sendFile(path.resolve("dist/public/index.html"));
