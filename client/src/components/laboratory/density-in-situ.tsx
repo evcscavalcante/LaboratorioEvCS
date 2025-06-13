@@ -82,7 +82,7 @@ export default function DensityInSitu() {
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
       console.log("🔄 Enviando dados do ensaio:", testData);
-      const response = await apiRequest("POST", "/api/tests/density-in-situ", testData);
+      const response = await apiRequest("POST", "/api/tests/density-in-situ/temp", testData);
       console.log("📡 Resposta da API:", response);
       return response.json();
     },
