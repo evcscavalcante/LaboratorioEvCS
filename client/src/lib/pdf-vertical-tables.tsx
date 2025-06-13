@@ -816,40 +816,32 @@ export const MaxMinDensityVerticalDocument: React.FC<{ data: any; calculations: 
         </View>
       </View>
 
-      {/* Resultados Específicos para Max/Min */}
+      {/* Resultados Finais Simplificados */}
       <View style={styles.resultSection}>
-        <Text style={styles.resultTitle}>RESULTADOS FINAIS</Text>
+        <Text style={styles.sectionTitle}>RESULTADOS FINAIS</Text>
         <View style={styles.verticalTable}>
           <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text style={styles.labelText}>Densidade Máxima (g/cm³):</Text>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={[styles.labelText, { fontWeight: 'bold' }]}>Densidade Máxima (g/cm³):</Text>
             </View>
-            <View style={styles.dataCell}>
-              <Text style={styles.resultValue}>{(calculations?.results?.gammaDMax || 0).toFixed(3)}</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text style={styles.labelText}>Densidade Mínima (g/cm³):</Text>
-            </View>
-            <View style={styles.dataCell}>
-              <Text style={styles.resultValue}>{(calculations?.results?.gammaDMin || 0).toFixed(3)}</Text>
+            <View style={[styles.dataCell, { width: '40%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.results?.gammaDMax || 0).toFixed(3)}</Text>
             </View>
           </View>
           <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text style={styles.labelText}>Índice de Vazios Máximo:</Text>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={[styles.labelText, { fontWeight: 'bold' }]}>Densidade Mínima (g/cm³):</Text>
             </View>
-            <View style={styles.dataCell}>
-              <Text style={styles.resultValue}>{(calculations?.results?.emax || 0).toFixed(3)}</Text>
+            <View style={[styles.dataCell, { width: '40%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.results?.gammaDMin || 0).toFixed(3)}</Text>
             </View>
           </View>
           <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text style={styles.labelText}>Índice de Vazios Mínimo:</Text>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Umidade média (%):</Text>
             </View>
-            <View style={styles.dataCell}>
-              <Text style={styles.resultValue}>{(calculations?.results?.emin || 0).toFixed(3)}</Text>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{(calculations?.averageMoisture || 0).toFixed(2)}</Text>
             </View>
           </View>
         </View>
