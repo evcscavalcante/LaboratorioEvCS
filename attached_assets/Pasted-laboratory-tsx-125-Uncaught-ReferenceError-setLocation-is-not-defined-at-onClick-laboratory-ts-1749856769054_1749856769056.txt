@@ -1,0 +1,38 @@
+laboratory.tsx:125 Uncaught ReferenceError: setLocation is not defined
+    at onClick (laboratory.tsx:125:32)
+    at HTMLUnknownElement.callCallback2 (chunk-XQLYTHWV.js?v=aad78fbd:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-XQLYTHWV.js?v=aad78fbd:3699:24)
+    at invokeGuardedCallback (chunk-XQLYTHWV.js?v=aad78fbd:3733:39)
+    at invokeGuardedCallbackAndCatchFirstError (chunk-XQLYTHWV.js?v=aad78fbd:3736:33)
+    at executeDispatch (chunk-XQLYTHWV.js?v=aad78fbd:7014:11)
+    at processDispatchQueueItemsInOrder (chunk-XQLYTHWV.js?v=aad78fbd:7034:15)
+    at processDispatchQueue (chunk-XQLYTHWV.js?v=aad78fbd:7043:13)
+    at dispatchEventsForPlugins (chunk-XQLYTHWV.js?v=aad78fbd:7051:11)
+    at chunk-XQLYTHWV.js?v=aad78fbd:7174:20
+onClick @ laboratory.tsx:125
+callCallback2 @ chunk-XQLYTHWV.js?v=aad78fbd:3674
+invokeGuardedCallbackDev @ chunk-XQLYTHWV.js?v=aad78fbd:3699
+invokeGuardedCallback @ chunk-XQLYTHWV.js?v=aad78fbd:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-XQLYTHWV.js?v=aad78fbd:3736
+executeDispatch @ chunk-XQLYTHWV.js?v=aad78fbd:7014
+processDispatchQueueItemsInOrder @ chunk-XQLYTHWV.js?v=aad78fbd:7034
+processDispatchQueue @ chunk-XQLYTHWV.js?v=aad78fbd:7043
+dispatchEventsForPlugins @ chunk-XQLYTHWV.js?v=aad78fbd:7051
+(anonymous) @ chunk-XQLYTHWV.js?v=aad78fbd:7174
+batchedUpdates$1 @ chunk-XQLYTHWV.js?v=aad78fbd:18913
+batchedUpdates @ chunk-XQLYTHWV.js?v=aad78fbd:3579
+dispatchEventForPluginEventSystem @ chunk-XQLYTHWV.js?v=aad78fbd:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-XQLYTHWV.js?v=aad78fbd:5478
+dispatchEvent @ chunk-XQLYTHWV.js?v=aad78fbd:5472
+dispatchDiscreteEvent @ chunk-XQLYTHWV.js?v=aad78fbd:5449Understand this error
+chunk-XQLYTHWV.js?v=aad78fbd:3750 Uncaught ReferenceError: setLocation is not defined
+    at onClick (laboratory.tsx:125:32)
+    at HTMLUnknownElement.callCallback2 (chunk-XQLYTHWV.js?v=aad78fbd:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-XQLYTHWV.js?v=aad78fbd:3699:24)
+    at invokeGuardedCallback (chunk-XQLYTHWV.js?v=aad78fbd:3733:39)
+    at invokeGuardedCallbackAndCatchFirstError (chunk-XQLYTHWV.js?v=aad78fbd:3736:33)
+    at executeDispatch (chunk-XQLYTHWV.js?v=aad78fbd:7014:11)
+    at processDispatchQueueItemsInOrder (chunk-XQLYTHWV.js?v=aad78fbd:7034:15)
+    at processDispatchQueue (chunk-XQLYTHWV.js?v=aad78fbd:7043:13)
+    at dispatchEventsForPlugins (chunk-XQLYTHWV.js?v=aad78fbd:7051:11)
+    at chunk-XQLYTHWV.js?v=aad78fbd:7174:20
