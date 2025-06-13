@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
@@ -6,6 +6,14 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/client/src/$1',
     '^@shared/(.*)$': '<rootDir>/shared/$1',
     '^@assets/(.*)$': '<rootDir>/attached_assets/$1'
+  },
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      useESM: true,
+      tsconfig: {
+        jsx: 'react-jsx'
+      }
+    }]
   },
   testMatch: [
     '<rootDir>/src/test/**/*.test.{js,jsx,ts,tsx}',
