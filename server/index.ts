@@ -154,7 +154,7 @@ async function startServer() {
       // Adicionar userId padrão para desenvolvimento
       const testData = {
         ...req.body,
-        userId: 1,
+        userId: 9,
         createdBy: 'evcsousa@yahoo.com.br'
       };
       
@@ -179,7 +179,7 @@ async function startServer() {
       // Adicionar userId padrão para desenvolvimento
       const testData = {
         ...req.body,
-        userId: 1,
+        userId: 9,
         createdBy: 'evcsousa@yahoo.com.br'
       };
       
