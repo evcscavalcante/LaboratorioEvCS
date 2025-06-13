@@ -25,6 +25,16 @@ export interface FirebaseUser {
 }
 
 export const verifyFirebaseToken = async (idToken: string): Promise<FirebaseUser | null> => {
+  // Token de desenvolvimento para testes
+  if (idToken === 'dev-token') {
+    return {
+      uid: 'dev-user-123',
+      email: 'evcsousa@yahoo.com.br',
+      name: 'Desenvolvedor',
+      emailVerified: true
+    };
+  }
+
   if (!admin) {
     console.log('Firebase Admin não configurado - requer credenciais');
     return null;
@@ -97,16 +107,6 @@ export const firebaseAuthMiddleware = async (req: Request, res: Response, next: 
     }
     
     const idToken = authHeader.split('Bearer ')[1];
-    
-    // Para desenvolvimento, aceitar token especial
-    if (idToken === 'dev-token') {
-      const defaultUser = await storage.getUserByUsername('evcsousa@yahoo.com.br');
-      if (defaultUser) {
-        (req as any).user = defaultUser;
-        return next();
-      }
-    }
-    
     const firebaseUser = await verifyFirebaseToken(idToken);
     
     if (!firebaseUser) {
