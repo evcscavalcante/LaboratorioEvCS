@@ -12,7 +12,7 @@ import TestsSidebar from "@/components/dashboard/tests-sidebar";
 
 export default function Laboratory() {
   const [currentDateTime, setCurrentDateTime] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [location] = useLocation();
   
   // Parse URL parameters from hash

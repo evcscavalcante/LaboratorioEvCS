@@ -128,6 +128,7 @@ User Input → Local Storage → API Validation → PostgreSQL → Firestore Syn
   - Sistema agora suporta quantidade ilimitada de tipos de ensaios
   - Mantida funcionalidade de clique direto para abrir na calculadora correspondente
   - Busca e filtros funcionais para localizar ensaios específicos
+  - Sidebar aberta por padrão para acesso direto aos botões e ensaios
 
 ## User Preferences
 
