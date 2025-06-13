@@ -114,7 +114,13 @@ User Input → Local Storage → API Validation → PostgreSQL → Firestore Syn
 - Authentication: Firebase project with custom claims
 
 ## Changelog
-- June 13, 2025. Initial setup
+- June 13, 2025: Initial setup
+- June 13, 2025: Sistema de pastas de ensaios implementado
+  - Interface organizada como explorador de arquivos
+  - Três pastas separadas por tipo de ensaio (Densidade In-Situ, Real, Máx/Mín)
+  - Cada ensaio aparece como arquivo individual que abre na calculadora
+  - Autenticação Firebase configurada com token nas requisições API
+  - Servidor detectando ensaios salvos corretamente
 
 ## User Preferences
 
