@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   Search, 
   FileText, 
@@ -14,7 +15,11 @@ import {
   Eye,
   Edit,
   Download,
-  Trash2
+  Trash2,
+  Folder,
+  FolderOpen,
+  ChevronRight,
+  ChevronDown
 } from 'lucide-react';
 import { getQueryFn, apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +32,11 @@ interface TestsSidebarProps {
 export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [testTypeFilter, setTestTypeFilter] = useState('all');
+  const [expandedFolders, setExpandedFolders] = useState({
+    'density-in-situ': true,
+    'real-density': true,
+    'max-min-density': true
+  });
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -113,38 +123,66 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     }
   };
 
-  // Combinar todos os ensaios
-  const allTests = [
-    ...(Array.isArray(densityInSituTests) ? (densityInSituTests as any[]) : []).map((test: any) => ({ 
-      ...test, 
-      type: 'density-in-situ', 
-      typeName: 'Densidade In Situ' 
-    })),
-    ...(Array.isArray(realDensityTests) ? (realDensityTests as any[]) : []).map((test: any) => ({ 
-      ...test, 
-      type: 'real-density', 
-      typeName: 'Densidade Real' 
-    })),
-    ...(Array.isArray(maxMinDensityTests) ? (maxMinDensityTests as any[]) : []).map((test: any) => ({ 
-      ...test, 
-      type: 'max-min-density', 
-      typeName: 'Densidade Máx/Mín' 
-    }))
+  // Organizar ensaios por tipo (pastas)
+  const testFolders = [
+    {
+      id: 'density-in-situ',
+      name: 'Densidade In Situ',
+      icon: Folder,
+      iconOpen: FolderOpen,
+      tests: (Array.isArray(densityInSituTests) ? (densityInSituTests as any[]) : []).map((test: any) => ({
+        ...test,
+        type: 'density-in-situ',
+        typeName: 'Densidade In Situ'
+      }))
+    },
+    {
+      id: 'real-density', 
+      name: 'Densidade Real',
+      icon: Folder,
+      iconOpen: FolderOpen,
+      tests: (Array.isArray(realDensityTests) ? (realDensityTests as any[]) : []).map((test: any) => ({
+        ...test,
+        type: 'real-density', 
+        typeName: 'Densidade Real'
+      }))
+    },
+    {
+      id: 'max-min-density',
+      name: 'Densidade Máx/Mín', 
+      icon: Folder,
+      iconOpen: FolderOpen,
+      tests: (Array.isArray(maxMinDensityTests) ? (maxMinDensityTests as any[]) : []).map((test: any) => ({
+        ...test,
+        type: 'max-min-density',
+        typeName: 'Densidade Máx/Mín'
+      }))
+    }
   ];
 
-  // Filtrar ensaios
-  const filteredTests = allTests.filter(test => {
-    const matchesSearch = !searchTerm || 
-      test.registrationNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      test.testNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      test.operator?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      test.client?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      test.work?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesType = testTypeFilter === 'all' || test.type === testTypeFilter;
-    
-    return matchesSearch && matchesType;
-  });
+  // Filtrar ensaios dentro de cada pasta
+  const filteredFolders = testFolders.map(folder => ({
+    ...folder,
+    tests: folder.tests.filter(test => {
+      const matchesSearch = !searchTerm || 
+        test.registrationNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        test.testNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        test.operator?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        test.client?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        test.work?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesType = testTypeFilter === 'all' || test.type === testTypeFilter;
+      
+      return matchesSearch && matchesType;
+    })
+  })).filter(folder => folder.tests.length > 0 || testTypeFilter === 'all');
+
+  const toggleFolder = (folderId: string) => {
+    setExpandedFolders(prev => ({
+      ...prev,
+      [folderId]: !prev[folderId as keyof typeof prev]
+    }));
+  };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
@@ -159,8 +197,8 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     <Card className="h-full">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
-          <FileText size={20} />
-          Ensaios Salvos ({filteredTests.length})
+          <Folder size={20} />
+          Pasta de Ensaios
         </CardTitle>
         
         {/* Filtros */}
@@ -168,149 +206,146 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por registro, operador..."
+              placeholder="Buscar ensaios..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8"
             />
           </div>
-          
-          <Select value={testTypeFilter} onValueChange={setTestTypeFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os tipos</SelectItem>
-              <SelectItem value="density-in-situ">Densidade In Situ</SelectItem>
-              <SelectItem value="real-density">Densidade Real</SelectItem>
-              <SelectItem value="max-min-density">Densidade Máx/Mín</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </CardHeader>
       
       <CardContent className="p-0">
         <ScrollArea className="h-[600px]">
-          <div className="p-4 space-y-3">
-            {filteredTests.length === 0 ? (
+          <div className="p-4 space-y-2">
+            {filteredFolders.length === 0 ? (
               <div className="text-center text-muted-foreground py-8">
-                <FileText size={48} className="mx-auto mb-2 opacity-50" />
-                <p>Nenhum ensaio encontrado</p>
+                <Folder size={48} className="mx-auto mb-2 opacity-50" />
+                <p>Nenhuma pasta encontrada</p>
               </div>
             ) : (
-              filteredTests.map((test) => (
-                <div key={`${test.type}-${test.id}`} className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                  {/* Cabeçalho com tipo e ID */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs font-medium">
-                        {test.typeName}
-                      </Badge>
-                      <span className="text-sm font-bold text-gray-900">
-                        ID: {test.id || 'N/A'}
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500 flex items-center gap-1">
-                      <Calendar size={12} />
-                      {formatDate(test.date || test.createdAt)}
-                    </div>
-                  </div>
-                  
-                  {/* Informações de identificação */}
-                  <div className="space-y-2 mb-3">
-                    <div className="text-sm">
-                      <span className="font-medium text-gray-700">Registro:</span> 
-                      <span className="ml-2">{test.registrationNumber || test.testNumber || 'Sem registro'}</span>
-                    </div>
-                    {test.operator && (
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-700">Operador:</span>
-                        <span className="ml-2">{test.operator}</span>
+              filteredFolders.map((folder) => (
+                <div key={folder.id} className="space-y-1">
+                  {/* Cabeçalho da Pasta */}
+                  <Collapsible 
+                    open={expandedFolders[folder.id as keyof typeof expandedFolders]} 
+                    onOpenChange={() => toggleFolder(folder.id)}
+                  >
+                    <CollapsibleTrigger asChild>
+                      <div className="flex items-center gap-2 p-2 bg-blue-50 hover:bg-blue-100 rounded cursor-pointer transition-colors">
+                        <div className="flex items-center gap-1">
+                          {expandedFolders[folder.id as keyof typeof expandedFolders] ? (
+                            <ChevronDown size={16} className="text-gray-600" />
+                          ) : (
+                            <ChevronRight size={16} className="text-gray-600" />
+                          )}
+                          {expandedFolders[folder.id as keyof typeof expandedFolders] ? (
+                            <FolderOpen size={16} className="text-blue-600" />
+                          ) : (
+                            <Folder size={16} className="text-blue-600" />
+                          )}
+                        </div>
+                        <span className="font-medium text-gray-900">{folder.name}</span>
+                        <Badge variant="secondary" className="ml-auto text-xs">
+                          {folder.tests.length}
+                        </Badge>
                       </div>
-                    )}
-                    {test.client && (
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-700">Cliente:</span>
-                        <span className="ml-2">{test.client}</span>
-                      </div>
-                    )}
-                    {test.work && (
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-700">Obra:</span>
-                        <span className="ml-2">{test.work}</span>
-                      </div>
-                    )}
-                    {test.location && (
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-700">Local:</span>
-                        <span className="ml-2">{test.location}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Botões de ação */}
-                  <div className="flex gap-2 pt-2 border-t border-gray-100">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => onSelectTest?.(test.id, test.type)}
-                    >
-                      <Eye size={12} className="mr-1" />
-                      Ver
-                    </Button>
+                    </CollapsibleTrigger>
                     
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => onEditTest?.(test.id, test.type)}
-                    >
-                      <Edit size={12} className="mr-1" />
-                      Editar
-                    </Button>
-                    
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDownloadPDF(test.id, test.type)}
-                    >
-                      <Download size={12} />
-                    </Button>
-                    
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    <CollapsibleContent className="space-y-1 pl-6 mt-1">
+                      {folder.tests.map((test: any) => (
+                        <div 
+                          key={`${test.type}-${test.id}`}
+                          className="group p-3 bg-white border border-gray-200 rounded hover:shadow-md hover:border-blue-300 transition-all cursor-pointer"
+                          onClick={() => onEditTest?.(test.id, test.type)}
                         >
-                          <Trash2 size={12} />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Tem certeza que deseja excluir este ensaio? Esta ação não pode ser desfeita.
-                            <br />
-                            <strong>Registro:</strong> {test.registrationNumber || test.testNumber || 'Sem registro'}
-                            <br />
-                            <strong>Tipo:</strong> {test.typeName}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteTest(test.id, test.type)}
-                            className="bg-red-600 hover:bg-red-700"
-                          >
-                            Excluir
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
+                          {/* Ícone e Nome do Arquivo */}
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-7 h-7 flex items-center justify-center bg-green-100 rounded">
+                              <FileText size={14} className="text-green-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-gray-900 truncate text-sm">
+                                {test.registrationNumber || test.testNumber || `Ensaio_${test.id}`}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                ID: {test.id} • {formatDate(test.date || test.createdAt)}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Informações resumidas */}
+                          <div className="text-xs text-gray-600 mb-2 space-y-1">
+                            {test.client && <div>📋 {test.client}</div>}
+                            {test.work && <div>🏗️ {test.work}</div>}
+                            {test.operator && <div>👤 {test.operator}</div>}
+                          </div>
+                          
+                          {/* Botões de ação - aparecem no hover */}
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 px-2 text-xs flex-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditTest?.(test.id, test.type);
+                              }}
+                            >
+                              <Edit size={12} className="mr-1" />
+                              Abrir
+                            </Button>
+                            
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 px-2 text-xs"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadPDF(test.id, test.type);
+                              }}
+                            >
+                              <Download size={12} />
+                            </Button>
+                            
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Trash2 size={12} />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Excluir Ensaio</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Tem certeza que deseja excluir este ensaio?
+                                    <br />
+                                    <strong>{test.registrationNumber || test.testNumber || `Ensaio_${test.id}`}</strong>
+                                    <br />
+                                    Esta ação não pode ser desfeita.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteTest(test.id, test.type)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    Excluir
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
               ))
             )}
