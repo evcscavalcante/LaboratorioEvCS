@@ -635,80 +635,83 @@ export const DensityInSituVerticalDocument: React.FC<{ data: any; calculations: 
         }}
       />
 
-      {/* Resultados Finais */}
-      <View style={styles.resultSection}>
-        <Text style={styles.sectionTitle}>RESULTADOS FINAIS</Text>
-        <View style={styles.verticalTable}>
-          <View style={styles.tableRow}>
-            <View style={[styles.labelCell, { width: '60%' }]}>
-              <Text style={styles.labelText}>γd Topo (g/cm³)</Text>
+      {/* Seção combinada de Resultados Finais e Referências */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
+        {/* Resultados Finais - lado esquerdo */}
+        <View style={[styles.resultSection, { width: '48%' }]}>
+          <Text style={styles.resultTitle}>RESULTADOS FINAIS</Text>
+          <View style={styles.verticalTable}>
+            <View style={styles.tableRow}>
+              <View style={[styles.labelCell, { width: '70%' }]}>
+                <Text style={styles.labelText}>γd Topo (g/cm³)</Text>
+              </View>
+              <View style={[styles.dataCell, { width: '30%' }]}>
+                <Text style={styles.dataText}>{(calculations?.results?.gammaDTop || 0).toFixed(3)}</Text>
+              </View>
             </View>
-            <View style={[styles.dataCell, { width: '40%' }]}>
-              <Text style={styles.dataText}>{(calculations?.results?.gammaDTop || 0).toFixed(3)}</Text>
+            <View style={styles.tableRow}>
+              <View style={[styles.labelCell, { width: '70%' }]}>
+                <Text style={styles.labelText}>γd Base (g/cm³)</Text>
+              </View>
+              <View style={[styles.dataCell, { width: '30%' }]}>
+                <Text style={styles.dataText}>{(calculations?.results?.gammaDBase || 0).toFixed(3)}</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.labelCell, { width: '60%' }]}>
-              <Text style={styles.labelText}>γd Base (g/cm³)</Text>
-            </View>
-            <View style={[styles.dataCell, { width: '40%' }]}>
-              <Text style={styles.dataText}>{(calculations?.results?.gammaDBase || 0).toFixed(3)}</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.labelCell, { width: '60%' }]}>
-              <Text style={[styles.labelText, { fontWeight: 'bold' }]}>γd Médio (g/cm³)</Text>
-            </View>
-            <View style={[styles.dataCell, { width: '40%', backgroundColor: '#f0f0f0' }]}>
-              <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(((calculations?.results?.gammaDTop || 0) + (calculations?.results?.gammaDBase || 0)) / 2).toFixed(3)}</Text>
+            <View style={styles.tableRow}>
+              <View style={[styles.labelCell, { width: '70%' }]}>
+                <Text style={[styles.labelText, { fontWeight: 'bold' }]}>γd Médio (g/cm³)</Text>
+              </View>
+              <View style={[styles.dataCell, { width: '30%', backgroundColor: '#f0f0f0' }]}>
+                <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(((calculations?.results?.gammaDTop || 0) + (calculations?.results?.gammaDBase || 0)) / 2).toFixed(3)}</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
 
-      {/* Referências */}
-      <View style={[styles.resultSection, { marginTop: 4, padding: 3 }]}>
-        <Text style={styles.sectionTitle}>REFERÊNCIAS</Text>
-        <View style={styles.verticalTable}>
-          <View style={styles.tableRow}>
-            <View style={[styles.labelCell, { width: '60%' }]}>
-              <Text style={styles.labelText}>Registro de Densidade Real:</Text>
+        {/* Referências - lado direito */}
+        <View style={[styles.resultSection, { width: '48%' }]}>
+          <Text style={styles.resultTitle}>REFERÊNCIAS</Text>
+          <View style={styles.verticalTable}>
+            <View style={styles.tableRow}>
+              <View style={[styles.labelCell, { width: '80%' }]}>
+                <Text style={[styles.labelText, { fontSize: 8 }]}>Densidade Real:</Text>
+              </View>
+              <View style={[styles.dataCell, { width: '20%' }]}>
+                <Text style={[styles.dataText, { fontSize: 8 }]}>{data.realDensityRef || 'N/S'}</Text>
+              </View>
             </View>
-            <View style={[styles.dataCell, { width: '40%' }]}>
-              <Text style={styles.dataText}>{data.realDensityRef || 'Não selecionado'}</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow}>
-            <View style={[styles.labelCell, { width: '60%' }]}>
-              <Text style={styles.labelText}>Registro de Densidade Máx/Mín:</Text>
-            </View>
-            <View style={[styles.dataCell, { width: '40%' }]}>
-              <Text style={styles.dataText}>{data.maxMinDensityRef || 'Não selecionado'}</Text>
+            <View style={styles.tableRow}>
+              <View style={[styles.labelCell, { width: '80%' }]}>
+                <Text style={[styles.labelText, { fontSize: 8 }]}>Densidade Máx/Mín:</Text>
+              </View>
+              <View style={[styles.dataCell, { width: '20%' }]}>
+                <Text style={[styles.dataText, { fontSize: 8 }]}>{data.maxMinDensityRef || 'N/S'}</Text>
+              </View>
             </View>
           </View>
         </View>
       </View>
 
       {/* Resultados Topo e Base lado a lado */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 3 }}>
         {/* Resultados Topo */}
         <View style={[styles.resultSection, { width: '48%' }]}>
-          <Text style={styles.sectionTitle}>RESULTADOS TOPO</Text>
+          <Text style={styles.resultTitle}>RESULTADOS TOPO</Text>
           <View style={styles.verticalTable}>
             <View style={styles.tableRow}>
-              <View style={[styles.labelCell, { width: '70%' }]}>
-                <Text style={styles.labelText}>Índice de Vazios Topo (e)</Text>
+              <View style={[styles.labelCell, { width: '75%' }]}>
+                <Text style={[styles.labelText, { fontSize: 8 }]}>Índice de Vazios Topo (e)</Text>
               </View>
-              <View style={[styles.dataCell, { width: '30%' }]}>
-                <Text style={styles.dataText}>{(calculations?.results?.voidIndexTop || 0).toFixed(3)}</Text>
+              <View style={[styles.dataCell, { width: '25%' }]}>
+                <Text style={[styles.dataText, { fontSize: 8 }]}>{(calculations?.results?.voidIndexTop || 0).toFixed(3)}</Text>
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={[styles.labelCell, { width: '70%' }]}>
-                <Text style={styles.labelText}>Compacidade Relativa Topo (%)</Text>
+              <View style={[styles.labelCell, { width: '75%' }]}>
+                <Text style={[styles.labelText, { fontSize: 8 }]}>Compacidade Relativa Topo (%)</Text>
               </View>
-              <View style={[styles.dataCell, { width: '30%' }]}>
-                <Text style={styles.dataText}>{(calculations?.results?.relativeCompactnessTop || 0).toFixed(1)}</Text>
+              <View style={[styles.dataCell, { width: '25%' }]}>
+                <Text style={[styles.dataText, { fontSize: 8 }]}>{(calculations?.results?.relativeCompactnessTop || 0).toFixed(1)}</Text>
               </View>
             </View>
           </View>
@@ -716,22 +719,22 @@ export const DensityInSituVerticalDocument: React.FC<{ data: any; calculations: 
 
         {/* Resultados Base */}
         <View style={[styles.resultSection, { width: '48%' }]}>
-          <Text style={styles.sectionTitle}>RESULTADOS BASE</Text>
+          <Text style={styles.resultTitle}>RESULTADOS BASE</Text>
           <View style={styles.verticalTable}>
             <View style={styles.tableRow}>
-              <View style={[styles.labelCell, { width: '70%' }]}>
-                <Text style={styles.labelText}>Índice de Vazios Base (e)</Text>
+              <View style={[styles.labelCell, { width: '75%' }]}>
+                <Text style={[styles.labelText, { fontSize: 8 }]}>Índice de Vazios Base (e)</Text>
               </View>
-              <View style={[styles.dataCell, { width: '30%' }]}>
-                <Text style={styles.dataText}>{(calculations?.results?.voidIndexBase || 0).toFixed(3)}</Text>
+              <View style={[styles.dataCell, { width: '25%' }]}>
+                <Text style={[styles.dataText, { fontSize: 8 }]}>{(calculations?.results?.voidIndexBase || 0).toFixed(3)}</Text>
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={[styles.labelCell, { width: '70%' }]}>
-                <Text style={styles.labelText}>Compacidade Relativa Base (%)</Text>
+              <View style={[styles.labelCell, { width: '75%' }]}>
+                <Text style={[styles.labelText, { fontSize: 8 }]}>Compacidade Relativa Base (%)</Text>
               </View>
-              <View style={[styles.dataCell, { width: '30%' }]}>
-                <Text style={styles.dataText}>{(calculations?.results?.relativeCompactnessBase || 0).toFixed(1)}</Text>
+              <View style={[styles.dataCell, { width: '25%' }]}>
+                <Text style={[styles.dataText, { fontSize: 8 }]}>{(calculations?.results?.relativeCompactnessBase || 0).toFixed(1)}</Text>
               </View>
             </View>
           </View>
