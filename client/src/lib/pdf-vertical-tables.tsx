@@ -243,7 +243,7 @@ const TwoColumnHeader: React.FC<{ data: any }> = ({ data }) => (
   </View>
 );
 
-// Componente para dados de densidade in situ com sequência completa
+// Componente para dados de densidade in situ completo
 const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, calculations }) => (
   <View style={styles.multiColumnTable}>
     <Text style={styles.sectionTitle}>DETERMINAÇÕES - DENSIDADE IN SITU</Text>
@@ -271,7 +271,7 @@ const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, 
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={styles.labelText}>Molde + Solo (g)</Text>
+        <Text style={styles.labelText}>Cilindro + Solo úmido (g)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
         <Text style={styles.dataText}>{(data.det1?.moldeSolo || 0).toFixed(2)}</Text>
@@ -282,7 +282,7 @@ const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, 
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={styles.labelText}>Molde (g)</Text>
+        <Text style={styles.labelText}>Massa do Cilindro (g)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
         <Text style={styles.dataText}>{(data.det1?.molde || 0).toFixed(2)}</Text>
@@ -293,18 +293,18 @@ const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, 
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={styles.labelText}>Solo (g)</Text>
+        <Text style={styles.labelText}>Solo úmido (g)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{(calculations?.det1?.soil || 0).toFixed(2)}</Text>
+        <Text style={styles.dataText}>{((data.det1?.moldeSolo || 0) - (data.det1?.molde || 0)).toFixed(2)}</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{(calculations?.det2?.soil || 0).toFixed(2)}</Text>
+        <Text style={styles.dataText}>{((data.det2?.moldeSolo || 0) - (data.det2?.molde || 0)).toFixed(2)}</Text>
       </View>
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={styles.labelText}>Volume (cm³)</Text>
+        <Text style={styles.labelText}>Volume do Cilindro (cm³)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
         <Text style={styles.dataText}>{(data.det1?.volume || 0).toFixed(2)}</Text>
@@ -315,24 +315,43 @@ const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, 
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={[styles.labelText, { fontWeight: 'bold' }]}>γnat úmido (g/cm³)</Text>
+        <Text style={styles.labelText}>Teor de Umidade (%)</Text>
       </View>
-      <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
-        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det1?.gammaNatWet || 0).toFixed(3)}</Text>
+      <View style={[styles.dataCell, { width: '25%' }]}>
+        <Text style={styles.dataText}>{(data.det1?.umidade || calculations?.averageMoisture || 0).toFixed(2)}</Text>
       </View>
-      <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
-        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det2?.gammaNatWet || 0).toFixed(3)}</Text>
+      <View style={[styles.dataCell, { width: '25%' }]}>
+        <Text style={styles.dataText}>{(data.det2?.umidade || calculations?.averageMoisture || 0).toFixed(2)}</Text>
       </View>
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={[styles.labelText, { fontWeight: 'bold' }]}>γnat seco (g/cm³)</Text>
+        <Text style={[styles.labelText, { fontWeight: 'bold' }]}>Densidade úmida (g/cm³)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
-        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det1?.gammaNatDry || 0).toFixed(3)}</Text>
+        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>
+          {(((data.det1?.moldeSolo || 0) - (data.det1?.molde || 0)) / (data.det1?.volume || 1)).toFixed(3)}
+        </Text>
       </View>
       <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
-        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det2?.gammaNatDry || 0).toFixed(3)}</Text>
+        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>
+          {(((data.det2?.moldeSolo || 0) - (data.det2?.molde || 0)) / (data.det2?.volume || 1)).toFixed(3)}
+        </Text>
+      </View>
+    </View>
+    <View style={styles.tableRow}>
+      <View style={[styles.labelCell, { width: '50%' }]}>
+        <Text style={[styles.labelText, { fontWeight: 'bold' }]}>Densidade seca (g/cm³)</Text>
+      </View>
+      <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
+        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>
+          {((((data.det1?.moldeSolo || 0) - (data.det1?.molde || 0)) / (data.det1?.volume || 1)) / (1 + (data.det1?.umidade || calculations?.averageMoisture || 0) / 100)).toFixed(3)}
+        </Text>
+      </View>
+      <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
+        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>
+          {((((data.det2?.moldeSolo || 0) - (data.det2?.molde || 0)) / (data.det2?.volume || 1)) / (1 + (data.det2?.umidade || calculations?.averageMoisture || 0) / 100)).toFixed(3)}
+        </Text>
       </View>
     </View>
   </View>
