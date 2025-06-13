@@ -2,14 +2,14 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
 import { generateDensityInSituPDFFinal } from './pdf-density-final';
 
-// Estilos profissionais para relatórios técnicos
+// Estilos profissionais para relatórios técnicos - Orientação Vertical
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
-    padding: 15,
+    padding: 20,
     fontFamily: 'Helvetica',
-    fontSize: 8,
+    fontSize: 9,
   },
   header: {
     marginBottom: 20,
@@ -45,14 +45,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   table: {
-    width: 'auto',
+    width: '100%',
     borderStyle: 'solid',
     borderWidth: 1,
-    borderColor: '#CCCCCC',
-    marginBottom: 10,
+    borderColor: '#000000',
+    marginBottom: 15,
+  },
+  tableVertical: {
+    width: '100%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#000000',
+    marginBottom: 15,
   },
   tableRow: {
     flexDirection: 'row',
+    minHeight: 20,
+  },
+  tableRowVertical: {
+    flexDirection: 'column',
+    width: '100%',
   },
   tableColHeader: {
     borderStyle: 'solid',
@@ -144,6 +156,50 @@ const styles = StyleSheet.create({
   },
   infoTable: {
     marginBottom: 15,
+  },
+  resultText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#1976D2',
+    marginBottom: 5,
+  },
+  resultValue: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#000000',
+    backgroundColor: '#F5F5F5',
+    padding: 5,
+    textAlign: 'center',
+  },
+  footerText: {
+    fontSize: 8,
+    color: '#666666',
+    textAlign: 'center',
+  },
+  fullWidthTable: {
+    width: '100%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#000000',
+    marginBottom: 10,
+  },
+  dataCell: {
+    borderStyle: 'solid',
+    borderWidth: 0.5,
+    borderColor: '#000000',
+    padding: 6,
+    fontSize: 8,
+    textAlign: 'center',
+  },
+  labelCell: {
+    borderStyle: 'solid',
+    borderWidth: 0.5,
+    borderColor: '#000000',
+    padding: 6,
+    fontSize: 8,
+    textAlign: 'left',
+    backgroundColor: '#F0F0F0',
+    fontWeight: 'bold',
   },
 });
 

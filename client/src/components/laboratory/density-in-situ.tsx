@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import StatusIndicator from "./status-indicator";
 import { calculateMoistureContent, calculateDensityInSitu } from "@/lib/calculations";
-import { generateDensityInSituPDF } from "@/lib/pdf-generator";
+import { generateDensityInSituVerticalPDF } from "@/lib/pdf-vertical-tables";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -465,7 +465,7 @@ export default function DensityInSitu() {
   };
 
   const handleGeneratePDF = () => {
-    generateDensityInSituPDF(data, calculations);
+    generateDensityInSituVerticalPDF(data, calculations);
   };
 
   const handleClear = () => {
