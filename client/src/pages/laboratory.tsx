@@ -64,12 +64,38 @@ export default function Laboratory() {
 
   const handleSelectTest = (testId: number, testType: string) => {
     console.log('Visualizar ensaio:', testId, testType);
-    // Implementar navegação para visualizar ensaio
+    
+    // Mapear tipo do ensaio para aba correspondente
+    let tabName = '';
+    if (testType === 'density-in-situ') tabName = 'density-in-situ';
+    if (testType === 'real-density') tabName = 'density-real'; 
+    if (testType === 'max-min-density') tabName = 'density-max-min';
+    
+    if (tabName) {
+      setActiveTab(tabName);
+      window.location.hash = `#${tabName}`;
+      // Atualizar URL com parâmetros de visualização
+      const newUrl = `/laboratory?test=${testType}&id=${testId}&mode=view`;
+      window.history.pushState({}, '', newUrl);
+    }
   };
 
   const handleEditTest = (testId: number, testType: string) => {
     console.log('Editar ensaio:', testId, testType);
-    // Implementar navegação para editar ensaio
+    
+    // Mapear tipo do ensaio para aba correspondente
+    let tabName = '';
+    if (testType === 'density-in-situ') tabName = 'density-in-situ';
+    if (testType === 'real-density') tabName = 'density-real';
+    if (testType === 'max-min-density') tabName = 'density-max-min';
+    
+    if (tabName) {
+      setActiveTab(tabName);
+      window.location.hash = `#${tabName}`;
+      // Atualizar URL com parâmetros de edição
+      const newUrl = `/laboratory?test=${testType}&id=${testId}&mode=edit`;
+      window.history.pushState({}, '', newUrl);
+    }
   };
 
   return (
