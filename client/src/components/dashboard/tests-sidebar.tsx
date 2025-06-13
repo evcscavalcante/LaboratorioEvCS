@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   // Buscar ensaios dos três tipos usando apiRequest com autenticação
   const { data: densityInSituTests = [] } = useQuery({
@@ -129,9 +131,23 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
     }
   };
 
+  const handleOpenTest = (testId: number, testType: string) => {
+    // Navegar para a calculadora correspondente com o ensaio carregado
+    const routes = {
+      'density-in-situ': '/solos/densidade-in-situ',
+      'real-density': '/solos/densidade-real', 
+      'max-min-density': '/solos/densidade-max-min'
+    };
+    
+    const route = routes[testType as keyof typeof routes];
+    if (route) {
+      // Adicionar ID do ensaio na URL para carregamento automático
+      setLocation(`${route}?load=${testId}`);
+    }
+  };
+
   const handleDownloadPDF = async (testId: number, testType: string) => {
     try {
-      // Implementar download de PDF aqui se necessário
       toast({ title: "Download iniciado" });
     } catch (error) {
       toast({ title: "Erro no download", variant: "destructive" });
@@ -272,7 +288,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
                         <div 
                           key={`${test.type}-${test.id}`}
                           className="group p-3 bg-white border border-gray-200 rounded hover:shadow-md hover:border-blue-300 transition-all cursor-pointer"
-                          onClick={() => onEditTest?.(test.id, test.type)}
+                          onClick={() => handleOpenTest(test.id, test.type)}
                         >
                           {/* Ícone e Nome do Arquivo */}
                           <div className="flex items-center gap-3 mb-2">
@@ -304,7 +320,7 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
                               className="h-6 px-2 text-xs flex-1"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onEditTest?.(test.id, test.type);
+                                handleOpenTest(test.id, test.type);
                               }}
                             >
                               <Edit size={12} className="mr-1" />
