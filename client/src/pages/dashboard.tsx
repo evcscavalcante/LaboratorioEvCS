@@ -79,7 +79,7 @@ export default function Dashboard() {
     try {
       // Carregar dados do PostgreSQL
       const [densityInSituResponse, realDensityResponse, maxMinDensityResponse, balanceData] = await Promise.all([
-        apiRequest('GET', '/api/tests/density-in-situ').then(res => res.json()).catch(() => []),
+        apiRequest('GET', '/api/tests/density-in-situ/temp').then(res => res.json()).catch(() => []),
         apiRequest('GET', '/api/tests/real-density').then(res => res.json()).catch(() => []),
         apiRequest('GET', '/api/tests/max-min-density').then(res => res.json()).catch(() => []),
         localDataManager.getBalanceVerifications()

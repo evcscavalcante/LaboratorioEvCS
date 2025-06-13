@@ -134,6 +134,18 @@ async function startServer() {
     }
   });
 
+  // Rota temporária para buscar ensaios sem autenticação
+  app.get('/api/tests/density-in-situ/temp', async (req: Request, res: Response) => {
+    try {
+      const tests = await storage.getDensityInSituTests();
+      console.log('📋 Ensaios encontrados:', tests.length);
+      res.json(tests);
+    } catch (error) {
+      console.error('Erro ao buscar ensaios de densidade in situ:', error);
+      res.status(500).json({ message: 'Falha ao buscar ensaios' });
+    }
+  });
+
   // Rota temporária sem autenticação para testes
   app.post('/api/tests/density-in-situ/temp', async (req: Request, res: Response) => {
     try {
