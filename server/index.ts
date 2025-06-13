@@ -381,22 +381,12 @@ async function startServer() {
     }
   });
 
-  // Health check endpoint
-  app.get('/health', (req, res) => {
-    res.status(200).json({ 
-      status: 'OK', 
-      timestamp: new Date().toISOString(),
-      port: port,
-      host: host
-    });
-  });
-
   // Serve static files
   app.use(express.static('client'));
   
   // Serve the main HTML file for all non-API routes
   app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
+    if (!req.path.startsWith('/api')) {
       res.sendFile(path.resolve('client/index.html'));
     }
   });
