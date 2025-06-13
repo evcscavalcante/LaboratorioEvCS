@@ -15,19 +15,31 @@ export default function Laboratory() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [location] = useLocation();
   
-  // Parse URL parameters
-  const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  const testType = urlParams.get('test');
-  const testId = urlParams.get('id');
-  const mode = urlParams.get('mode'); // 'view' or 'edit'
+  // Parse URL parameters from hash
+  const [testId, setTestId] = useState<number | undefined>();
+  const [mode, setMode] = useState<'view' | 'edit' | 'new'>('new');
+  
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes('?')) {
+      const params = new URLSearchParams(hash.split('?')[1]);
+      const id = params.get('id');
+      const urlMode = params.get('mode');
+      
+      if (id) setTestId(parseInt(id));
+      if (urlMode === 'view' || urlMode === 'edit') setMode(urlMode);
+    } else {
+      setTestId(undefined);
+      setMode('new');
+    }
+  }, [location]);
   
   // Set initial tab based on URL hash or parameters
   const [activeTab, setActiveTab] = useState(() => {
-    const hash = window.location.hash.substring(1);
-    if (hash) return hash;
-    if (testType === 'density-in-situ') return 'density-in-situ';
-    if (testType === 'real-density') return 'density-real';
-    if (testType === 'max-min-density') return 'density-max-min';
+    const hash = window.location.hash.substring(1).split('?')[0];
+    if (hash && ['density-in-situ', 'density-real', 'density-max-min'].includes(hash)) {
+      return hash;
+    }
     return 'density-in-situ';
   });
 
@@ -63,7 +75,6 @@ export default function Laboratory() {
   }, []);
 
   const handleSelectTest = (testId: number, testType: string) => {
-    // Navegar para visualizar ensaio específico
     const tabMap: { [key: string]: string } = {
       'density-in-situ': 'density-in-situ',
       'real-density': 'density-real',
@@ -73,14 +84,14 @@ export default function Laboratory() {
     const tab = tabMap[testType];
     if (tab) {
       setActiveTab(tab);
+      setTestId(testId);
+      setMode('view');
       setSidebarOpen(false);
-      // Aqui você pode implementar carregamento específico do ensaio para visualização
       window.location.hash = `${tab}?id=${testId}&mode=view`;
     }
   };
 
   const handleEditTest = (testId: number, testType: string) => {
-    // Navegar para editar ensaio específico
     const tabMap: { [key: string]: string } = {
       'density-in-situ': 'density-in-situ',
       'real-density': 'density-real',
@@ -90,8 +101,9 @@ export default function Laboratory() {
     const tab = tabMap[testType];
     if (tab) {
       setActiveTab(tab);
+      setTestId(testId);
+      setMode('edit');
       setSidebarOpen(false);
-      // Aqui você pode implementar carregamento específico do ensaio para edição
       window.location.hash = `${tab}?id=${testId}&mode=edit`;
     }
   };
@@ -144,6 +156,18 @@ export default function Laboratory() {
                   {sidebarOpen ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
                   {sidebarOpen ? 'Fechar' : 'Ensaios Salvos'}
                 </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setTestId(undefined);
+                    setMode('new');
+                    window.location.hash = activeTab;
+                  }}
+                  className="mr-2"
+                >
+                  <FileText className="mr-2" size={16} />
+                  Novo Ensaio
+                </Button>
                 <Button className="bg-blue-600 hover:bg-blue-700">
                   <Save className="mr-2" size={16} />
                   Salvar Dados
@@ -179,22 +203,22 @@ export default function Laboratory() {
 
             <TabsContent value="density-in-situ">
               <DensityInSitu 
-                testId={testId ? parseInt(testId) : undefined}
-                mode={mode as 'view' | 'edit' | 'new'}
+                testId={testId}
+                mode={mode}
               />
             </TabsContent>
 
             <TabsContent value="density-real">
               <DensityReal 
-                testId={testId ? parseInt(testId) : undefined}
-                mode={mode as 'view' | 'edit' | 'new'}
+                testId={testId}
+                mode={mode}
               />
             </TabsContent>
 
             <TabsContent value="density-max-min">
               <DensityMaxMin 
-                testId={testId ? parseInt(testId) : undefined}
-                mode={mode as 'view' | 'edit' | 'new'}
+                testId={testId}
+                mode={mode}
               />
             </TabsContent>
           </Tabs>
