@@ -77,6 +77,7 @@ function Router() {
         <Route path="/help/manual-admin" component={ManualAdmin} />
         <Route path="/test-access" component={TestAccess} />
         <Route path="/system-status" component={SystemStatus} />
+        <Route path="/tests" component={TestsList} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
