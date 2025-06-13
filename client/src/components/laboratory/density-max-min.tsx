@@ -299,7 +299,7 @@ export default function DensityMaxMin() {
 
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
-      return apiRequest("POST", "/api/tests/max-min-density", testData);
+      return apiRequest("POST", "/api/tests/max-min-density/temp", testData);
     },
     onSuccess: () => {
       toast({ title: "Ensaio salvo com sucesso!" });

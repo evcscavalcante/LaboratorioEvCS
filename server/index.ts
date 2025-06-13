@@ -235,6 +235,42 @@ async function startServer() {
     }
   });
 
+  // Rota temporária para buscar ensaios de densidade real sem autenticação
+  app.get('/api/tests/real-density/temp', async (req: Request, res: Response) => {
+    try {
+      const tests = await storage.getRealDensityTests();
+      console.log('📋 Ensaios densidade real encontrados:', tests.length);
+      res.json(tests);
+    } catch (error) {
+      console.error('Erro ao buscar ensaios densidade real:', error);
+      res.status(500).json({ message: 'Falha ao buscar ensaios' });
+    }
+  });
+
+  // Rota temporária para salvar ensaios de densidade real sem autenticação
+  app.post('/api/tests/real-density/temp', async (req: Request, res: Response) => {
+    try {
+      console.log('📥 Recebendo dados do ensaio densidade real (temp):', JSON.stringify(req.body, null, 2));
+      
+      const testData = {
+        ...req.body,
+        userId: 1,
+        createdBy: 'evcsousa@yahoo.com.br'
+      };
+      
+      console.log('📝 Dados preparados para salvamento:', JSON.stringify(testData, null, 2));
+      
+      const test = await storage.createRealDensityTest(testData);
+      console.log('✅ Ensaio densidade real salvo com sucesso:', test);
+      
+      res.status(201).json(test);
+    } catch (error) {
+      console.error('❌ Erro detalhado ao criar ensaio densidade real:', error);
+      console.error('📊 Stack trace:', (error as Error).stack);
+      res.status(500).json({ message: 'Failed to create test', error: (error as Error).message });
+    }
+  });
+
   app.post('/api/tests/real-density', verifyFirebaseToken, async (req: Request, res: Response) => {
     try {
       const test = await storage.createRealDensityTest(req.body);
@@ -253,6 +289,42 @@ async function startServer() {
     } catch (error) {
       console.error('Error fetching max/min density tests:', error);
       res.status(500).json({ message: 'Failed to fetch tests' });
+    }
+  });
+
+  // Rota temporária para buscar ensaios máx/mín sem autenticação
+  app.get('/api/tests/max-min-density/temp', async (req: Request, res: Response) => {
+    try {
+      const tests = await storage.getMaxMinDensityTests();
+      console.log('📋 Ensaios máx/mín encontrados:', tests.length);
+      res.json(tests);
+    } catch (error) {
+      console.error('Erro ao buscar ensaios máx/mín:', error);
+      res.status(500).json({ message: 'Falha ao buscar ensaios' });
+    }
+  });
+
+  // Rota temporária para salvar ensaios máx/mín sem autenticação
+  app.post('/api/tests/max-min-density/temp', async (req: Request, res: Response) => {
+    try {
+      console.log('📥 Recebendo dados do ensaio máx/mín (temp):', JSON.stringify(req.body, null, 2));
+      
+      const testData = {
+        ...req.body,
+        userId: 1,
+        createdBy: 'evcsousa@yahoo.com.br'
+      };
+      
+      console.log('📝 Dados preparados para salvamento:', JSON.stringify(testData, null, 2));
+      
+      const test = await storage.createMaxMinDensityTest(testData);
+      console.log('✅ Ensaio máx/mín salvo com sucesso:', test);
+      
+      res.status(201).json(test);
+    } catch (error) {
+      console.error('❌ Erro detalhado ao criar ensaio máx/mín:', error);
+      console.error('📊 Stack trace:', (error as Error).stack);
+      res.status(500).json({ message: 'Failed to create test', error: (error as Error).message });
     }
   });
 
