@@ -782,55 +782,28 @@ export default function DensityInSitu() {
                 <TableRow>
                   <TableCell className="font-medium">Cápsula nº</TableCell>
                   <TableCell>
-                    <Select 
-                      value={data.moistureBase1.capsule} 
-                      onValueChange={(value) => updateData("moistureBase1", { ...data.moistureBase1, capsule: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {equipamentos.capsulas.map((cap: any) => (
-                          <SelectItem key={cap.id} value={cap.id}>
-                            {cap.id} ({cap.peso}g)
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      type="text"
+                      value={data.moistureBase1.capsule}
+                      onChange={(e) => updateData("moistureBase1", { ...data.moistureBase1, capsule: e.target.value })}
+                      placeholder="Ex: CAP-B01"
+                    />
                   </TableCell>
                   <TableCell>
-                    <Select 
-                      value={data.moistureBase2.capsule} 
-                      onValueChange={(value) => updateData("moistureBase2", { ...data.moistureBase2, capsule: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {equipamentos.capsulas.map((cap: any) => (
-                          <SelectItem key={cap.id} value={cap.id}>
-                            {cap.id} ({cap.peso}g)
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      type="text"
+                      value={data.moistureBase2.capsule}
+                      onChange={(e) => updateData("moistureBase2", { ...data.moistureBase2, capsule: e.target.value })}
+                      placeholder="Ex: CAP-B02"
+                    />
                   </TableCell>
                   <TableCell>
-                    <Select 
-                      value={data.moistureBase3.capsule} 
-                      onValueChange={(value) => updateData("moistureBase3", { ...data.moistureBase3, capsule: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {equipamentos.capsulas.map((cap: any) => (
-                          <SelectItem key={cap.id} value={cap.id}>
-                            {cap.id} ({cap.peso}g)
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      type="text"
+                      value={data.moistureBase3.capsule}
+                      onChange={(e) => updateData("moistureBase3", { ...data.moistureBase3, capsule: e.target.value })}
+                      placeholder="Ex: CAP-B03"
+                    />
                   </TableCell>
                 </TableRow>
                 <TableRow>
