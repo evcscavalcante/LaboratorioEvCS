@@ -11,10 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { 
   Search, 
   FileText, 
-  Calendar, 
-  Eye,
   Edit,
-  Download,
   Trash2,
   Plus
 } from 'lucide-react';
@@ -202,27 +199,30 @@ export default function TestsSidebar({ onSelectTest, onEditTest }: TestsSidebarP
         </CardTitle>
         
         {/* Botões para Novos Ensaios */}
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-2 mb-4">
           <Button
             onClick={() => handleNewTest('density-in-situ')}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            className="flex items-center justify-start gap-2 bg-blue-600 hover:bg-blue-700 text-white h-12"
           >
             <Plus size={16} />
-            ⚖️ Densidade In Situ - Cilindro de Cravação
+            <span className="text-lg">⚖️</span>
+            Densidade In Situ - Cilindro de Cravação
           </Button>
           <Button
             onClick={() => handleNewTest('real-density')}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            className="flex items-center justify-start gap-2 bg-green-600 hover:bg-green-700 text-white h-12"
           >
             <Plus size={16} />
-            ⚛️ Densidade Real dos Grãos
+            <span className="text-lg">⚛️</span>
+            Densidade Real dos Grãos
           </Button>
           <Button
             onClick={() => handleNewTest('max-min-density')}
-            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
+            className="flex items-center justify-start gap-2 bg-purple-600 hover:bg-purple-700 text-white h-12"
           >
             <Plus size={16} />
-            ↕️ Densidade Máx/Mín
+            <span className="text-lg">↕️</span>
+            Densidade Máx/Mín
           </Button>
         </div>
         
