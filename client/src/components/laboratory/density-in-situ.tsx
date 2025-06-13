@@ -364,7 +364,7 @@ export default function DensityInSitu() {
                   <SelectValue placeholder="Selecionar registro..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum registro selecionado</SelectItem>
+                  <SelectItem value="none">Nenhum registro selecionado</SelectItem>
                   {realDensityTests.map((test: any) => (
                     <SelectItem key={test.id} value={test.registrationNumber}>
                       {test.registrationNumber} - {test.material}
@@ -380,7 +380,7 @@ export default function DensityInSitu() {
                   <SelectValue placeholder="Selecionar registro..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum registro selecionado</SelectItem>
+                  <SelectItem value="none">Nenhum registro selecionado</SelectItem>
                   {maxMinDensityTests.map((test: any) => (
                     <SelectItem key={test.id} value={test.registrationNumber}>
                       {test.registrationNumber} - {test.material}
