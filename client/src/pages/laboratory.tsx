@@ -8,7 +8,7 @@ import { getQueryFn } from "@/lib/queryClient";
 import DensityInSitu from "@/components/laboratory/density-in-situ";
 import DensityReal from "@/components/laboratory/density-real";
 import DensityMaxMin from "@/components/laboratory/density-max-min";
-import TestsSidebar from "@/components/dashboard/tests-sidebar";
+import SimpleTestsSidebar from "@/components/dashboard/simple-tests-sidebar";
 
 export default function Laboratory() {
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -111,14 +111,51 @@ export default function Laboratory() {
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
       {/* Sidebar */}
-      <div className={`transition-all duration-300 ${sidebarOpen ? 'w-80' : 'w-0'} overflow-hidden border-r bg-white`}>
-        {sidebarOpen && (
-          <TestsSidebar 
-            onSelectTest={handleSelectTest}
-            onEditTest={handleEditTest}
-          />
-        )}
-      </div>
+      {sidebarOpen && (
+        <div className="w-80 bg-white border-r h-full flex flex-col">
+          <div className="p-4 border-b">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <FileText size={20} />
+              Ensaios Salvos (3)
+            </h2>
+            
+            {/* Três botões para novos ensaios */}
+            <div className="space-y-3 mb-4">
+              <button
+                onClick={() => setLocation('/solos/densidade-in-situ')}
+                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-3 px-4 font-medium"
+              >
+                <span className="text-xl">⚖️</span>
+                <span>Densidade In Situ - Cilindro de Cravação</span>
+              </button>
+              
+              <button
+                onClick={() => setLocation('/solos/densidade-real')}
+                className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-3 px-4 font-medium"
+              >
+                <span className="text-xl">⚛️</span>
+                <span>Densidade Real dos Grãos</span>
+              </button>
+              
+              <button
+                onClick={() => setLocation('/solos/densidade-max-min')}
+                className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-3 px-4 font-medium"
+              >
+                <span className="text-xl">↕️</span>
+                <span>Densidade Máx/Mín</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Lista de ensaios seria aqui */}
+          <div className="flex-1 p-4">
+            <div className="text-center text-gray-500 py-8">
+              <FileText size={48} className="mx-auto mb-2 opacity-50" />
+              <p>Lista de ensaios salvos aparecerá aqui</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
       <div className="flex-1 flex flex-col">
