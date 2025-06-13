@@ -238,22 +238,7 @@ const TwoColumnHeader: React.FC<{ data: any }> = ({ data }) => (
             <Text style={styles.dataText}>{[data.balanceId, data.ovenId].filter(Boolean).join(', ') || '-'}</Text>
           </View>
         </View>
-        <View style={styles.tableRow}>
-          <View style={[styles.labelCell, { width: '45%' }]}>
-            <Text style={styles.labelText}>Reg. Dens. Real:</Text>
-          </View>
-          <View style={[styles.dataCell, { width: '55%' }]}>
-            <Text style={styles.dataText}>{data.realDensityRef || 'Não selecionado'}</Text>
-          </View>
-        </View>
-        <View style={styles.tableRow}>
-          <View style={[styles.labelCell, { width: '45%' }]}>
-            <Text style={styles.labelText}>Reg. Dens. Máx/Mín:</Text>
-          </View>
-          <View style={[styles.dataCell, { width: '55%' }]}>
-            <Text style={styles.dataText}>{data.maxMinDensityRef || 'Não selecionado'}</Text>
-          </View>
-        </View>
+
       </View>
     </View>
   </View>
@@ -675,6 +660,29 @@ export const DensityInSituVerticalDocument: React.FC<{ data: any; calculations: 
             </View>
             <View style={[styles.dataCell, { width: '40%', backgroundColor: '#f0f0f0' }]}>
               <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(((calculations?.results?.gammaDTop || 0) + (calculations?.results?.gammaDBase || 0)) / 2).toFixed(3)}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Referências */}
+      <View style={[styles.resultSection, { marginTop: 4, padding: 3 }]}>
+        <Text style={styles.sectionTitle}>REFERÊNCIAS</Text>
+        <View style={styles.verticalTable}>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Registro de Densidade Real:</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{data.realDensityRef || 'Não selecionado'}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Registro de Densidade Máx/Mín:</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{data.maxMinDensityRef || 'Não selecionado'}</Text>
             </View>
           </View>
         </View>
