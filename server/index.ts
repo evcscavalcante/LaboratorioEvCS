@@ -151,9 +151,14 @@ async function startServer() {
     try {
       console.log('📥 Recebendo dados do ensaio (temp):', JSON.stringify(req.body, null, 2));
       
-      // Adicionar userId padrão para desenvolvimento
+      // Adicionar userId padrão e campos obrigatórios
+      const currentDate = new Date().toISOString().split('T')[0];
+      const currentTime = new Date().toTimeString().slice(0, 5);
+      
       const testData = {
         ...req.body,
+        date: req.body.date || currentDate,
+        time: req.body.time || currentTime,
         userId: 9,
         createdBy: 'evcsousa@yahoo.com.br'
       };
