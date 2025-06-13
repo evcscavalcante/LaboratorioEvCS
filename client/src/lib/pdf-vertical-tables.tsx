@@ -243,10 +243,10 @@ const TwoColumnHeader: React.FC<{ data: any }> = ({ data }) => (
   </View>
 );
 
-// Componente para dados de densidade in situ
-const DensityInSituTable: React.FC<{ data: any }> = ({ data }) => (
+// Componente para dados de densidade in situ com sequência completa
+const DensityInSituTable: React.FC<{ data: any; calculations: any }> = ({ data, calculations }) => (
   <View style={styles.multiColumnTable}>
-    <Text style={styles.sectionTitle}>DETERMINAÇÕES DE DENSIDADE IN SITU</Text>
+    <Text style={styles.sectionTitle}>DETERMINAÇÕES - DENSIDADE IN SITU</Text>
     <View style={styles.tableRow}>
       <View style={[styles.headerCell, { width: '50%' }]}>
         <Text style={styles.headerText}>Campo</Text>
@@ -260,35 +260,46 @@ const DensityInSituTable: React.FC<{ data: any }> = ({ data }) => (
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={styles.labelText}>Cilindro</Text>
+        <Text style={styles.labelText}>Número do Cilindro</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{data.det1?.cylinder || '-'}</Text>
+        <Text style={styles.dataText}>{data.det1?.cylinderNumber || '-'}</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{data.det2?.cylinder || '-'}</Text>
+        <Text style={styles.dataText}>{data.det2?.cylinderNumber || '-'}</Text>
       </View>
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={styles.labelText}>Solo + Cilindro (g)</Text>
+        <Text style={styles.labelText}>Molde + Solo (g)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{data.det1?.soilCylinder || '-'}</Text>
+        <Text style={styles.dataText}>{(data.det1?.moldeSolo || 0).toFixed(2)}</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{data.det2?.soilCylinder || '-'}</Text>
+        <Text style={styles.dataText}>{(data.det2?.moldeSolo || 0).toFixed(2)}</Text>
       </View>
     </View>
     <View style={styles.tableRow}>
       <View style={[styles.labelCell, { width: '50%' }]}>
-        <Text style={styles.labelText}>Cilindro (g)</Text>
+        <Text style={styles.labelText}>Molde (g)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{data.det1?.cylinderWeight || '-'}</Text>
+        <Text style={styles.dataText}>{(data.det1?.molde || 0).toFixed(2)}</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{data.det2?.cylinderWeight || '-'}</Text>
+        <Text style={styles.dataText}>{(data.det2?.molde || 0).toFixed(2)}</Text>
+      </View>
+    </View>
+    <View style={styles.tableRow}>
+      <View style={[styles.labelCell, { width: '50%' }]}>
+        <Text style={styles.labelText}>Solo (g)</Text>
+      </View>
+      <View style={[styles.dataCell, { width: '25%' }]}>
+        <Text style={styles.dataText}>{(calculations?.det1?.soil || 0).toFixed(2)}</Text>
+      </View>
+      <View style={[styles.dataCell, { width: '25%' }]}>
+        <Text style={styles.dataText}>{(calculations?.det2?.soil || 0).toFixed(2)}</Text>
       </View>
     </View>
     <View style={styles.tableRow}>
@@ -296,10 +307,32 @@ const DensityInSituTable: React.FC<{ data: any }> = ({ data }) => (
         <Text style={styles.labelText}>Volume (cm³)</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{data.det1?.volume || '-'}</Text>
+        <Text style={styles.dataText}>{(data.det1?.volume || 0).toFixed(2)}</Text>
       </View>
       <View style={[styles.dataCell, { width: '25%' }]}>
-        <Text style={styles.dataText}>{data.det2?.volume || '-'}</Text>
+        <Text style={styles.dataText}>{(data.det2?.volume || 0).toFixed(2)}</Text>
+      </View>
+    </View>
+    <View style={styles.tableRow}>
+      <View style={[styles.labelCell, { width: '50%' }]}>
+        <Text style={[styles.labelText, { fontWeight: 'bold' }]}>γnat úmido (g/cm³)</Text>
+      </View>
+      <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
+        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det1?.gammaNatWet || 0).toFixed(3)}</Text>
+      </View>
+      <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
+        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det2?.gammaNatWet || 0).toFixed(3)}</Text>
+      </View>
+    </View>
+    <View style={styles.tableRow}>
+      <View style={[styles.labelCell, { width: '50%' }]}>
+        <Text style={[styles.labelText, { fontWeight: 'bold' }]}>γnat seco (g/cm³)</Text>
+      </View>
+      <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
+        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det1?.gammaNatDry || 0).toFixed(3)}</Text>
+      </View>
+      <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
+        <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det2?.gammaNatDry || 0).toFixed(3)}</Text>
       </View>
     </View>
   </View>
@@ -562,7 +595,7 @@ export const DensityInSituVerticalDocument: React.FC<{ data: any; calculations: 
       <TwoColumnHeader data={data} />
 
       {/* Dados de Densidade */}
-      <DensityInSituTable data={data.determinations || data} />
+      <DensityInSituTable data={data.determinations || data} calculations={calculations} />
 
       {/* Tabelas de umidade lado a lado */}
       <SideBySideMoistureTables 
@@ -685,11 +718,214 @@ export const MaxMinDensityVerticalDocument: React.FC<{ data: any; calculations: 
       {/* Cabeçalho em duas colunas */}
       <TwoColumnHeader data={data} />
 
-      {/* Densidade Máxima */}
-      <MaxMinDensityTable data={data.maxDensity || data} type="max" />
+      {/* Tabelas de densidade máxima e mínima lado a lado */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+        {/* Densidade Máxima */}
+        <View style={[styles.multiColumnTable, { width: '48%' }]}>
+          <Text style={[styles.sectionTitle, { fontSize: 9 }]}>DENSIDADE MÁXIMA</Text>
+          <View style={styles.tableRow}>
+            <View style={[styles.headerCell, { width: '40%' }]}>
+              <Text style={[styles.headerText, { fontSize: 7 }]}>Campo</Text>
+            </View>
+            <View style={[styles.headerCell, { width: '20%' }]}>
+              <Text style={[styles.headerText, { fontSize: 7 }]}>Det 1</Text>
+            </View>
+            <View style={[styles.headerCell, { width: '20%' }]}>
+              <Text style={[styles.headerText, { fontSize: 7 }]}>Det 2</Text>
+            </View>
+            <View style={[styles.headerCell, { width: '20%' }]}>
+              <Text style={[styles.headerText, { fontSize: 7 }]}>Det 3</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Nº Cilindro</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{data.maxDensity1?.cylinderNumber || '-'}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{data.maxDensity2?.cylinderNumber || '-'}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{data.maxDensity3?.cylinderNumber || '-'}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Molde + Solo (g)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity1?.moldeSolo || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity2?.moldeSolo || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity3?.moldeSolo || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Molde (g)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity1?.molde || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity2?.molde || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity3?.molde || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Solo (g)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(calculations?.maxDensity?.det1?.soil || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(calculations?.maxDensity?.det2?.soil || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(calculations?.maxDensity?.det3?.soil || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Volume (cm³)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity1?.volume || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity2?.volume || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.maxDensity3?.volume || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6, fontWeight: 'bold' }]}>γd (g/cm³)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontSize: 6, fontWeight: 'bold' }]}>{(calculations?.maxDensity?.det1?.gammaDMax || 0).toFixed(3)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontSize: 6, fontWeight: 'bold' }]}>{(calculations?.maxDensity?.det2?.gammaDMax || 0).toFixed(3)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontSize: 6, fontWeight: 'bold' }]}>{(calculations?.maxDensity?.det3?.gammaDMax || 0).toFixed(3)}</Text>
+            </View>
+          </View>
+        </View>
 
-      {/* Densidade Mínima */}
-      <MaxMinDensityTable data={data.minDensity || data} type="min" />
+        {/* Densidade Mínima */}
+        <View style={[styles.multiColumnTable, { width: '48%' }]}>
+          <Text style={[styles.sectionTitle, { fontSize: 9 }]}>DENSIDADE MÍNIMA</Text>
+          <View style={styles.tableRow}>
+            <View style={[styles.headerCell, { width: '40%' }]}>
+              <Text style={[styles.headerText, { fontSize: 7 }]}>Campo</Text>
+            </View>
+            <View style={[styles.headerCell, { width: '20%' }]}>
+              <Text style={[styles.headerText, { fontSize: 7 }]}>Det 1</Text>
+            </View>
+            <View style={[styles.headerCell, { width: '20%' }]}>
+              <Text style={[styles.headerText, { fontSize: 7 }]}>Det 2</Text>
+            </View>
+            <View style={[styles.headerCell, { width: '20%' }]}>
+              <Text style={[styles.headerText, { fontSize: 7 }]}>Det 3</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Nº Cilindro</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{data.minDensity1?.cylinderNumber || '-'}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{data.minDensity2?.cylinderNumber || '-'}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{data.minDensity3?.cylinderNumber || '-'}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Molde + Solo (g)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity1?.moldeSolo || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity2?.moldeSolo || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity3?.moldeSolo || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Molde (g)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity1?.molde || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity2?.molde || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity3?.molde || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Solo (g)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(calculations?.minDensity?.det1?.soil || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(calculations?.minDensity?.det2?.soil || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(calculations?.minDensity?.det3?.soil || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6 }]}>Volume (cm³)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity1?.volume || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity2?.volume || 0).toFixed(2)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%' }]}>
+              <Text style={[styles.dataText, { fontSize: 6 }]}>{(data.minDensity3?.volume || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '40%' }]}>
+              <Text style={[styles.labelText, { fontSize: 6, fontWeight: 'bold' }]}>γd (g/cm³)</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontSize: 6, fontWeight: 'bold' }]}>{(calculations?.minDensity?.det1?.gammaDMin || 0).toFixed(3)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontSize: 6, fontWeight: 'bold' }]}>{(calculations?.minDensity?.det2?.gammaDMin || 0).toFixed(3)}</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '20%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontSize: 6, fontWeight: 'bold' }]}>{(calculations?.minDensity?.det3?.gammaDMin || 0).toFixed(3)}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
 
       {/* Tabela de umidade com cálculos detalhados */}
       <View style={styles.verticalTable}>
@@ -869,121 +1105,154 @@ export const RealDensityVerticalDocument: React.FC<{ data: any; calculations: an
       {/* Cabeçalho em duas colunas */}
       <TwoColumnHeader data={data} />
 
-      {/* Dados específicos do ensaio de densidade real */}
+      {/* Dados específicos do ensaio de densidade real - 2 determinações */}
       <View style={styles.multiColumnTable}>
         <Text style={styles.sectionTitle}>DETERMINAÇÕES - DENSIDADE REAL</Text>
         <View style={styles.tableRow}>
-          <View style={[styles.headerCell, { width: '40%' }]}>
+          <View style={[styles.headerCell, { width: '50%' }]}>
             <Text style={styles.headerText}>Campo</Text>
           </View>
-          <View style={[styles.headerCell, { width: '20%' }]}>
+          <View style={[styles.headerCell, { width: '25%' }]}>
             <Text style={styles.headerText}>Det 1</Text>
           </View>
-          <View style={[styles.headerCell, { width: '20%' }]}>
+          <View style={[styles.headerCell, { width: '25%' }]}>
             <Text style={styles.headerText}>Det 2</Text>
           </View>
-          <View style={[styles.headerCell, { width: '20%' }]}>
-            <Text style={styles.headerText}>Det 3</Text>
-          </View>
         </View>
         <View style={styles.tableRow}>
-          <View style={[styles.labelCell, { width: '40%' }]}>
+          <View style={[styles.labelCell, { width: '50%' }]}>
             <Text style={styles.labelText}>Picnômetro</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{data.det1?.picnometer || '-'}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{data.det2?.picnometer || '-'}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
-            <Text style={styles.dataText}>{data.det3?.picnometer || '-'}</Text>
-          </View>
         </View>
         <View style={styles.tableRow}>
-          <View style={[styles.labelCell, { width: '40%' }]}>
+          <View style={[styles.labelCell, { width: '50%' }]}>
             <Text style={styles.labelText}>Pic + Solo + Água (g)</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{(data.det1?.picSoilWater || 0).toFixed(2)}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{(data.det2?.picSoilWater || 0).toFixed(2)}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
-            <Text style={styles.dataText}>{(data.det3?.picSoilWater || 0).toFixed(2)}</Text>
-          </View>
         </View>
         <View style={styles.tableRow}>
-          <View style={[styles.labelCell, { width: '40%' }]}>
+          <View style={[styles.labelCell, { width: '50%' }]}>
             <Text style={styles.labelText}>Picnômetro + Água (g)</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{(data.det1?.picWater || 0).toFixed(2)}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{(data.det2?.picWater || 0).toFixed(2)}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
-            <Text style={styles.dataText}>{(data.det3?.picWater || 0).toFixed(2)}</Text>
-          </View>
         </View>
         <View style={styles.tableRow}>
-          <View style={[styles.labelCell, { width: '40%' }]}>
+          <View style={[styles.labelCell, { width: '50%' }]}>
             <Text style={styles.labelText}>Peso do Solo Seco (g)</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{(data.det1?.drySoilWeight || 0).toFixed(2)}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{(data.det2?.drySoilWeight || 0).toFixed(2)}</Text>
-          </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
-            <Text style={styles.dataText}>{(data.det3?.drySoilWeight || 0).toFixed(2)}</Text>
           </View>
         </View>
         <View style={styles.tableRow}>
-          <View style={[styles.labelCell, { width: '40%' }]}>
+          <View style={[styles.labelCell, { width: '50%' }]}>
             <Text style={styles.labelText}>Temperatura (°C)</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{(data.det1?.temperature || 0).toFixed(1)}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
+          <View style={[styles.dataCell, { width: '25%' }]}>
             <Text style={styles.dataText}>{(data.det2?.temperature || 0).toFixed(1)}</Text>
           </View>
-          <View style={[styles.dataCell, { width: '20%' }]}>
-            <Text style={styles.dataText}>{(data.det3?.temperature || 0).toFixed(1)}</Text>
+        </View>
+        
+        {/* Tabela de cálculos intermediários */}
+        <View style={styles.tableRow}>
+          <View style={[styles.labelCell, { width: '50%' }]}>
+            <Text style={styles.labelText}>Densidade da água na temp. (g/cm³)</Text>
+          </View>
+          <View style={[styles.dataCell, { width: '25%' }]}>
+            <Text style={styles.dataText}>{(calculations?.det1?.waterDensity || 1.000).toFixed(4)}</Text>
+          </View>
+          <View style={[styles.dataCell, { width: '25%' }]}>
+            <Text style={styles.dataText}>{(calculations?.det2?.waterDensity || 1.000).toFixed(4)}</Text>
+          </View>
+        </View>
+        <View style={styles.tableRow}>
+          <View style={[styles.labelCell, { width: '50%' }]}>
+            <Text style={styles.labelText}>Volume água deslocada (cm³)</Text>
+          </View>
+          <View style={[styles.dataCell, { width: '25%' }]}>
+            <Text style={styles.dataText}>{(calculations?.det1?.displacedWaterVolume || 0).toFixed(2)}</Text>
+          </View>
+          <View style={[styles.dataCell, { width: '25%' }]}>
+            <Text style={styles.dataText}>{(calculations?.det2?.displacedWaterVolume || 0).toFixed(2)}</Text>
+          </View>
+        </View>
+        <View style={styles.tableRow}>
+          <View style={[styles.labelCell, { width: '50%' }]}>
+            <Text style={[styles.labelText, { fontWeight: 'bold' }]}>Densidade real (g/cm³)</Text>
+          </View>
+          <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
+            <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det1?.realDensity || 0).toFixed(3)}</Text>
+          </View>
+          <View style={[styles.dataCell, { width: '25%', backgroundColor: '#f0f0f0' }]}>
+            <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.det2?.realDensity || 0).toFixed(3)}</Text>
           </View>
         </View>
       </View>
 
-      {/* Resultados */}
+      {/* Resultados estatísticos finais */}
       <View style={styles.resultSection}>
-        <Text style={styles.resultTitle}>RESULTADOS FINAIS</Text>
+        <Text style={styles.sectionTitle}>CÁLCULOS E RESULTADOS FINAIS</Text>
         <View style={styles.verticalTable}>
           <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text style={styles.labelText}>Densidade Real Média (g/cm³):</Text>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={[styles.labelText, { fontWeight: 'bold' }]}>Densidade Real Média (g/cm³):</Text>
             </View>
-            <View style={styles.dataCell}>
-              <Text style={styles.resultValue}>{(calculations?.results?.realDensity || 0).toFixed(3)}</Text>
+            <View style={[styles.dataCell, { width: '40%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.results?.realDensity || 0).toFixed(3)}</Text>
             </View>
           </View>
           <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
               <Text style={styles.labelText}>Desvio Padrão:</Text>
             </View>
-            <View style={styles.dataCell}>
-              <Text style={styles.resultValue}>{(calculations?.results?.standardDeviation || 0).toFixed(4)}</Text>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{(calculations?.results?.standardDeviation || 0).toFixed(4)}</Text>
             </View>
           </View>
           <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
               <Text style={styles.labelText}>Coeficiente de Variação (%):</Text>
             </View>
-            <View style={styles.dataCell}>
-              <Text style={styles.resultValue}>{(calculations?.results?.coefficientVariation || 0).toFixed(2)}</Text>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{(calculations?.results?.coefficientVariation || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Método:</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{data.method || 'ABNT NBR 6508'}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Observações:</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{data.observations || 'Ensaio realizado conforme norma'}</Text>
             </View>
           </View>
         </View>
