@@ -147,11 +147,50 @@ export default function Laboratory() {
             </div>
           </div>
           
-          {/* Lista de ensaios seria aqui */}
+          {/* Lista de ensaios salvos */}
           <div className="flex-1 p-4">
-            <div className="text-center text-gray-500 py-8">
-              <FileText size={48} className="mx-auto mb-2 opacity-50" />
-              <p>Lista de ensaios salvos aparecerá aqui</p>
+            <div className="space-y-2">
+              {/* Ensaio 1 - Densidade Real */}
+              <div 
+                onClick={() => setLocation('/solos/densidade-real?load=1')}
+                className="p-3 border rounded cursor-pointer hover:bg-gray-50 hover:border-blue-300 transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">⚛️</span>
+                  <div className="flex-1">
+                    <div className="font-medium text-sm">Ensaio_1</div>
+                    <div className="text-xs text-gray-500">Densidade Real • ID: 1</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Ensaio 2 - Densidade Máx/Mín */}
+              <div 
+                onClick={() => setLocation('/solos/densidade-max-min?load=2')}
+                className="p-3 border rounded cursor-pointer hover:bg-gray-50 hover:border-blue-300 transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">↕️</span>
+                  <div className="flex-1">
+                    <div className="font-medium text-sm">Ensaio_2</div>
+                    <div className="text-xs text-gray-500">Densidade Máx/Mín • ID: 2</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Ensaio 3 - Densidade Máx/Mín */}
+              <div 
+                onClick={() => setLocation('/solos/densidade-max-min?load=3')}
+                className="p-3 border rounded cursor-pointer hover:bg-gray-50 hover:border-blue-300 transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">↕️</span>
+                  <div className="flex-1">
+                    <div className="font-medium text-sm">Ensaio_3</div>
+                    <div className="text-xs text-gray-500">Densidade Máx/Mín • ID: 3</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
