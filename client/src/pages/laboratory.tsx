@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FlaskRound, Save, PanelLeftOpen, PanelLeftClose, BarChart3 } from "lucide-react";
+import { FlaskRound, Save, PanelLeftOpen, PanelLeftClose, BarChart3, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useLocation } from "wouter";
@@ -182,6 +182,35 @@ export default function Laboratory() {
 
         {/* Main Content */}
         <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Botão para ensaios salvos - mais visível */}
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Ensaios de Laboratório</h2>
+              <p className="text-gray-600">Gerencie e execute ensaios geotécnicos</p>
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                variant="outline"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="flex items-center gap-2"
+              >
+                <FileText size={16} />
+                {sidebarOpen ? 'Fechar Lista' : 'Ensaios Salvos (3)'}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setTestId(undefined);
+                  setMode('new');
+                  window.location.hash = activeTab;
+                }}
+              >
+                <span className="mr-2">+</span>
+                Novo Ensaio
+              </Button>
+            </div>
+          </div>
+          
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-white border sticky top-0 z-10">
               <TabsTrigger 
