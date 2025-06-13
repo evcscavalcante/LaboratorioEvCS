@@ -381,12 +381,22 @@ async function startServer() {
     }
   });
 
+  // Health check endpoint
+  app.get('/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'OK', 
+      timestamp: new Date().toISOString(),
+      port: port,
+      host: host
+    });
+  });
+
   // Serve static files
   app.use(express.static('client'));
   
   // Serve the main HTML file for all non-API routes
   app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
       res.sendFile(path.resolve('client/index.html'));
     }
   });
@@ -398,12 +408,15 @@ async function startServer() {
   });
 
   const port = parseInt(process.env.PORT || "5000");
-  server.listen(port, "0.0.0.0", () => {
+  const host = process.env.HOST || "0.0.0.0";
+  
+  server.listen(port, host, () => {
     console.log(`✅ Usuário administrador evcsousa@yahoo.com.br atualizado no banco de dados`);
     console.log(`🚀 Servidor híbrido iniciado na porta ${port}`);
     console.log(`🔥 Firebase Authentication (Frontend)`);
     console.log(`🐘 PostgreSQL Database (Backend)`);
     console.log(`🔐 Autenticação híbrida configurada`);
+    console.log(`🌐 Servidor acessível em: http://${host}:${port}`);
   });
 }
 
