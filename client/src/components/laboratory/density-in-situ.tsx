@@ -81,10 +81,13 @@ export default function DensityInSitu() {
   // Mutation para salvar ensaio
   const saveTestMutation = useMutation({
     mutationFn: async (testData: any) => {
+      console.log("🔄 Enviando dados do ensaio:", testData);
       const response = await apiRequest("POST", "/api/tests/density-in-situ", testData);
+      console.log("📡 Resposta da API:", response);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      console.log("✅ Ensaio salvo com sucesso:", result);
       toast({
         title: "Ensaio salvo com sucesso",
         description: "O ensaio foi salvo no banco de dados.",
@@ -93,7 +96,7 @@ export default function DensityInSitu() {
       localStorage.removeItem('density-in-situ-progress');
     },
     onError: (error: any) => {
-      console.error('Erro ao salvar ensaio:', error);
+      console.error('❌ Erro ao salvar ensaio:', error);
       toast({
         title: "Erro ao salvar ensaio",
         description: "Não foi possível salvar o ensaio no banco de dados.",
@@ -266,6 +269,16 @@ export default function DensityInSitu() {
   };
 
   const handleSave = () => {
+    // Validação básica dos campos obrigatórios
+    if (!data.registrationNumber || !data.operator || !data.material) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha pelo menos Registro, Operador e Material",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const testData = {
       registrationNumber: data.registrationNumber,
       date: data.date,
@@ -296,9 +309,20 @@ export default function DensityInSitu() {
         det2: data.moistureBase2,
         det3: data.moistureBase3
       },
-      results: calculations.results
+      results: {
+        gammaDTop: calculations.det1.gammaNatDry || 0,
+        gammaDBase: calculations.det2.gammaNatDry || 0,
+        voidIndex: 0,
+        relativeCompactness: calculations.results.relativeCompactness || 0,
+        voidIndexTop: 0,
+        voidIndexBase: 0,
+        relativeCompactnessTop: 0,
+        relativeCompactnessBase: 0,
+        status: "AGUARDANDO" as const
+      }
     };
 
+    console.log("🔄 Preparando para salvar ensaio:", testData);
     saveTestMutation.mutate(testData);
   };
 
