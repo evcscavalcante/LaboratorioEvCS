@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import session from "express-session";
 import cors from "cors";
+import path from "path";
 import { db } from "./db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
@@ -384,13 +385,7 @@ async function startServer() {
   if (process.env.NODE_ENV === "production") {
     app.use(express.static("dist/public"));
     app.get("*", (_req, res) => {
-      res.sendFile(require("path").resolve("dist/public/index.html"));
-    });
-  } else {
-    // Development - serve from client directory and handle SPA routing
-    app.use(express.static("client/public"));
-    app.get("*", (_req, res) => {
-      res.sendFile(require("path").resolve("client/index.html"));
+      res.sendFile(path.resolve("dist/public/index.html"));
     });
   }
 
