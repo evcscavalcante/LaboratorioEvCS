@@ -25,6 +25,8 @@ import { localDataManager } from '@/lib/local-storage';
 import { notificationManager } from '@/lib/notification-system';
 import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 interface DashboardStats {
   totalTests: number;
@@ -75,22 +77,35 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      const [densityInSitu, densityReal, densityMaxMin, balanceData] = await Promise.all([
-        localDataManager.getDensityInSituTests(),
-        localDataManager.getDensityRealTests(),
-        localDataManager.getDensityMaxMinTests(),
+      // Carregar dados do PostgreSQL
+      const [densityInSituResponse, realDensityResponse, maxMinDensityResponse, balanceData] = await Promise.all([
+        apiRequest('GET', '/api/tests/density-in-situ').then(res => res.json()).catch(() => []),
+        apiRequest('GET', '/api/tests/real-density').then(res => res.json()).catch(() => []),
+        apiRequest('GET', '/api/tests/max-min-density').then(res => res.json()).catch(() => []),
         localDataManager.getBalanceVerifications()
       ]);
 
+      const densityInSitu = densityInSituResponse || [];
+      const densityReal = realDensityResponse || [];
+      const densityMaxMin = maxMinDensityResponse || [];
       const allTests = [...densityInSitu, ...densityReal, ...densityMaxMin];
       
       // Calculate statistics
       const totalTests = allTests.length;
       const today = new Date();
       
-      const todayTests = allTests.filter(test => isToday(new Date(test.dataEnsaio))).length;
-      const weekTests = allTests.filter(test => isThisWeek(new Date(test.dataEnsaio))).length;
-      const monthTests = allTests.filter(test => isThisMonth(new Date(test.dataEnsaio))).length;
+      const todayTests = allTests.filter(test => {
+        const testDate = test.date || test.dataEnsaio;
+        return testDate && isToday(new Date(testDate));
+      }).length;
+      const weekTests = allTests.filter(test => {
+        const testDate = test.date || test.dataEnsaio;
+        return testDate && isThisWeek(new Date(testDate));
+      }).length;
+      const monthTests = allTests.filter(test => {
+        const testDate = test.date || test.dataEnsaio;
+        return testDate && isThisMonth(new Date(testDate));
+      }).length;
 
       // Count pending calibrations (example logic)
       const pendingCalibrations = balanceData.filter(item => {
@@ -114,7 +129,11 @@ export default function Dashboard() {
       
       // Add recent tests
       allTests
-        .sort((a, b) => new Date(b.dataEnsaio).getTime() - new Date(a.dataEnsaio).getTime())
+        .sort((a, b) => {
+          const dateA = new Date(a.date || a.dataEnsaio || a.createdAt);
+          const dateB = new Date(b.date || b.dataEnsaio || b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        })
         .slice(0, 3)
         .forEach(test => {
           let type: RecentActivity['type'] = 'density_in_situ';
@@ -128,12 +147,16 @@ export default function Dashboard() {
             title = 'Densidade Máx/Mín';
           }
 
+          const testDate = test.date || test.dataEnsaio || test.createdAt;
+          const location = test.origin || test.localizacao || test.registrationNumber || 'Local não especificado';
+          const operator = test.operator || test.responsavel || 'Operador não especificado';
+
           activities.push({
             id: `test_${test.id}`,
             type,
-            title: `${title} - ${test.localizacao}`,
-            subtitle: `Por ${test.responsavel} • ${format(new Date(test.dataEnsaio), 'dd/MM/yyyy', { locale: ptBR })}`,
-            timestamp: new Date(test.dataEnsaio),
+            title: `${title} - ${location}`,
+            subtitle: `Por ${operator} • ${format(new Date(testDate), 'dd/MM/yyyy', { locale: ptBR })}`,
+            timestamp: new Date(testDate),
             status: 'completed'
           });
         });
