@@ -29,13 +29,13 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: 'bold',
     color: '#1976D2',
-    marginBottom: 8,
-    marginTop: 12,
+    marginBottom: 4,
+    marginTop: 6,
     backgroundColor: '#F5F5F5',
-    padding: 4,
+    padding: 2,
     textAlign: 'center',
   },
   verticalTable: {
@@ -47,14 +47,14 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: 'row',
-    minHeight: 18,
+    minHeight: 14,
   },
   labelCell: {
     width: '40%',
     borderStyle: 'solid',
     borderWidth: 0.5,
     borderColor: '#000000',
-    padding: 4,
+    padding: 2,
     backgroundColor: '#F0F0F0',
   },
   dataCell: {
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 0.5,
     borderColor: '#000000',
-    padding: 4,
+    padding: 2,
   },
   labelText: {
     fontSize: 8,
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 0.5,
     borderColor: '#000000',
-    padding: 4,
+    padding: 2,
     backgroundColor: '#1976D2',
   },
   headerText: {
@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
   },
   resultSection: {
     backgroundColor: '#F8F9FA',
-    padding: 8,
-    marginTop: 12,
+    padding: 4,
+    marginTop: 6,
     borderWidth: 1,
     borderColor: '#E0E0E0',
   },
@@ -614,8 +614,60 @@ export const DensityInSituVerticalDocument: React.FC<{ data: any; calculations: 
         }}
       />
 
-      {/* Resultados Completos */}
-      <CompleteResultsTable data={data} calculations={calculations} />
+      {/* Resultados Finais Simplificados */}
+      <View style={styles.resultSection}>
+        <Text style={styles.sectionTitle}>RESULTADOS FINAIS</Text>
+        <View style={styles.verticalTable}>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Volume do cilindro (cm³):</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{(data.cylinderVolume || calculations?.cylinderVolume || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Peso úmido total (g):</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{(data.wetWeight || calculations?.wetWeight || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Densidade úmida (g/cm³):</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{(calculations?.wetDensity || calculations?.results?.wetDensity || 0).toFixed(3)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Umidade média (%):</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{(calculations?.averageMoisture || calculations?.results?.averageMoisture || 0).toFixed(2)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={[styles.labelText, { fontWeight: 'bold' }]}>Densidade seca média (g/cm³):</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%', backgroundColor: '#f0f0f0' }]}>
+              <Text style={[styles.dataText, { fontWeight: 'bold' }]}>{(calculations?.finalDensity || calculations?.results?.dryDensity || 0).toFixed(3)}</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={[styles.labelCell, { width: '60%' }]}>
+              <Text style={styles.labelText}>Grau de compactação (%):</Text>
+            </View>
+            <View style={[styles.dataCell, { width: '40%' }]}>
+              <Text style={styles.dataText}>{(calculations?.compactionDegree || calculations?.results?.relativeCompactness || 0).toFixed(1)}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
 
       {/* Footer */}
       <View style={styles.footer}>
