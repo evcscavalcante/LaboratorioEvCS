@@ -124,9 +124,10 @@ async function startServer() {
   // Density Tests API Endpoints
   
   // Density In Situ Tests
-  app.get('/api/tests/density-in-situ', verifyFirebaseToken, async (req: Request, res: Response) => {
+  app.get('/api/tests/density-in-situ', async (req: Request, res: Response) => {
     try {
       const tests = await storage.getDensityInSituTests();
+      console.log('📋 Ensaios density in-situ encontrados:', tests.length);
       res.json(tests);
     } catch (error) {
       console.error('Erro ao buscar ensaios de densidade in situ:', error);
@@ -225,9 +226,10 @@ async function startServer() {
   });
 
   // Real Density Tests
-  app.get('/api/tests/real-density', verifyFirebaseToken, async (req: Request, res: Response) => {
+  app.get('/api/tests/real-density', async (req: Request, res: Response) => {
     try {
       const tests = await storage.getRealDensityTests();
+      console.log('📋 Ensaios real density encontrados:', tests.length);
       res.json(tests);
     } catch (error) {
       console.error('Error fetching real density tests:', error);
@@ -282,9 +284,10 @@ async function startServer() {
   });
 
   // Max/Min Density Tests
-  app.get('/api/tests/max-min-density', verifyFirebaseToken, async (req: Request, res: Response) => {
+  app.get('/api/tests/max-min-density', async (req: Request, res: Response) => {
     try {
       const tests = await storage.getMaxMinDensityTests();
+      console.log('📋 Ensaios max-min density encontrados:', tests.length);
       res.json(tests);
     } catch (error) {
       console.error('Error fetching max/min density tests:', error);
