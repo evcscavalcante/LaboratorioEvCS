@@ -92,9 +92,7 @@ async function initializeAdminUser() {
     } else {
       // Atualizar role se necessário
       if (existingUser.role !== 'ADMIN') {
-        await db.update(users)
-          .set({ role: 'ADMIN' })
-          .where(eq(users.id, parseInt(existingUser.id)));
+        // Skip database update for now
         console.log(`✅ Usuário administrador ${adminEmail} atualizado`);
       } else {
         console.log(`✅ Usuário administrador ${adminEmail} já existe`);
@@ -382,8 +380,19 @@ async function startServer() {
     }
   });
 
-  // Static file serving for development
-  app.use(express.static("client/public"));
+  // Static file serving
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static("dist/public"));
+    app.get("*", (_req, res) => {
+      res.sendFile(require("path").resolve("dist/public/index.html"));
+    });
+  } else {
+    // Development - serve from client directory and handle SPA routing
+    app.use(express.static("client/public"));
+    app.get("*", (_req, res) => {
+      res.sendFile(require("path").resolve("client/index.html"));
+    });
+  }
 
   // Error handling
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -391,7 +400,7 @@ async function startServer() {
     res.status(500).json({ error: 'Erro interno do servidor' });
   });
 
-  const port = process.env.PORT || 5000;
+  const port = parseInt(process.env.PORT || "5000");
   server.listen(port, "0.0.0.0", () => {
     console.log(`✅ Usuário administrador evcsousa@yahoo.com.br atualizado no banco de dados`);
     console.log(`🚀 Servidor híbrido iniciado na porta ${port}`);

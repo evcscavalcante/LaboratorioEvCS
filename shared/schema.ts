@@ -46,12 +46,18 @@ export const sessions = pgTable(
 );
 
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 255 }).primaryKey(),
   firebase_uid: varchar("firebase_uid", { length: 255 }).unique(),
+  username: varchar("username", { length: 255 }).unique(),
   email: varchar("email", { length: 255 }).unique(),
   name: varchar("name", { length: 255 }).notNull(),
-  role: varchar("role", { length: 50 }).notNull().default("TECHNICIAN"),
+  password: varchar("password", { length: 255 }),
+  role: varchar("role", { length: 50 }).notNull().default("VIEWER"),
   organizationId: integer("organization_id").references(() => organizations.id),
+  firstName: varchar("first_name", { length: 255 }),
+  lastName: varchar("last_name", { length: 255 }),
+  profileImageUrl: varchar("profile_image_url", { length: 500 }),
+  isActive: boolean("is_active").default(true),
   permissions: json("permissions").$type<string[]>(),
   active: boolean("active").default(true),
   lastLogin: timestamp("last_login"),

@@ -216,6 +216,7 @@ export class MemStorage implements IStorage {
     const userId = userData.id || String(Date.now());
     const user: User = {
       id: userId,
+      firebase_uid: userData.firebase_uid || null,
       username: userData.username || userData.email?.split('@')[0] || 'user',
       name: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
       email: userData.email || null,
@@ -243,6 +244,7 @@ export class MemStorage implements IStorage {
     
     const user: User = {
       id: userId,
+      firebase_uid: userData.firebase_uid || null,
       username: userData.username || userData.email?.split('@')[0] || 'user',
       name: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
       email: userData.email || null,
