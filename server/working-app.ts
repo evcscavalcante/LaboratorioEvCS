@@ -91,7 +91,7 @@ app.get('/api/density-in-situ', mockAuth, (req, res) => {
   res.json([]);
 });
 
-app.post('/api/density-in-situ', mockAuth, (req, res) => {
+app.post('/api/density-in-situ', mockAuth, (req: any, res) => {
   const test = {
     id: Date.now(),
     ...req.body,
@@ -106,7 +106,7 @@ app.get('/api/real-density', mockAuth, (req, res) => {
   res.json([]);
 });
 
-app.post('/api/real-density', mockAuth, (req, res) => {
+app.post('/api/real-density', mockAuth, (req: any, res) => {
   const test = {
     id: Date.now(),
     ...req.body,
@@ -121,7 +121,7 @@ app.get('/api/max-min-density', mockAuth, (req, res) => {
   res.json([]);
 });
 
-app.post('/api/max-min-density', mockAuth, (req, res) => {
+app.post('/api/max-min-density', mockAuth, (req: any, res) => {
   const test = {
     id: Date.now(),
     ...req.body,
