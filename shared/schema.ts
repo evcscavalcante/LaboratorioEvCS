@@ -49,6 +49,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   firebase_uid: varchar("firebase_uid", { length: 255 }).unique(),
   email: varchar("email", { length: 255 }).unique(),
+  username: varchar("username", { length: 255 }).unique(),
   name: varchar("name", { length: 255 }).notNull(),
   role: varchar("role", { length: 50 }).notNull().default("TECHNICIAN"),
   organizationId: integer("organization_id").references(() => organizations.id),

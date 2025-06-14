@@ -1,10 +1,12 @@
 import '@testing-library/jest-dom';
+import 'cross-fetch/polyfill';
 import { initializeTestEnvironment, RulesTestEnvironment } from '@firebase/rules-unit-testing';
 
 // Mock environment variables for testing
 process.env.VITE_FIREBASE_PROJECT_ID = 'test-project-id';
 process.env.VITE_FIREBASE_API_KEY = 'test-api-key';
 process.env.VITE_FIREBASE_APP_ID = 'test-app-id';
+process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 
 // Global test environment setup
 let testEnv: RulesTestEnvironment;
@@ -23,10 +25,6 @@ beforeAll(async () => {
           }
         }
       `,
-    },
-    auth: {
-      uid: 'test-user',
-      email: 'test@example.com',
     },
   });
 });
