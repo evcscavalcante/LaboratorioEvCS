@@ -217,20 +217,16 @@ export class MemStorage implements IStorage {
     const user: User = {
       id: userId,
       username: userData.username || userData.email?.split('@')[0] || 'user',
-      name: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+      name: userData.name || '',
       email: userData.email || null,
-      password: userData.password || '',
       role: userData.role || 'VIEWER',
       organizationId: userData.organizationId || null,
-      firstName: userData.firstName || null,
-      lastName: userData.lastName || null,
-      profileImageUrl: userData.profileImageUrl || null,
-      isActive: userData.isActive !== undefined ? userData.isActive : true,
-      active: userData.active !== undefined ? userData.active : true,
       permissions: userData.permissions || null,
+      active: userData.active !== undefined ? userData.active : true,
       createdAt: new Date(),
       updatedAt: new Date(),
-      lastLogin: null
+      lastLogin: null,
+      firebase_uid: null
     };
     
     this.users.set(user.id, user);
@@ -238,26 +234,22 @@ export class MemStorage implements IStorage {
   }
 
   async upsertUser(userData: any): Promise<User> {
-    const existingUser = userData.id ? this.users.get(userData.id) : null;
+    const existingUser = userData.id ? this.users.get(String(userData.id)) : null;
     const userId = userData.id || String(Date.now());
     
     const user: User = {
       id: userId,
       username: userData.username || userData.email?.split('@')[0] || 'user',
-      name: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+      name: userData.name || '',
       email: userData.email || null,
-      password: userData.password || '',
       role: userData.role || 'VIEWER',
       organizationId: userData.organizationId || null,
-      firstName: userData.firstName || null,
-      lastName: userData.lastName || null,
-      profileImageUrl: userData.profileImageUrl || null,
-      isActive: userData.isActive !== undefined ? userData.isActive : true,
-      active: userData.active !== undefined ? userData.active : true,
       permissions: userData.permissions || null,
+      active: userData.active !== undefined ? userData.active : true,
       createdAt: existingUser?.createdAt || new Date(),
       updatedAt: new Date(),
-      lastLogin: existingUser?.lastLogin || null
+      lastLogin: existingUser?.lastLogin || null,
+      firebase_uid: existingUser?.firebase_uid || null
     };
     
     this.users.set(user.id, user);
@@ -265,6 +257,5 @@ export class MemStorage implements IStorage {
   }
 }
 
-import { DatabaseStorage } from "./storage-database";
-
-export const storage = new DatabaseStorage();
+// Default to an in-memory storage implementation during development
+export const storage = new MemStorage();

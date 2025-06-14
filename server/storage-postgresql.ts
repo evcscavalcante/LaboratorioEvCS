@@ -135,7 +135,7 @@ export class PostgreSQLStorage implements IStorage {
   // Density In Situ Methods
   async createDensityInSituTest(insertTest: InsertDensityInSituTest): Promise<DensityInSituTest> {
     try {
-      const [test] = await db.insert(densityInSituTests).values(insertTest).returning();
+      const [test] = await db.insert(densityInSituTests).values(insertTest as any).returning();
       return test;
     } catch (error) {
       console.error('Error creating density in situ test:', error);
@@ -166,7 +166,7 @@ export class PostgreSQLStorage implements IStorage {
     try {
       const [updatedTest] = await db
         .update(densityInSituTests)
-        .set(updates)
+        .set(updates as any)
         .where(eq(densityInSituTests.id, id))
         .returning();
       return updatedTest || undefined;
@@ -189,7 +189,7 @@ export class PostgreSQLStorage implements IStorage {
   // Real Density Methods
   async createRealDensityTest(insertTest: InsertRealDensityTest): Promise<RealDensityTest> {
     try {
-      const [test] = await db.insert(realDensityTests).values(insertTest).returning();
+      const [test] = await db.insert(realDensityTests).values(insertTest as any).returning();
       return test;
     } catch (error) {
       console.error('Error creating real density test:', error);
@@ -220,7 +220,7 @@ export class PostgreSQLStorage implements IStorage {
     try {
       const [updatedTest] = await db
         .update(realDensityTests)
-        .set(updates)
+        .set(updates as any)
         .where(eq(realDensityTests.id, id))
         .returning();
       return updatedTest || undefined;
@@ -243,7 +243,7 @@ export class PostgreSQLStorage implements IStorage {
   // Max Min Density Methods
   async createMaxMinDensityTest(insertTest: InsertMaxMinDensityTest): Promise<MaxMinDensityTest> {
     try {
-      const [test] = await db.insert(maxMinDensityTests).values(insertTest).returning();
+      const [test] = await db.insert(maxMinDensityTests).values(insertTest as any).returning();
       return test;
     } catch (error) {
       console.error('Error creating max min density test:', error);
@@ -274,7 +274,7 @@ export class PostgreSQLStorage implements IStorage {
     try {
       const [updatedTest] = await db
         .update(maxMinDensityTests)
-        .set(updates)
+        .set(updates as any)
         .where(eq(maxMinDensityTests.id, id))
         .returning();
       return updatedTest || undefined;
